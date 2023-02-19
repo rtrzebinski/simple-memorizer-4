@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"log"
@@ -61,9 +62,20 @@ type ExercisesHandler struct {
 }
 
 func (h *ExercisesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp := []byte("{\"question\":\"What is your name?\", \"answer\":\"Robert\"}")
+	var ex Exercise
 
-	w.Write(resp)
+	const query = `SELECT question, answer FROM exercise ORDER BY random() LIMIT 1`
+
+	if err := h.db.QueryRow(query).Scan(&ex.Question, &ex.Answer); err != nil {
+		fmt.Println(err)
+	}
+
+	encoded, err := json.Marshal(ex)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Write(encoded)
 }
 
 // hello is a component that displays a simple "Hello World!". A component is a
@@ -105,35 +117,6 @@ func (h *hello) exercises() (string, string) {
 	}
 
 	return exercise.Question, exercise.Answer
-
-	//var question string
-	//var answer string
-	//
-	//const query = `SELECT question, answer FROM exercise`
-	//
-	//if err := h.db.QueryRow(query).Scan(&question, &answer); err != nil {
-	//	fmt.Println(err)
-	//}
-	//
-	//return question, answer
-
-	//capitals := map[string]string{
-	//	"Poland":      "Warsaw",
-	//	"Germany":     "Berlin",
-	//	"France":      "Paris",
-	//	"Netherlands": "Amsterdam",
-	//	"Spain":       "Madrid",
-	//}
-	//
-	//i := rand.Intn(len(capitals))
-	//for k := range capitals {
-	//	if i == 0 {
-	//		return k, capitals[k]
-	//	}
-	//	i--
-	//}
-	//
-	//panic("never")
 }
 
 // The Render method is where the component appearance is defined.
@@ -173,17 +156,19 @@ func (h *hello) Render() app.UI {
 				Style("margin-right", "10px"),
 		),
 		app.H2().Body(
+			app.Text("What is the capital of "),
 			app.If(h.question != "",
 				app.Text(h.question),
 			).Else(
-				app.Text("..."),
+				app.Text(""),
 			),
+			app.Text("?"),
 		),
 		app.H2().Body(
 			app.If(h.answer != "",
 				app.Text(h.answer),
 			).Else(
-				app.Text("?"),
+				app.Text(""),
 			),
 		).Hidden(!h.showAnswer),
 		app.P().Body(
