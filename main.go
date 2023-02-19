@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
+	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"log"
-	"math/rand"
 	"net/http"
 )
 
@@ -30,6 +32,12 @@ func main() {
 	// instructions.
 	app.RunWhenOnBrowser()
 
+	// connect DB
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable")
+	if err != nil {
+		log.Fatalf("Error opening DB: %v", err)
+	}
+
 	// Finally, launching the server that serves the app is done by using the Go
 	// standard HTTP package.
 	//
@@ -41,9 +49,21 @@ func main() {
 		Description: "An Hello World! example",
 	})
 
+	http.Handle("/exercises", &ExercisesHandler{db})
+
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+type ExercisesHandler struct {
+	db *sql.DB
+}
+
+func (h *ExercisesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resp := []byte("{\"question\":\"What is your name?\", \"answer\":\"Robert\"}")
+
+	w.Write(resp)
 }
 
 // hello is a component that displays a simple "Hello World!". A component is a
@@ -62,9 +82,58 @@ type hello struct {
 // init fetch random exercises, showAnswer question, hide answer
 func (h *hello) init() {
 	h.showAnswer = false
-	question, answer := exercises()
+	question, answer := h.exercises()
 	h.question = question
 	h.answer = answer
+}
+
+type Exercise struct {
+	Question string
+	Answer   string
+}
+
+func (h *hello) exercises() (string, string) {
+
+	resp, err := http.Get("http://localhost:8000/exercises")
+	if err != nil {
+		panic(err)
+	}
+
+	var exercise Exercise
+	if err := json.NewDecoder(resp.Body).Decode(&exercise); err != nil {
+		panic(err)
+	}
+
+	return exercise.Question, exercise.Answer
+
+	//var question string
+	//var answer string
+	//
+	//const query = `SELECT question, answer FROM exercise`
+	//
+	//if err := h.db.QueryRow(query).Scan(&question, &answer); err != nil {
+	//	fmt.Println(err)
+	//}
+	//
+	//return question, answer
+
+	//capitals := map[string]string{
+	//	"Poland":      "Warsaw",
+	//	"Germany":     "Berlin",
+	//	"France":      "Paris",
+	//	"Netherlands": "Amsterdam",
+	//	"Spain":       "Madrid",
+	//}
+	//
+	//i := rand.Intn(len(capitals))
+	//for k := range capitals {
+	//	if i == 0 {
+	//		return k, capitals[k]
+	//	}
+	//	i--
+	//}
+	//
+	//panic("never")
 }
 
 // The Render method is where the component appearance is defined.
@@ -104,13 +173,11 @@ func (h *hello) Render() app.UI {
 				Style("margin-right", "10px"),
 		),
 		app.H2().Body(
-			app.Text("What is the capital of "),
 			app.If(h.question != "",
 				app.Text(h.question),
 			).Else(
 				app.Text("..."),
 			),
-			app.Text("?"),
 		),
 		app.H2().Body(
 			app.If(h.answer != "",
@@ -128,24 +195,4 @@ func (h *hello) Render() app.UI {
 			app.Text(h.badAnswers),
 		),
 	)
-}
-
-func exercises() (string, string) {
-	capitals := map[string]string{
-		"Poland":      "Warsaw",
-		"Germany":     "Berlin",
-		"France":      "Paris",
-		"Netherlands": "Amsterdam",
-		"Spain":       "Madrid",
-	}
-
-	i := rand.Intn(len(capitals))
-	for k := range capitals {
-		if i == 0 {
-			return k, capitals[k]
-		}
-		i--
-	}
-
-	panic("never")
 }

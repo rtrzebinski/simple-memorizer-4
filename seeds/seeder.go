@@ -32,11 +32,22 @@ func (s Seeder) ExerciseSeed() {
 		panic(err)
 	}
 
-	// execute query
-	_, err = stmt.Exec("Foo", "Bar")
-	if err != nil {
-		panic(err)
+	capitals := map[string]string{
+		"Poland":      "Warsaw",
+		"Germany":     "Berlin",
+		"France":      "Paris",
+		"Netherlands": "Amsterdam",
+		"Spain":       "Madrid",
 	}
+
+	for q, a := range capitals {
+		// execute query
+		_, err = stmt.Exec(q, a)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
