@@ -58,12 +58,13 @@ db: ## Database CLI client connection
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 5430 --host localhost
 
 build: ## Build client and server
-	GOARCH=wasm GOOS=js go build -o web/app.wasm
-	go build
+	@GOARCH=wasm GOOS=js go build -o web/app.wasm
+	@go build
 
 run: ## Build and run locally
-	make build
-	go run main.go
+	@make build
+	@echo "Running on http://localhost:8000"
+	@go run main.go
 
 test: ## Test all
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)"
