@@ -1,19 +1,17 @@
-# simple-memorizer-go
+### simple-memorizer-go
 
-WIP - SM go client with go-app
+WIP - simple-memorizer-go web app built with go-app
 
-Just build the server:
-
-```shell
-make build
 ```
-
-Build the server and run:
-
-```shell
+make start
+make migrate
 make run
 ```
 
 Open -> http://localhost:8000
 
+### Documentation
+
 https://go-app.dev/getting-started
+
+[Dev documentation - local environment](https://github.com/rtrzebinski/simple-memorizer-go/wiki/Dev-documentation---local-environment) 

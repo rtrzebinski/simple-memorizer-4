@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  sm-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - '5430:5432'
