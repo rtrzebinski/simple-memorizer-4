@@ -5,6 +5,7 @@ WIP - simple-memorizer-go web app built with go-app
 ```
 make start
 make migrate
+make seed
 make run
 ```
 
