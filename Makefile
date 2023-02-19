@@ -6,6 +6,7 @@ SERVICE_NAME=sm
 
 build:
 	GOARCH=wasm GOOS=js go build -o web/app.wasm
+	go build
 
 run:
 	make build
