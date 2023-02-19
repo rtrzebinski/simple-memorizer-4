@@ -19,6 +19,9 @@ test-short:
 	@echo "$(OK_COLOR)==> Running short tests$(NO_COLOR)"
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
 
+db:
+	@PGPASSWORD=postgres psql -U postgres -d postgres --port 5430 --host localhost
+
 migrate:
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" up
 
