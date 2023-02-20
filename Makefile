@@ -30,7 +30,7 @@ stop: ## Stop containers (docker compose down)
 	@echo "$(OK_COLOR)==> Bringing containers down for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./docker-compose.yml down
 
-reload: stop start ## Stop and start again
+restart: stop start ## Stop and start again
 
 destroy: ## Stop and remove volumes
 	@echo "$(OK_COLOR)==> Bringing containers down and removing volumes for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -46,11 +46,14 @@ migrate: ## Run migrations (migrate up)
 migrate-down: ## Revert migrations (migrate down)
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" down
 
+migrate-drop: ## Drop database without confirmation (migrate drop)
+	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" drop -f
+
 seed: ## Seed the database with example data
 	@go run seeds/seeder.go
 
-reseed: ## Destroy, recreate and seed database
-	@make migrate-down
+reseed: ## Destroy, recreate and seed database (no confirmation)
+	@make migrate-drop
 	@make migrate
 	@make seed
 
@@ -73,3 +76,11 @@ test: ## Test all
 test-short: ## Test short (unit)
 	@echo "$(OK_COLOR)==> Running short tests$(NO_COLOR)"
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
+
+dev: ## Stop + Start + Migrate + Seed + Run (no confirmation)
+	@make stop
+	@make start
+	@sleep 1 # Wait for the db to be ready
+	@make migrate
+	@make seed
+	@make run

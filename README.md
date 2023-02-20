@@ -4,11 +4,7 @@ WIP - simple-memorizer-go web app built with go-app
 
 ```
 make help
-
-make start
-make migrate
-make seed
-make run
+make dev
 ```
 
 Open -> http://localhost:8000
