@@ -15,3 +15,4 @@
 # vendor/
 
 simple-memorizer-go
+web/app.wasm
