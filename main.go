@@ -93,6 +93,8 @@ type hello struct {
 
 // init fetch random exercises, showAnswer question, hide answer
 func (h *hello) init() {
+	log.Println("Hello module init..")
+
 	h.showAnswer = false
 	question, answer := h.exercises()
 	h.question = question
@@ -105,6 +107,7 @@ type Exercise struct {
 }
 
 func (h *hello) exercises() (string, string) {
+	log.Println("Loading exercises..")
 
 	resp, err := http.Get("http://localhost:8000/exercises")
 	if err != nil {
@@ -121,6 +124,8 @@ func (h *hello) exercises() (string, string) {
 
 // The Render method is where the component appearance is defined.
 func (h *hello) Render() app.UI {
+	log.Println("Rendering UI..")
+
 	// will be re-run on every button click
 	if h.question == "" && h.answer == "" {
 		h.init()

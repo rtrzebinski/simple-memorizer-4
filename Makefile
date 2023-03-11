@@ -24,11 +24,11 @@ help: ## Show this help
 
 start: ## Start containers (docker compose up)
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml up -d
+	@docker-compose -f ./docker-compose.yml up -d --remove-orphans
 
 stop: ## Stop containers (docker compose down)
 	@echo "$(OK_COLOR)==> Bringing containers down for $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml down
+	@docker-compose -f ./docker-compose.yml down --remove-orphans
 
 restart: stop start ## Stop and start again
 
@@ -41,15 +41,19 @@ ps: ## Show running containers
 	@docker-compose -f ./docker-compose.yml ps
 
 migrate: ## Run migrations (migrate up)
+	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" up
 
 migrate-down: ## Revert migrations (migrate down)
+	@echo "$(OK_COLOR)==> Reverting db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" down
 
 migrate-drop: ## Drop database without confirmation (migrate drop)
+	@echo "$(OK_COLOR)==> Dropping db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" drop -f
 
 seed: ## Seed the database with example data
+	@echo "$(OK_COLOR)==> Seeding the db for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go run seeds/seeder.go
 
 reseed: ## Destroy, recreate and seed database (no confirmation)
@@ -58,29 +62,36 @@ reseed: ## Destroy, recreate and seed database (no confirmation)
 	@make seed
 
 db: ## Database CLI client connection
+	@echo "$(OK_COLOR)==> Connecting to the db of $(SERVICE_NAME)... $(NO_COLOR)"
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 5430 --host localhost
 
 build: ## Build client and server
+	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
 	@GOARCH=wasm GOOS=js go build -o web/app.wasm
 	@go build
+	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 run: ## Build and run locally
 	@make build
-	@echo "Running on http://localhost:8000"
+	@echo "$(OK_COLOR)==> Running on http://localhost:8000 $(NO_COLOR)"
 	@go run main.go
 
 test: ## Test all
-	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go test -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
+	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 test-short: ## Test short (unit)
-	@echo "$(OK_COLOR)==> Running short tests$(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running short tests for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
+	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-dev: ## Stop + Start + Migrate + Seed + Run (no confirmation)
+dev: ## Prepare dev environment (stop + start + migrate + seed)
+	@echo "$(OK_COLOR)==> Prepare dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
 	@make stop
 	@make start
-	@sleep 1 # Wait for the db to be ready
+	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
+	@sleep 1
 	@make migrate
 	@make seed
-	@make run
+	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
