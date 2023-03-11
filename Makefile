@@ -32,7 +32,7 @@ stop: ## Stop containers (docker compose down)
 
 restart: stop start ## Stop and start containers
 
-destroy: ## Stop and remove volumes
+destroy: ## Stop containers and remove volumes
 	@echo "$(OK_COLOR)==> Bringing containers down and removing volumes for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./docker-compose.yml down --rmi all --volumes
 
@@ -40,15 +40,15 @@ ps: ## Show running containers
 	@echo "$(OK_COLOR)==> Checking containers status of $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./docker-compose.yml ps
 
-migrate: ## Run migrations (migrate up)
+migrate: ## Run db migrations (migrate up)
 	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" up
 
-migrate-down: ## Revert migrations (migrate down)
+migrate-down: ## Revert db migrations (migrate down)
 	@echo "$(OK_COLOR)==> Reverting db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" down
 
-migrate-drop: ## Drop the database without a confirmation (migrate drop)
+migrate-drop: ## Drop db without confirmation (migrate drop)
 	@echo "$(OK_COLOR)==> Dropping db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" drop -f
 
@@ -61,7 +61,7 @@ reseed: ## Destroy, recreate and seed the database (no confirmation)
 	@make migrate
 	@make seed
 
-db: ## Database CLI client connection
+db: ## Db CLI client connection
 	@echo "$(OK_COLOR)==> Connecting to the db of $(SERVICE_NAME)... $(NO_COLOR)"
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 5430 --host localhost
 
