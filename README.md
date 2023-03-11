@@ -9,14 +9,14 @@ target                         help
 help                           Show this help
 start                          Start containers (docker compose up)
 stop                           Stop containers (docker compose down)
-restart                        Stop and start again
+restart                        Stop and start containers
 destroy                        Stop and remove volumes
 ps                             Show running containers
 migrate                        Run migrations (migrate up)
 migrate-down                   Revert migrations (migrate down)
-migrate-drop                   Drop database without confirmation (migrate drop)
-seed                           Seed the database with example data
-reseed                         Destroy, recreate and seed database (no confirmation)
+migrate-drop                   Drop the database without a confirmation (migrate drop)
+seed                           Seed the database with some example data
+reseed                         Destroy, recreate and seed the database (no confirmation)
 db                             Database CLI client connection
 build                          Build client and server
 run                            Build and run locally
