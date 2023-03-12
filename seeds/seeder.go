@@ -47,7 +47,6 @@ func (s Seeder) ExerciseSeed() {
 			panic(err)
 		}
 	}
-
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
