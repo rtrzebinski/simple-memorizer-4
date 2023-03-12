@@ -106,13 +106,17 @@ type hello struct {
 }
 
 // init fetch random exercises, showAnswer question, hide answer
-func (h *hello) init() {
+func (h *hello) init(host string) {
 	log.Println("Hello module init..")
 
 	h.showAnswer = false
-	question, answer := h.exercises()
+	question, answer := h.exercises(host)
 	h.question = question
 	h.answer = answer
+}
+
+func (h *hello) OnMount(ctx app.Context) {
+	h.init(app.Window().URL().Host)
 }
 
 type Exercise struct {
@@ -120,10 +124,10 @@ type Exercise struct {
 	Answer   string
 }
 
-func (h *hello) exercises() (string, string) {
+func (h *hello) exercises(host string) (string, string) {
 	log.Println("Loading exercises..")
 
-	resp, err := http.Get("http://localhost:8000/exercises")
+	resp, err := http.Get("http://" + host + "/exercises")
 	if err != nil {
 		panic(err)
 	}
@@ -140,17 +144,12 @@ func (h *hello) exercises() (string, string) {
 func (h *hello) Render() app.UI {
 	log.Println("Rendering UI..")
 
-	// will be re-run on every button click
-	if h.question == "" && h.answer == "" {
-		h.init()
-	}
-
 	return app.Div().Body(
 		app.P().Body(
 			app.Button().
 				Text("Next exercise").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.init()
+					h.init(app.Window().URL().Host)
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
@@ -163,14 +162,14 @@ func (h *hello) Render() app.UI {
 				Text("Good Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					h.goodAnswers++
-					h.init()
+					h.init(app.Window().URL().Host)
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
 				Text("Bad Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					h.badAnswers++
-					h.init()
+					h.init(app.Window().URL().Host)
 				}).
 				Style("margin-right", "10px"),
 		),
