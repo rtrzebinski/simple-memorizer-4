@@ -14,6 +14,8 @@ import (
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
 func main() {
+	log.Println("start main..")
+
 	// The first thing to do is to associate the hello component with a path.
 	//
 	// This is done by calling the Route() function,  which tells go-app what
