@@ -4,17 +4,29 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"log"
 	"net/http"
 )
 
+type config struct {
+	Db struct {
+		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
+		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable"`
+	}
+}
+
 // The main function is the entry point where the app is configured and started.
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
 func main() {
-	log.Println("start main..")
+	// Configuration
+	var cfg config
+	if err := envconfig.Process("", &cfg); err != nil {
+		log.Fatalf("failed to load the env vars: %v", err)
+	}
 
 	// The first thing to do is to associate the hello component with a path.
 	//
@@ -36,7 +48,7 @@ func main() {
 	app.RunWhenOnBrowser()
 
 	// connect DB
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable")
+	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
 	if err != nil {
 		log.Fatalf("Error opening DB: %v", err)
 	}
