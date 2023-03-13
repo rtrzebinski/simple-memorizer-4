@@ -20,9 +20,7 @@ func seed(s Seeder, seedMethodName string) {
 		log.Fatal("No method called ", seedMethodName)
 	}
 	// Execute the method
-	log.Println("Seeding ", seedMethodName, "...")
 	m.Call(nil)
-	log.Println("Seeder ", seedMethodName, " succeeded")
 }
 
 func (s Seeder) ExerciseSeed() {

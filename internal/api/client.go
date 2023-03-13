@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/models"
-	"log"
 	"net/http"
 )
 
@@ -21,8 +20,6 @@ func (c *Client) SetScheme(scheme string) {
 }
 
 func (c *Client) FetchExercise() models.Exercise {
-	log.Println("Fetching exercise from the API..")
-
 	resp, err := http.Get(c.scheme + "://" + c.host + Exercises)
 	if err != nil {
 		panic(err)

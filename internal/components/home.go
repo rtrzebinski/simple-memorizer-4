@@ -3,7 +3,6 @@ package components
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/api"
-	"log"
 )
 
 // A Home component
@@ -27,8 +26,6 @@ func NewHome(client api.Client) *Home {
 
 // fetchExercise fetch random exercises, showAnswer question, hide answer
 func (h *Home) fetchExercise() {
-	log.Println("Home component fetch exercise..")
-
 	h.showAnswer = false
 	exercise := h.client.FetchExercise()
 	h.question = exercise.Question
@@ -37,8 +34,6 @@ func (h *Home) fetchExercise() {
 
 // The OnMount method is run once component is mounted
 func (h *Home) OnMount(ctx app.Context) {
-	log.Println("Home component mounted..")
-
 	// host can only be read from the Window once component is mounted
 	h.client.SetHost(app.Window().URL().Host)
 	// scheme can only be read from the Window once component is mounted
@@ -49,8 +44,6 @@ func (h *Home) OnMount(ctx app.Context) {
 
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
-	log.Println("Home component rendering the UI..")
-
 	return app.Div().Body(
 		app.P().Body(
 			app.Button().
