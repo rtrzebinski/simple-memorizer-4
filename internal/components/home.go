@@ -24,20 +24,6 @@ func NewHome(client api.Client) *Home {
 	}
 }
 
-// nextExercise fetch random exercises, showAnswer question, hide answer
-func (h *Home) nextExercise() {
-	h.showAnswer = false
-	exercise := h.client.GetRandomExercise()
-	h.question = exercise.Question
-	h.answer = exercise.Answer
-}
-
-// The OnMount method is run once component is mounted
-func (h *Home) OnMount(ctx app.Context) {
-	h.client.Configure(app.Window().URL())
-	h.nextExercise()
-}
-
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
@@ -94,4 +80,18 @@ func (h *Home) Render() app.UI {
 			app.Text(h.badAnswers),
 		),
 	)
+}
+
+// The OnMount method is run once component is mounted
+func (h *Home) OnMount(ctx app.Context) {
+	h.client.Configure(app.Window().URL())
+	h.nextExercise()
+}
+
+// nextExercise fetch random exercises, showAnswer question, hide answer
+func (h *Home) nextExercise() {
+	exercise := h.client.GetRandomExercise()
+	h.showAnswer = false
+	h.question = exercise.Question
+	h.answer = exercise.Answer
 }
