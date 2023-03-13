@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/models"
 	"net/http"
+	"net/url"
 )
 
 type Client struct {
@@ -11,12 +12,9 @@ type Client struct {
 	scheme string
 }
 
-func (c *Client) SetHost(host string) {
-	c.host = host
-}
-
-func (c *Client) SetScheme(scheme string) {
-	c.scheme = scheme
+func (c *Client) Configure(url *url.URL) {
+	c.host = url.Host
+	c.scheme = url.Scheme
 }
 
 func (c *Client) GetRandomExercise() models.Exercise {

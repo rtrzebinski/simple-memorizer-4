@@ -24,8 +24,8 @@ func NewHome(client api.Client) *Home {
 	}
 }
 
-// fetchExercise fetch random exercises, showAnswer question, hide answer
-func (h *Home) fetchExercise() {
+// nextExercise fetch random exercises, showAnswer question, hide answer
+func (h *Home) nextExercise() {
 	h.showAnswer = false
 	exercise := h.client.GetRandomExercise()
 	h.question = exercise.Question
@@ -34,12 +34,8 @@ func (h *Home) fetchExercise() {
 
 // The OnMount method is run once component is mounted
 func (h *Home) OnMount(ctx app.Context) {
-	// host can only be read from the Window once component is mounted
-	h.client.SetHost(app.Window().URL().Host)
-	// scheme can only be read from the Window once component is mounted
-	h.client.SetScheme(app.Window().URL().Scheme)
-	// knowing host, fetch and display the initial exercise
-	h.fetchExercise()
+	h.client.Configure(app.Window().URL())
+	h.nextExercise()
 }
 
 // The Render method is where the component appearance is defined.
@@ -49,7 +45,7 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Next exercise").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.fetchExercise()
+					h.nextExercise()
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
@@ -62,14 +58,14 @@ func (h *Home) Render() app.UI {
 				Text("Good Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					h.goodAnswers++
-					h.fetchExercise()
+					h.nextExercise()
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
 				Text("Bad Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					h.badAnswers++
-					h.fetchExercise()
+					h.nextExercise()
 				}).
 				Style("margin-right", "10px"),
 		),
