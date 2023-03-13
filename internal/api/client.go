@@ -19,8 +19,8 @@ func (c *Client) SetScheme(scheme string) {
 	c.scheme = scheme
 }
 
-func (c *Client) FetchExercise() models.Exercise {
-	resp, err := http.Get(c.scheme + "://" + c.host + Exercises)
+func (c *Client) GetRandomExercise() models.Exercise {
+	resp, err := http.Get(c.scheme + "://" + c.host + RandomExercise)
 	if err != nil {
 		panic(err)
 	}

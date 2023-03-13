@@ -1,5 +1,5 @@
 package api
 
 const (
-	Exercises = "/exercises"
+	RandomExercise = "/random-exercise"
 )

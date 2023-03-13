@@ -27,7 +27,7 @@ func NewHome(client api.Client) *Home {
 // fetchExercise fetch random exercises, showAnswer question, hide answer
 func (h *Home) fetchExercise() {
 	h.showAnswer = false
-	exercise := h.client.FetchExercise()
+	exercise := h.client.GetRandomExercise()
 	h.question = exercise.Question
 	h.answer = exercise.Answer
 }

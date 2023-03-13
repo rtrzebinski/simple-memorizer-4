@@ -1,4 +1,4 @@
-package handlers
+package methods
 
 import (
 	"encoding/json"
@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-type ExercisesHandler struct {
+type GetRandomExercise struct {
 	r storage.Reader
 }
 
-func NewExercisesHandler(r storage.Reader) *ExercisesHandler {
-	return &ExercisesHandler{
+func NewExercisesHandler(r storage.Reader) *GetRandomExercise {
+	return &GetRandomExercise{
 		r: r,
 	}
 }
 
-func (h *ExercisesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *GetRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	exercise := h.r.RandomExercise()
 
 	encoded, err := json.Marshal(exercise)
