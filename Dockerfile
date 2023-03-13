@@ -9,4 +9,4 @@ RUN make build
 RUN go build
 
 EXPOSE 8000
-ENTRYPOINT ["/app/simple-memorizer-go"]
+ENTRYPOINT ["/app/simple-memorizer"]

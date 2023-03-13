@@ -67,14 +67,14 @@ db: ## Db CLI client connection
 
 build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
-	@GOARCH=wasm GOOS=js go build -o web/app.wasm
-	@go build
+	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-go/cmd/simple-memorizer
+	@go build github.com/rtrzebinski/simple-memorizer-go/cmd/simple-memorizer
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 run: ## Build and run locally
 	@make build
 	@echo "$(OK_COLOR)==> Running on http://localhost:8000 $(NO_COLOR)"
-	@go run main.go
+	@go run cmd/simple-memorizer/main.go
 
 test: ## Test all
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"
