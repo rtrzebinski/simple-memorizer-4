@@ -41,6 +41,8 @@ func (h *Home) OnMount(ctx app.Context) {
 
 	// host can only be read from the Window once component is mounted
 	h.client.SetHost(app.Window().URL().Host)
+	// scheme can only be read from the Window once component is mounted
+	h.client.SetScheme(app.Window().URL().Scheme)
 	// knowing host, fetch and display the initial exercise
 	h.fetchExercise()
 }

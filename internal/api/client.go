@@ -8,17 +8,22 @@ import (
 )
 
 type Client struct {
-	host string
+	host   string
+	scheme string
 }
 
 func (c *Client) SetHost(host string) {
 	c.host = host
 }
 
+func (c *Client) SetScheme(scheme string) {
+	c.scheme = scheme
+}
+
 func (c *Client) FetchExercise() models.Exercise {
 	log.Println("Fetching exercise from the API..")
 
-	resp, err := http.Get("http://" + c.host + Exercises)
+	resp, err := http.Get(c.scheme + "://" + c.host + Exercises)
 	if err != nil {
 		panic(err)
 	}
