@@ -28,25 +28,17 @@ type config struct {
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
 func main() {
-	log.Println("Main started..")
-
 	// Configuration
 	var cfg config
 	if err := envconfig.Process("", &cfg); err != nil {
 		log.Fatalf("failed to load the env vars: %v", err)
 	}
-	log.Println("Configuration loaded..")
-
-	// API client
-	client := api.Client{}
-	log.Println("API client created..")
 
 	// The first thing to do is to associate the home component with a path.
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", components.NewHome(client))
-	log.Println("Home page client handler set..")
+	app.Route("/", components.NewHome("bar"))
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -60,14 +52,12 @@ func main() {
 	// lets room for server implementation without the need for pre compiling
 	// instructions.
 	app.RunWhenOnBrowser()
-	log.Println("Browser app run..")
 
 	// Database connection
 	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
 	if err != nil {
 		log.Fatalf("Error opening DB: %v", err)
 	}
-	log.Println("Database connected..")
 
 	// Dependencies
 	r := storage.NewSqlReader(db)
@@ -77,7 +67,6 @@ func main() {
 		Name:        "Home",
 		Description: "Home page",
 	})
-	log.Println("Home page server handler set..")
 
 	// Start API server
 	api.ListenAndServe(r, cfg.Api.Port)
