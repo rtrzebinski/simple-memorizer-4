@@ -6,6 +6,8 @@ SERVICE_NAME=sm
 
 default: help
 
+.PHONY: all dev
+
 help: ## Show this help
 	@IFS=$$'\n' ; \
     help_lines=(`fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##/:/'`); \
@@ -24,21 +26,21 @@ help: ## Show this help
 
 start: ## Start containers (docker compose up)
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml up -d --remove-orphans
+	@docker-compose -f ./dev/docker-compose.yml up -d --remove-orphans
 
 stop: ## Stop containers (docker compose down)
 	@echo "$(OK_COLOR)==> Bringing containers down for $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml down --remove-orphans
+	@docker-compose -f ./dev/docker-compose.yml down --remove-orphans
 
 restart: stop start ## Stop and start containers
 
 destroy: ## Stop containers and remove volumes
 	@echo "$(OK_COLOR)==> Bringing containers down and removing volumes for $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml down --rmi all --volumes
+	@docker-compose -f ./dev/docker-compose.yml down --rmi all --volumes
 
 ps: ## Show running containers
 	@echo "$(OK_COLOR)==> Checking containers status of $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./docker-compose.yml ps
+	@docker-compose -f ./dev/docker-compose.yml ps
 
 migrate: ## Run db migrations (migrate up)
 	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
