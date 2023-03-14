@@ -36,10 +36,15 @@ func (c *Client) FetchRandomExercise() models.Exercise {
 }
 
 func (c *Client) IncrementBadAnswers(exerciseId int) {
-	// todo use a struct for the request
-	values := map[string]int{"exercise_id": exerciseId}
-	jsonData, err := json.Marshal(values)
+	type Input struct {
+		ExerciseId int `json:"exercise_id"`
+	}
 
+	input := Input{
+		ExerciseId: exerciseId,
+	}
+
+	jsonData, err := json.Marshal(input)
 	if err != nil {
 		panic(err)
 	}
@@ -60,10 +65,15 @@ func (c *Client) IncrementBadAnswers(exerciseId int) {
 }
 
 func (c *Client) IncrementGoodAnswers(exerciseId int) {
-	// todo use a struct for the request
-	values := map[string]int{"exercise_id": exerciseId}
-	jsonData, err := json.Marshal(values)
+	type Input struct {
+		ExerciseId int `json:"exercise_id"`
+	}
 
+	input := Input{
+		ExerciseId: exerciseId,
+	}
+
+	jsonData, err := json.Marshal(input)
 	if err != nil {
 		panic(err)
 	}
