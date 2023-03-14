@@ -30,20 +30,11 @@ type config struct {
 func main() {
 	log.Println("App started..")
 
-	// Configuration
-	var cfg config
-	if err := envconfig.Process("", &cfg); err != nil {
-		log.Fatalf("failed to load the env vars: %v", err)
-	}
-
-	// API client
-	client := api.Client{}
-
 	// The first thing to do is to associate the home component with a path.
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", components.NewHome(client))
+	app.Route("/", &components.Home{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -57,6 +48,12 @@ func main() {
 	// lets room for server implementation without the need for pre compiling
 	// instructions.
 	app.RunWhenOnBrowser()
+
+	// Configuration
+	var cfg config
+	if err := envconfig.Process("", &cfg); err != nil {
+		log.Fatalf("failed to load the env vars: %v", err)
+	}
 
 	// Database connection
 	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)

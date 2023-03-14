@@ -17,13 +17,6 @@ type Home struct {
 	badAnswers  int
 }
 
-// NewHome component constructor
-func NewHome(client api.Client) *Home {
-	return &Home{
-		client: client,
-	}
-}
-
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
