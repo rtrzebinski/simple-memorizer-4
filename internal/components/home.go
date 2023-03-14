@@ -91,4 +91,6 @@ func (h *Home) nextExercise() {
 	h.showAnswer = false
 	h.question = exercise.Question
 	h.answer = exercise.Answer
+	h.goodAnswers = exercise.GoodAnswers
+	h.badAnswers = exercise.BadAnswers
 }
