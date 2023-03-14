@@ -7,7 +7,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/api"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/components"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-go/internal/storage/postgres"
 	"log"
 	"net/http"
 )
@@ -62,7 +62,8 @@ func main() {
 	}
 
 	// Dependencies
-	r := storage.NewSqlReader(db)
+	r := postgres.NewReader(db)
+	w := postgres.NewWriter(db)
 
 	// Handle home page
 	http.Handle("/", &app.Handler{
@@ -71,5 +72,5 @@ func main() {
 	})
 
 	// Start API server
-	api.ListenAndServe(r, cfg.Api.Port)
+	api.ListenAndServe(r, w, cfg.Api.Port)
 }

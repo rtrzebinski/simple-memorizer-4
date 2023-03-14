@@ -7,17 +7,15 @@ import (
 	"net/http"
 )
 
-type GetRandomExercise struct {
+type FetchRandomExercise struct {
 	r storage.Reader
 }
 
-func NewExercisesHandler(r storage.Reader) *GetRandomExercise {
-	return &GetRandomExercise{
-		r: r,
-	}
+func NewFetchRandomExercise(r storage.Reader) *FetchRandomExercise {
+	return &FetchRandomExercise{r: r}
 }
 
-func (h *GetRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *FetchRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	exercise := h.r.RandomExercise()
 
 	encoded, err := json.Marshal(exercise)

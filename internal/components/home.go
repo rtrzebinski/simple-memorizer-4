@@ -15,6 +15,7 @@ type Home struct {
 	showAnswer  bool
 	goodAnswers int
 	badAnswers  int
+	exerciseId  int
 }
 
 // The Render method is where the component appearance is defined.
@@ -36,6 +37,7 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Good Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
+					go h.client.IncrementGoodAnswers(h.exerciseId)
 					h.goodAnswers++
 					h.nextExercise()
 				}).
@@ -43,6 +45,7 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Bad Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
+					go h.client.IncrementBadAnswers(h.exerciseId)
 					h.badAnswers++
 					h.nextExercise()
 				}).
@@ -83,7 +86,8 @@ func (h *Home) OnMount(ctx app.Context) {
 
 // nextExercise fetch random exercises, showAnswer question, hide answer
 func (h *Home) nextExercise() {
-	exercise := h.client.GetRandomExercise()
+	exercise := h.client.FetchRandomExercise()
+	h.exerciseId = exercise.Id
 	h.showAnswer = false
 	h.question = exercise.Question
 	h.answer = exercise.Answer
