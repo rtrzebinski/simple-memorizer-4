@@ -17,7 +17,7 @@ func NewIncrementBadAnswers(w storage.Writer) *IncrementBadAnswers {
 
 func (h *IncrementBadAnswers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	type Input struct {
-		ExerciseId int `json:"exercise_id"`
+		ExerciseId int
 	}
 
 	var input Input

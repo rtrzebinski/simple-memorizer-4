@@ -37,7 +37,7 @@ func (c *Client) FetchRandomExercise() models.Exercise {
 
 func (c *Client) IncrementBadAnswers(exerciseId int) {
 	type Input struct {
-		ExerciseId int `json:"exercise_id"`
+		ExerciseId int
 	}
 
 	input := Input{
@@ -66,7 +66,7 @@ func (c *Client) IncrementBadAnswers(exerciseId int) {
 
 func (c *Client) IncrementGoodAnswers(exerciseId int) {
 	type Input struct {
-		ExerciseId int `json:"exercise_id"`
+		ExerciseId int
 	}
 
 	input := Input{
