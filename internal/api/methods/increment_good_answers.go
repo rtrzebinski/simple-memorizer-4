@@ -3,12 +3,16 @@ package methods
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
-	"log"
 	"net/http"
 )
 
 type IncrementGoodAnswers struct {
-	w storage.Writer
+	w   storage.Writer
+	req IncrementGoodAnswersReq
+}
+
+type IncrementGoodAnswersReq struct {
+	ExerciseId int
 }
 
 func NewIncrementGoodAnswers(w storage.Writer) *IncrementGoodAnswers {
@@ -16,17 +20,10 @@ func NewIncrementGoodAnswers(w storage.Writer) *IncrementGoodAnswers {
 }
 
 func (h *IncrementGoodAnswers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	type Input struct {
-		ExerciseId int
-	}
-
-	var input Input
-
-	err := json.NewDecoder(r.Body).Decode(&input)
+	err := json.NewDecoder(r.Body).Decode(&h.req)
 	if err != nil {
-		w.WriteHeader(400)
-		log.Println(err.Error())
+		panic(err)
 	}
 
-	h.w.IncrementGoodAnswers(input.ExerciseId)
+	h.w.IncrementGoodAnswers(h.req.ExerciseId)
 }

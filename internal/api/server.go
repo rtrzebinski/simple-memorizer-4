@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/rtrzebinski/simple-memorizer-go/internal/api/methods"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
-	"log"
 	"net/http"
 )
 
@@ -19,6 +18,6 @@ func ListenAndServe(r storage.Reader, w storage.Writer, port string) {
 	http.Handle(IncrementGoodAnswers, methods.NewIncrementGoodAnswers(w))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

@@ -3,7 +3,6 @@ package methods
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
-	"log"
 	"net/http"
 )
 
@@ -20,8 +19,11 @@ func (h *FetchRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	encoded, err := json.Marshal(exercise)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	w.Write(encoded)
+	_, err = w.Write(encoded)
+	if err != nil {
+		panic(err)
+	}
 }

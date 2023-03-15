@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-go/internal/api/methods"
 	"github.com/rtrzebinski/simple-memorizer-go/internal/models"
 	"log"
 	"net/http"
@@ -36,11 +37,7 @@ func (c *Client) FetchRandomExercise() models.Exercise {
 }
 
 func (c *Client) IncrementBadAnswers(exerciseId int) {
-	type Input struct {
-		ExerciseId int
-	}
-
-	input := Input{
+	input := methods.IncrementBadAnswersReq{
 		ExerciseId: exerciseId,
 	}
 
@@ -65,11 +62,7 @@ func (c *Client) IncrementBadAnswers(exerciseId int) {
 }
 
 func (c *Client) IncrementGoodAnswers(exerciseId int) {
-	type Input struct {
-		ExerciseId int
-	}
-
-	input := Input{
+	input := methods.IncrementGoodAnswersReq{
 		ExerciseId: exerciseId,
 	}
 

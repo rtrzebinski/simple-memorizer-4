@@ -1,9 +1,9 @@
-### simple-memorizer-go
+### simple-memorizer-4
 
-WIP - simple-memorizer-go web app built with go-app
+Work in progress - a proof of concept for simple-memorizer web app built with go-app.
 
 ```
-$ make
+simple-memorizer-4 $ make
 target                         help
 ------                         ----
 help                           Show this help
