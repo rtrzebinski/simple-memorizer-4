@@ -13,8 +13,6 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-// todo add unique key to exercise_result.exercise_id
-
 func (w *Writer) IncrementBadAnswers(exerciseId int) {
 	// check for existing exercise result
 	query := `SELECT id FROM exercise_result where exercise_id = $1`
