@@ -2,7 +2,7 @@ package components
 
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/api"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/api"
 )
 
 // A Home component

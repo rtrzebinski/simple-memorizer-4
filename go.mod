@@ -1,4 +1,4 @@
-module github.com/rtrzebinski/simple-memorizer-go
+module github.com/rtrzebinski/simple-memorizer-4
 
 go 1.19
 

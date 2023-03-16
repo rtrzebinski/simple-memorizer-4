@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-go/internal/api/methods"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/api/methods"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"net/http"
 )
 

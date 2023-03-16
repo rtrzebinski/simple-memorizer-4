@@ -29,4 +29,4 @@ dev                            Prepare dev environment (stop + start + migrate +
 
 https://go-app.dev/getting-started
 
-[Dev documentation - local environment](https://github.com/rtrzebinski/simple-memorizer-go/wiki/Dev-documentation---local-environment) 
+[Dev documentation - local environment](https://github.com/rtrzebinski/simple-memorizer-4/wiki/Dev-documentation---local-environment) 

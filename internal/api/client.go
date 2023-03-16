@@ -3,8 +3,8 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/api/methods"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/api/methods"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"log"
 	"net/http"
 	"net/url"

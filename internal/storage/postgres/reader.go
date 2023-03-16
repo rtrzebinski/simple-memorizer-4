@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
 type Reader struct {

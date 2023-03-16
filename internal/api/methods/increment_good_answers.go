@@ -2,7 +2,7 @@ package methods
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-go/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"net/http"
 )
 
