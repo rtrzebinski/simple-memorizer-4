@@ -9,9 +9,9 @@ target                         help
 help                           Show this help
 start                          Start containers (docker compose up)
 stop                           Stop containers (docker compose down)
+ps                             Show running containers
 restart                        Stop and start containers
 destroy                        Stop containers and remove volumes
-ps                             Show running containers
 migrate                        Run db migrations (migrate up)
 migrate-down                   Revert db migrations (migrate down)
 migrate-drop                   Drop db without confirmation (migrate drop)

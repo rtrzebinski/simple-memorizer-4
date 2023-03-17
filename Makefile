@@ -32,15 +32,15 @@ stop: ## Stop containers (docker compose down)
 	@echo "$(OK_COLOR)==> Bringing containers down for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml down --remove-orphans
 
+ps: ## Show running containers
+	@echo "$(OK_COLOR)==> Checking containers status of $(SERVICE_NAME)... $(NO_COLOR)"
+	@docker-compose -f ./dev/docker-compose.yml ps
+
 restart: stop start ## Stop and start containers
 
 destroy: ## Stop containers and remove volumes
 	@echo "$(OK_COLOR)==> Bringing containers down and removing volumes for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml down --rmi all --volumes
-
-ps: ## Show running containers
-	@echo "$(OK_COLOR)==> Checking containers status of $(SERVICE_NAME)... $(NO_COLOR)"
-	@docker-compose -f ./dev/docker-compose.yml ps
 
 migrate: ## Run db migrations (migrate up)
 	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
