@@ -2,13 +2,13 @@ package components
 
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/client"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 )
 
 // A Home component
 type Home struct {
 	app.Compo
-	api client.ApiClient
+	api frontend.ApiClient
 
 	question    string
 	answer      string

@@ -6,7 +6,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/client/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage/postgres"
 	"log"
