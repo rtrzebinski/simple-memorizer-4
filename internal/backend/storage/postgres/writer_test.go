@@ -8,6 +8,8 @@ import (
 )
 
 func TestIncrementBadAnswers(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -64,6 +66,8 @@ func TestIncrementBadAnswers(t *testing.T) {
 }
 
 func TestIncrementGoodAnswers(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}

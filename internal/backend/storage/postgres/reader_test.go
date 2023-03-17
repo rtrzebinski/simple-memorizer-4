@@ -9,6 +9,8 @@ import (
 )
 
 func TestRandomExercise(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
