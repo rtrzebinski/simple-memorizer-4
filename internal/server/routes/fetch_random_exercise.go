@@ -14,7 +14,7 @@ func NewFetchRandomExercise(r storage.Reader) *FetchRandomExercise {
 	return &FetchRandomExercise{r: r}
 }
 
-func (h *FetchRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	exercise := h.r.RandomExercise()
 
 	encoded, err := json.Marshal(exercise)
@@ -22,7 +22,7 @@ func (h *FetchRandomExercise) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		panic(err)
 	}
 
-	_, err = w.Write(encoded)
+	_, err = res.Write(encoded)
 	if err != nil {
 		panic(err)
 	}

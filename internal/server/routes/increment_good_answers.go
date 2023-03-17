@@ -19,8 +19,8 @@ func NewIncrementGoodAnswers(w storage.Writer) *IncrementGoodAnswers {
 	return &IncrementGoodAnswers{w: w}
 }
 
-func (h *IncrementGoodAnswers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := json.NewDecoder(r.Body).Decode(&h.req)
+func (h *IncrementGoodAnswers) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.req)
 	if err != nil {
 		panic(err)
 	}

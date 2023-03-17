@@ -11,17 +11,17 @@ import (
 	"net/url"
 )
 
-type Api struct {
+type ApiClient struct {
 	host   string
 	scheme string
 }
 
-func (c *Api) Configure(url *url.URL) {
+func (c *ApiClient) Configure(url *url.URL) {
 	c.host = url.Host
 	c.scheme = url.Scheme
 }
 
-func (c *Api) FetchRandomExercise() models.Exercise {
+func (c *ApiClient) FetchRandomExercise() models.Exercise {
 	resp, err := http.Get(c.scheme + "://" + c.host + server.FetchRandomExercise)
 	if err != nil {
 		panic(err)
@@ -37,19 +37,19 @@ func (c *Api) FetchRandomExercise() models.Exercise {
 	return exercise
 }
 
-func (c *Api) IncrementBadAnswers(exerciseId int) {
+func (c *ApiClient) IncrementBadAnswers(exerciseId int) {
 	input := routes.IncrementBadAnswersReq{
 		ExerciseId: exerciseId,
 	}
 
-	jsonData, err := json.Marshal(input)
+	body, err := json.Marshal(input)
 	if err != nil {
 		panic(err)
 	}
 
 	urlAddress := c.scheme + "://" + c.host + server.IncrementBadAnswers
 	contentType := "application/json"
-	buffer := bytes.NewBuffer(jsonData)
+	buffer := bytes.NewBuffer(body)
 
 	resp, err := http.Post(urlAddress, contentType, buffer)
 
@@ -62,19 +62,19 @@ func (c *Api) IncrementBadAnswers(exerciseId int) {
 	log.Println(resp.StatusCode)
 }
 
-func (c *Api) IncrementGoodAnswers(exerciseId int) {
+func (c *ApiClient) IncrementGoodAnswers(exerciseId int) {
 	input := routes.IncrementGoodAnswersReq{
 		ExerciseId: exerciseId,
 	}
 
-	jsonData, err := json.Marshal(input)
+	body, err := json.Marshal(input)
 	if err != nil {
 		panic(err)
 	}
 
 	urlAddress := c.scheme + "://" + c.host + server.IncrementGoodAnswers
 	contentType := "application/json"
-	buffer := bytes.NewBuffer(jsonData)
+	buffer := bytes.NewBuffer(body)
 
 	resp, err := http.Post(urlAddress, contentType, buffer)
 

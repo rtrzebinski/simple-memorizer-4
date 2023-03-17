@@ -7,6 +7,6 @@ type Reader interface {
 }
 
 type Writer interface {
-	IncrementGoodAnswers(exerciseId int)
 	IncrementBadAnswers(exerciseId int)
+	IncrementGoodAnswers(exerciseId int)
 }

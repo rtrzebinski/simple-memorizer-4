@@ -8,7 +8,7 @@ import (
 // A Home component
 type Home struct {
 	app.Compo
-	api client.Api
+	api client.ApiClient
 
 	question    string
 	answer      string
