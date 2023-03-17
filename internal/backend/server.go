@@ -1,8 +1,8 @@
-package server
+package backend
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"net/http"
 )
 

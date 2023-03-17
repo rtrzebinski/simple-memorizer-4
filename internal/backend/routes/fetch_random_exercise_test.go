@@ -2,8 +2,8 @@ package routes
 
 import (
 	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

@@ -2,7 +2,7 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"io"
 	"net/http"
 	"net/http/httptest"

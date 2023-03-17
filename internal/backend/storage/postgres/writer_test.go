@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage/entities"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

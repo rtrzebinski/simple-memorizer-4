@@ -3,9 +3,9 @@ package frontend
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/routes"
 	"log"
 	"net/http"
 	"net/url"
@@ -22,7 +22,7 @@ func (c *ApiClient) Configure(url *url.URL) {
 }
 
 func (c *ApiClient) FetchRandomExercise() models.Exercise {
-	resp, err := http.Get(c.scheme + "://" + c.host + server.FetchRandomExercise)
+	resp, err := http.Get(c.scheme + "://" + c.host + backend.FetchRandomExercise)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func (c *ApiClient) IncrementBadAnswers(exerciseId int) {
 		panic(err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + server.IncrementBadAnswers
+	urlAddress := c.scheme + "://" + c.host + backend.IncrementBadAnswers
 	contentType := "application/json"
 	buffer := bytes.NewBuffer(body)
 
@@ -72,7 +72,7 @@ func (c *ApiClient) IncrementGoodAnswers(exerciseId int) {
 		panic(err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + server.IncrementGoodAnswers
+	urlAddress := c.scheme + "://" + c.host + backend.IncrementGoodAnswers
 	contentType := "application/json"
 	buffer := bytes.NewBuffer(body)
 

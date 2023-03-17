@@ -6,9 +6,9 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage/postgres"
 	"log"
 	"net/http"
 )
@@ -80,7 +80,7 @@ func run(ctx context.Context) error {
 	})
 
 	// Start API server
-	if err = server.ListenAndServe(r, w, cfg.Api.Port); err != nil {
+	if err = backend.ListenAndServe(r, w, cfg.Api.Port); err != nil {
 		return err
 	}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage/entities"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"log"
