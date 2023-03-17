@@ -57,6 +57,12 @@ func run(ctx context.Context) error {
 	// instructions.
 	app.RunWhenOnBrowser()
 
+	// Handle home page
+	http.Handle("/", &app.Handler{
+		Name:        "Home",
+		Description: "Home page",
+	})
+
 	// Configuration
 	var cfg config
 	if err := envconfig.Process("", &cfg); err != nil {
@@ -72,12 +78,6 @@ func run(ctx context.Context) error {
 	// Dependencies
 	r := postgres.NewReader(db)
 	w := postgres.NewWriter(db)
-
-	// Handle home page
-	http.Handle("/", &app.Handler{
-		Name:        "Home",
-		Description: "Home page",
-	})
 
 	// Start API server
 	if err = backend.ListenAndServe(r, w, cfg.Api.Port); err != nil {
