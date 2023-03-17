@@ -8,7 +8,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/entities"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage/entities"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"log"
@@ -94,5 +94,5 @@ func newMigrator(db *sql.DB) (*migrate.Migrate, error) {
 		log.Fatalf("failed to create migrator driver: %s", err)
 	}
 
-	return migrate.NewWithDatabaseInstance("file://../../../migrations", "postgres", driver)
+	return migrate.NewWithDatabaseInstance("file://../../../../migrations", "postgres", driver)
 }

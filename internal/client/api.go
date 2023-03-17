@@ -1,27 +1,28 @@
-package api
+package client
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/api/methods"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/server"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/server/routes"
 	"log"
 	"net/http"
 	"net/url"
 )
 
-type Client struct {
+type Api struct {
 	host   string
 	scheme string
 }
 
-func (c *Client) Configure(url *url.URL) {
+func (c *Api) Configure(url *url.URL) {
 	c.host = url.Host
 	c.scheme = url.Scheme
 }
 
-func (c *Client) FetchRandomExercise() models.Exercise {
-	resp, err := http.Get(c.scheme + "://" + c.host + FetchRandomExercise)
+func (c *Api) FetchRandomExercise() models.Exercise {
+	resp, err := http.Get(c.scheme + "://" + c.host + server.FetchRandomExercise)
 	if err != nil {
 		panic(err)
 	}
@@ -36,8 +37,8 @@ func (c *Client) FetchRandomExercise() models.Exercise {
 	return exercise
 }
 
-func (c *Client) IncrementBadAnswers(exerciseId int) {
-	input := methods.IncrementBadAnswersReq{
+func (c *Api) IncrementBadAnswers(exerciseId int) {
+	input := routes.IncrementBadAnswersReq{
 		ExerciseId: exerciseId,
 	}
 
@@ -46,7 +47,7 @@ func (c *Client) IncrementBadAnswers(exerciseId int) {
 		panic(err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + IncrementBadAnswers
+	urlAddress := c.scheme + "://" + c.host + server.IncrementBadAnswers
 	contentType := "application/json"
 	buffer := bytes.NewBuffer(jsonData)
 
@@ -61,8 +62,8 @@ func (c *Client) IncrementBadAnswers(exerciseId int) {
 	log.Println(resp.StatusCode)
 }
 
-func (c *Client) IncrementGoodAnswers(exerciseId int) {
-	input := methods.IncrementGoodAnswersReq{
+func (c *Api) IncrementGoodAnswers(exerciseId int) {
+	input := routes.IncrementGoodAnswersReq{
 		ExerciseId: exerciseId,
 	}
 
@@ -71,7 +72,7 @@ func (c *Client) IncrementGoodAnswers(exerciseId int) {
 		panic(err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + IncrementGoodAnswers
+	urlAddress := c.scheme + "://" + c.host + server.IncrementGoodAnswers
 	contentType := "application/json"
 	buffer := bytes.NewBuffer(jsonData)
 

@@ -1,8 +1,8 @@
-package methods
+package routes
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/server/storage"
 	"net/http"
 )
 

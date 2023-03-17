@@ -2,13 +2,13 @@ package components
 
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/api"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/client"
 )
 
 // A Home component
 type Home struct {
 	app.Compo
-	client api.Client
+	api client.Api
 
 	question    string
 	answer      string
@@ -37,7 +37,7 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Good Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go h.client.IncrementGoodAnswers(h.exerciseId)
+					go h.api.IncrementGoodAnswers(h.exerciseId)
 					h.goodAnswers++
 					h.nextExercise()
 				}).
@@ -45,7 +45,7 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Bad Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go h.client.IncrementBadAnswers(h.exerciseId)
+					go h.api.IncrementBadAnswers(h.exerciseId)
 					h.badAnswers++
 					h.nextExercise()
 				}).
@@ -80,13 +80,13 @@ func (h *Home) Render() app.UI {
 
 // The OnMount method is run once component is mounted
 func (h *Home) OnMount(ctx app.Context) {
-	h.client.Configure(app.Window().URL())
+	h.api.Configure(app.Window().URL())
 	h.nextExercise()
 }
 
 // nextExercise fetch random exercises, showAnswer question, hide answer
 func (h *Home) nextExercise() {
-	exercise := h.client.FetchRandomExercise()
+	exercise := h.api.FetchRandomExercise()
 	h.exerciseId = exercise.Id
 	h.showAnswer = false
 	h.question = exercise.Question
