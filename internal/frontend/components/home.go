@@ -18,6 +18,12 @@ type Home struct {
 	exerciseId  int
 }
 
+// The OnMount method is run once component is mounted
+func (h *Home) OnMount(ctx app.Context) {
+	h.api.Configure(app.Window().URL())
+	h.nextExercise()
+}
+
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
@@ -76,12 +82,6 @@ func (h *Home) Render() app.UI {
 			app.Text(h.badAnswers),
 		),
 	)
-}
-
-// The OnMount method is run once component is mounted
-func (h *Home) OnMount(ctx app.Context) {
-	h.api.Configure(app.Window().URL())
-	h.nextExercise()
 }
 
 // nextExercise fetch random exercises, showAnswer question, hide answer
