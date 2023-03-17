@@ -2,13 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestRandomExercise(t *testing.T) {
+func TestIncrementBadAnswers_notExistingExerciseResult(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -34,7 +33,7 @@ func TestRandomExercise(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := NewReader(db)
+	w := NewWriter(db)
 
 	exercise := &entities.Exercise{
 		Question: "question",
@@ -43,9 +42,10 @@ func TestRandomExercise(t *testing.T) {
 
 	storeExercise(db, exercise)
 
-	res := r.RandomExercise()
+	w.IncrementBadAnswers(exercise.Id)
 
-	assert.IsType(t, models.Exercise{}, res)
-	assert.Equal(t, exercise.Question, res.Question)
-	assert.Equal(t, exercise.Answer, res.Answer)
+	exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
+
+	assert.Equal(t, 1, exerciseResult.BadAnswers)
+	assert.Equal(t, 0, exerciseResult.GoodAnswers)
 }

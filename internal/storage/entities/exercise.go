@@ -5,10 +5,3 @@ type Exercise struct {
 	Question string
 	Answer   string
 }
-
-type ExerciseResult struct {
-	Id          int
-	ExerciseId  int
-	BadAnswers  int
-	GoodAnswers int
-}

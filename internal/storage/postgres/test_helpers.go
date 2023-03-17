@@ -25,6 +25,21 @@ func storeExercise(db *sql.DB, exercise *entities.Exercise) {
 	}
 }
 
+func findExerciseResultByExerciseId(db *sql.DB, exerciseId int) entities.ExerciseResult {
+	var exerciseResult entities.ExerciseResult
+
+	const query = `
+		SELECT er.id, er.exercise_id, er.bad_answers, er.good_answers
+		FROM exercise_result er
+		WHERE er.exercise_id = $1;`
+
+	if err := db.QueryRow(query, exerciseId).Scan(&exerciseResult.Id, &exerciseResult.ExerciseId, &exerciseResult.BadAnswers, &exerciseResult.GoodAnswers); err != nil {
+		panic(err)
+	}
+
+	return exerciseResult
+}
+
 func createPostgresContainer(ctx context.Context, dbname string) (testcontainers.Container, *sql.DB, error) {
 	env := map[string]string{
 		"POSTGRES_PASSWORD": "password",
