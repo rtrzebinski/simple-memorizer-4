@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestIncrementBadAnswers_notExistingExerciseResult(t *testing.T) {
+func TestIncrementBadAnswers(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -42,10 +42,23 @@ func TestIncrementBadAnswers_notExistingExerciseResult(t *testing.T) {
 
 	storeExercise(db, exercise)
 
-	w.IncrementBadAnswers(exercise.Id)
+	t.Run(
+		"not existing exercise result", func(t *testing.T) {
+			w.IncrementBadAnswers(exercise.Id)
 
-	exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
+			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
 
-	assert.Equal(t, 1, exerciseResult.BadAnswers)
-	assert.Equal(t, 0, exerciseResult.GoodAnswers)
+			assert.Equal(t, 1, exerciseResult.BadAnswers)
+			assert.Equal(t, 0, exerciseResult.GoodAnswers)
+		})
+
+	t.Run(
+		"existing exercise result", func(t *testing.T) {
+			w.IncrementBadAnswers(exercise.Id)
+
+			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
+
+			assert.Equal(t, 2, exerciseResult.BadAnswers)
+			assert.Equal(t, 0, exerciseResult.GoodAnswers)
+		})
 }
