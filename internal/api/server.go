@@ -12,12 +12,14 @@ const (
 	IncrementGoodAnswers = "/increment-good-answers"
 )
 
-func ListenAndServe(r storage.Reader, w storage.Writer, port string) {
+func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	http.Handle(FetchRandomExercise, methods.NewFetchRandomExercise(r))
 	http.Handle(IncrementBadAnswers, methods.NewIncrementBadAnswers(w))
 	http.Handle(IncrementGoodAnswers, methods.NewIncrementGoodAnswers(w))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }

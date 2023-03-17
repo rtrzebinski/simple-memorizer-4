@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
@@ -22,12 +23,19 @@ type config struct {
 	}
 }
 
-// todo main -> run and errors handling in one place
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := run(ctx); err != nil {
+		panic(err)
+	}
+}
 
 // The main function is the entry point where the app is configured and started.
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
-func main() {
+func run(ctx context.Context) error {
 	log.Println("App started..")
 
 	// The first thing to do is to associate the home component with a path.
@@ -52,13 +60,13 @@ func main() {
 	// Configuration
 	var cfg config
 	if err := envconfig.Process("", &cfg); err != nil {
-		log.Fatalf("failed to load the env vars: %v", err)
+		return err
 	}
 
 	// Database connection
 	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
 	if err != nil {
-		log.Fatalf("Error opening DB: %v", err)
+		return err
 	}
 
 	// Dependencies
@@ -72,5 +80,9 @@ func main() {
 	})
 
 	// Start API server
-	api.ListenAndServe(r, w, cfg.Api.Port)
+	if err = api.ListenAndServe(r, w, cfg.Api.Port); err != nil {
+		return err
+	}
+
+	return nil
 }
