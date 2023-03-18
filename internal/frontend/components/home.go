@@ -3,12 +3,13 @@ package components
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"net/http"
 )
 
 // A Home component
 type Home struct {
 	app.Compo
-	api frontend.ApiClient
+	api *frontend.ApiClient
 
 	question    string
 	answer      string
@@ -20,7 +21,8 @@ type Home struct {
 
 // The OnMount method is run once component is mounted
 func (h *Home) OnMount(ctx app.Context) {
-	h.api.Configure(app.Window().URL())
+	url := app.Window().URL()
+	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
 	h.nextExercise()
 }
 

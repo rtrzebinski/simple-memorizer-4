@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"log"
 )
 
 type Writer struct {
@@ -30,8 +29,6 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) {
 			panic(err)
 		}
 
-		log.Println("Created exercise_result for bad_answer")
-
 		return
 	}
 
@@ -42,8 +39,6 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) {
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("Incremented exercise_result bad_answers")
 }
 
 func (w *Writer) IncrementGoodAnswers(exerciseId int) {
@@ -63,8 +58,6 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) {
 			panic(err)
 		}
 
-		log.Println("Created exercise_result for good_answer")
-
 		return
 	}
 
@@ -75,6 +68,4 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) {
 	if err != nil {
 		panic(err)
 	}
-
-	log.Println("Incremented exercise_result good_answers")
 }
