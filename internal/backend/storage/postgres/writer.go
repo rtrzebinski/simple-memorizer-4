@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type Writer struct {
@@ -12,7 +13,7 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) IncrementBadAnswers(exerciseId int) {
+func (w *Writer) IncrementBadAnswers(exerciseId int) error {
 	// check for existing exercise result
 	query := `SELECT id FROM exercise_result where exercise_id = $1`
 
@@ -26,10 +27,10 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) {
 
 		_, err := w.db.Exec(query, exerciseId)
 		if err != nil {
-			panic(err)
+			return fmt.Errorf("failed to execute INSERT query: %w", err)
 		}
 
-		return
+		return nil
 	}
 
 	// exercise result exist - increment bad_answers
@@ -37,11 +38,13 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) {
 
 	_, err = w.db.Exec(query, exerciseId)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to execute UPDATE query: %w", err)
 	}
+
+	return nil
 }
 
-func (w *Writer) IncrementGoodAnswers(exerciseId int) {
+func (w *Writer) IncrementGoodAnswers(exerciseId int) error {
 	// check for existing exercise result
 	query := `SELECT id FROM exercise_result where exercise_id = $1`
 
@@ -55,10 +58,10 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) {
 
 		_, err := w.db.Exec(query, exerciseId)
 		if err != nil {
-			panic(err)
+			return fmt.Errorf("failed to execute INSERT query: %w", err)
 		}
 
-		return
+		return nil
 	}
 
 	// exercise result exist - increment good_answers
@@ -66,6 +69,8 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) {
 
 	_, err = w.db.Exec(query, exerciseId)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to execute UPDATE query: %w", err)
 	}
+
+	return nil
 }

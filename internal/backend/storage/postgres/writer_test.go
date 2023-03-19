@@ -46,7 +46,8 @@ func TestIncrementBadAnswers(t *testing.T) {
 
 	t.Run(
 		"not existing exercise result", func(t *testing.T) {
-			w.IncrementBadAnswers(exercise.Id)
+			err := w.IncrementBadAnswers(exercise.Id)
+			assert.NoError(t, err)
 
 			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
 
@@ -56,7 +57,8 @@ func TestIncrementBadAnswers(t *testing.T) {
 
 	t.Run(
 		"existing exercise result", func(t *testing.T) {
-			w.IncrementBadAnswers(exercise.Id)
+			err := w.IncrementBadAnswers(exercise.Id)
+			assert.NoError(t, err)
 
 			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
 
@@ -104,7 +106,8 @@ func TestIncrementGoodAnswers(t *testing.T) {
 
 	t.Run(
 		"not existing exercise result", func(t *testing.T) {
-			w.IncrementGoodAnswers(exercise.Id)
+			err := w.IncrementGoodAnswers(exercise.Id)
+			assert.NoError(t, err)
 
 			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
 
@@ -114,7 +117,8 @@ func TestIncrementGoodAnswers(t *testing.T) {
 
 	t.Run(
 		"existing exercise result", func(t *testing.T) {
-			w.IncrementGoodAnswers(exercise.Id)
+			err := w.IncrementGoodAnswers(exercise.Id)
+			assert.NoError(t, err)
 
 			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
 

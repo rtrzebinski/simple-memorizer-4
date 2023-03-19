@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
@@ -13,7 +14,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) RandomExercise() models.Exercise {
+func (r *Reader) RandomExercise() (models.Exercise, error) {
 	var exercise models.Exercise
 
 	const query = `
@@ -24,8 +25,8 @@ func (r *Reader) RandomExercise() models.Exercise {
 		LIMIT 1`
 
 	if err := r.db.QueryRow(query).Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.GoodAnswers); err != nil {
-		panic(err)
+		return exercise, fmt.Errorf("failed to scan query results: %w", err)
 	}
 
-	return exercise
+	return exercise, nil
 }

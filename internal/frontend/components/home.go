@@ -48,7 +48,9 @@ func (h *Home) Render() app.UI {
 				OnClick(func(ctx app.Context, e app.Event) {
 					go func() {
 						err := h.api.IncrementGoodAnswers(h.exerciseId)
-						app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+						if err != nil {
+							app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+						}
 					}()
 					h.goodAnswers++
 					h.nextExercise()
@@ -59,7 +61,9 @@ func (h *Home) Render() app.UI {
 				OnClick(func(ctx app.Context, e app.Event) {
 					go func() {
 						err := h.api.IncrementBadAnswers(h.exerciseId)
-						app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+						if err != nil {
+							app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+						}
 					}()
 					h.badAnswers++
 					h.nextExercise()

@@ -45,8 +45,9 @@ func TestRandomExercise(t *testing.T) {
 
 	storeExercise(db, exercise)
 
-	res := r.RandomExercise()
+	res, err := r.RandomExercise()
 
+	assert.NoError(t, err)
 	assert.IsType(t, models.Exercise{}, res)
 	assert.Equal(t, exercise.Question, res.Question)
 	assert.Equal(t, exercise.Answer, res.Answer)

@@ -17,15 +17,27 @@ func NewFetchRandomExercise(r storage.Reader) *FetchRandomExercise {
 }
 
 func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	exercise := h.r.RandomExercise()
+	exercise, err := h.r.RandomExercise()
+	if err != nil {
+		log.Print(fmt.Errorf("failed to find a random exercise: %w", err))
+		res.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
 
 	encoded, err := json.Marshal(exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to encode FetchRandomExercise HTTP response: %w", err))
+		res.WriteHeader(http.StatusInternalServerError)
+
+		return
 	}
 
 	_, err = res.Write(encoded)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to write FetchRandomExercise HTTP response: %w", err))
+		res.WriteHeader(http.StatusInternalServerError)
+
+		return
 	}
 }

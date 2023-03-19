@@ -25,7 +25,16 @@ func (h *IncrementBadAnswers) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	err := json.NewDecoder(req.Body).Decode(&h.req)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode IncrementBadAnswers HTTP request: %w", err))
+		res.WriteHeader(http.StatusBadRequest)
+
+		return
 	}
 
-	h.w.IncrementBadAnswers(h.req.ExerciseId)
+	err = h.w.IncrementBadAnswers(h.req.ExerciseId)
+	if err != nil {
+		log.Print(fmt.Errorf("failed to increment bad answers: %w", err))
+		res.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
 }
