@@ -3,6 +3,7 @@ package components
 import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"log"
 	"net/http"
 )
 
@@ -88,7 +89,10 @@ func (h *Home) Render() app.UI {
 
 // nextExercise fetch random exercises, showAnswer question, hide answer
 func (h *Home) nextExercise() {
-	exercise := h.api.FetchRandomExercise()
+	exercise, err := h.api.FetchRandomExercise()
+	if err != nil {
+		log.Println(err)
+	}
 	h.exerciseId = exercise.Id
 	h.showAnswer = false
 	h.question = exercise.Question
