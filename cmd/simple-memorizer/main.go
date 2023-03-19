@@ -61,6 +61,11 @@ func run(ctx context.Context) error {
 	http.Handle("/", &app.Handler{
 		Name:        "Home",
 		Description: "Home page",
+		Icon: app.Icon{
+			Default:    "/web/logo-192.png",
+			Large:      "/web/logo-512.png",
+			AppleTouch: "/web/logo-192.png",
+		},
 	})
 
 	// Configuration
