@@ -2,7 +2,9 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
+	"log"
 	"net/http"
 )
 
@@ -19,11 +21,11 @@ func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	encoded, err := json.Marshal(exercise)
 	if err != nil {
-		panic(err)
+		log.Print(fmt.Errorf("failed to encode FetchRandomExercise HTTP response: %w", err))
 	}
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		panic(err)
+		log.Print(fmt.Errorf("failed to write FetchRandomExercise HTTP response: %w", err))
 	}
 }
