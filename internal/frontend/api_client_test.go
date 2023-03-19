@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"io"
@@ -48,7 +49,8 @@ func (suite *ApiClientSuite) TestFetchRandomExercise() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result := suite.apiClient.FetchRandomExercise()
+	result, err := suite.apiClient.FetchRandomExercise()
+	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercise, result)
 }

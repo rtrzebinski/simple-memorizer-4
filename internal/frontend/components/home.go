@@ -1,9 +1,9 @@
 package components
 
 import (
+	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
-	"log"
 	"net/http"
 )
 
@@ -46,7 +46,10 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Good Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go h.api.IncrementGoodAnswers(h.exerciseId)
+					go func() {
+						err := h.api.IncrementGoodAnswers(h.exerciseId)
+						app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+					}()
 					h.goodAnswers++
 					h.nextExercise()
 				}).
@@ -54,7 +57,10 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Bad Answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go h.api.IncrementBadAnswers(h.exerciseId)
+					go func() {
+						err := h.api.IncrementBadAnswers(h.exerciseId)
+						app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+					}()
 					h.badAnswers++
 					h.nextExercise()
 				}).
@@ -91,7 +97,7 @@ func (h *Home) Render() app.UI {
 func (h *Home) nextExercise() {
 	exercise, err := h.api.FetchRandomExercise()
 	if err != nil {
-		log.Println(err)
+		app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
 	}
 	h.exerciseId = exercise.Id
 	h.showAnswer = false
