@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sm-4-app
+  name: simple-memorizer-4-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: sm-4-app
+      app: simple-memorizer-4-app
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: sm-4-app
+        app: simple-memorizer-4-app
     spec:
       containers:
         - name: simple-memorizer-4
@@ -31,11 +31,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sm-4-app-service
+  name: simple-memorizer-4-service
 spec:
   type: LoadBalancer
   ports:
     - port: 80
       targetPort: 8000
   selector:
-    app: sm-4-app
+    app: simple-memorizer-4-app

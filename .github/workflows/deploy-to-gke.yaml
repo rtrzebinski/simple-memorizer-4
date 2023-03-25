@@ -10,7 +10,7 @@ env:
   IMAGE: simple-memorizer-4
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
-  DEPLOYMENT_NAME: sm-4-app # TODO: update if changed in k8s/deployment.yaml
+  DEPLOYMENT_NAME: simple-memorizer-4-app # TODO: update if changed in k8s/deployment.yaml
 
 jobs:
   build-and-deploy-to-gke:
