@@ -1,4 +1,4 @@
-name: Deploy to GKE
+name: Build and Deploy to GKE
 
 on:
   push:
@@ -10,11 +10,11 @@ env:
   IMAGE: simple-memorizer-4
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
-  DEPLOYMENT_NAME: sm-4-app # TODO: update if changed in deployment.yaml
+  DEPLOYMENT_NAME: sm-4-app # TODO: update if changed in k8s/deployment.yaml
 
 jobs:
-  setup-and-deploy:
-    name: Setup and Deploy
+  build-and-deploy-to-gke:
+    name: Build and Deploy to GKE
     runs-on: ubuntu-latest
 
     # Add "id-token" with the intended permissions
@@ -65,7 +65,8 @@ jobs:
       # Deploy the Docker image to the GKE cluster
       - name: Deploy
         run: |-
-          ./kustomize edit set image gcr.io/project/image=gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
-          ./kustomize build . | kubectl apply -f -
+          cd k8s
+          ../kustomize edit set image gcr.io/project/image=gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
+          ../kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide

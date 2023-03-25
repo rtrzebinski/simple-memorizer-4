@@ -18,7 +18,7 @@ spec:
         app: sm-4-app
     spec:
       containers:
-        - name: hello-app
+        - name: simple-memorizer-4
           image: gcr.io/project/image
           ports:
             - containerPort: 8080
