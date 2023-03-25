@@ -21,7 +21,7 @@ spec:
         - name: simple-memorizer-4
           image: gcr.io/project/image
           ports:
-            - containerPort: 8080
+            - containerPort: 8000
           resources:
             requests:
               cpu: 100m
