@@ -9,7 +9,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
-  DEPLOYMENT_NAME: gke-hello-app # TODO: update deployment name if changed in deployment.yaml
+  DEPLOYMENT_NAME: sm-4-app # TODO: update deployment name if changed in deployment.yaml
 
 jobs:
   setup-and-deploy:

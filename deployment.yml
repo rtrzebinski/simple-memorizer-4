@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gke-hello-app
+  name: sm-4-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: gke-hello-app
+      app: sm-4-app
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: gke-hello-app
+        app: sm-4-app
     spec:
       containers:
         - name: hello-app
@@ -31,11 +31,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gke-hello-app-service
+  name: sm-4-app-service
 spec:
   type: LoadBalancer
   ports:
     - port: 80
       targetPort: 8080
   selector:
-    app: gke-hello-app
+    app: sm-4-app
