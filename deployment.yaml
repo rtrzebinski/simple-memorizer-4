@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hello-app
-          image: eu.gcr.io/plucky-catfish-378418/simple-memorizer-4:latest
+          image: eu.gcr.io/project/image
           ports:
             - containerPort: 8080
           resources:
