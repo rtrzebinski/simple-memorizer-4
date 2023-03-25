@@ -7,9 +7,10 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  IMAGE: simple-memorizer-4 # TODO: update if changed in deployment.yaml
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
-  DEPLOYMENT_NAME: sm-4-app # TODO: update deployment name if changed in deployment.yaml
+  DEPLOYMENT_NAME: sm-4-app # TODO: update if changed in deployment.yaml
 
 jobs:
   setup-and-deploy:
@@ -36,7 +37,12 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      # Get the GKE credentials so we can deploy to the cluster
+      # Build the Docker image
+      - name: Build
+        run: |-
+          docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" .
+
+      # Get the GKE credentials, so we can deploy to the cluster
       - run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
           gcloud components install gke-gcloud-auth-plugin
