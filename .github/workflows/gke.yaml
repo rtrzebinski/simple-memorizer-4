@@ -42,10 +42,14 @@ jobs:
         run: |-
           docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" .
 
+      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+      - run: |-
+          gcloud --quiet auth configure-docker          
+
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"          
+          docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"      
 
       # Get the GKE credentials, so we can deploy to the cluster
       - run: |-
