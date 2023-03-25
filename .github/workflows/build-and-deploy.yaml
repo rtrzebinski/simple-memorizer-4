@@ -10,58 +10,56 @@ env:
   IMAGE: simple-memorizer-4
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
-  DEPLOYMENT_NAME: simple-memorizer-4-app # TODO: update if changed in k8s/deployment.yaml
+  DEPLOYMENT_NAME: simple-memorizer-4-app # update if changed in k8s/deployment.yaml
 
 jobs:
-  build-and-deploy-to-gke:
-    name: Build and Deploy to GKE
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Authenticate to Google Cloud
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: '${{ secrets.GKE_SA_KEY }}'
 
-      # Setup gcloud CLI
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      # Build the Docker image
-      - name: Build
+      - name: Build Docker image
         run: |-
           docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" .
 
-      # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
-      - run: |-
+      - name: Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+        run: |-
           gcloud --quiet auth configure-docker          
 
-      # Push the Docker image to Google Container Registry
-      - name: Publish
+      - name: Publish Docker image
         run: |-
           docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"      
 
-      # Set up kustomize
       - name: Set up Kustomize
         run: |-
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      # Get the GKE credentials, so we can deploy to the cluster
-      - run: |-
+      - name: Get the GKE credentials
+        run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |-
           gcloud components install gke-gcloud-auth-plugin
 
-      # Deploy the Docker image to the GKE cluster
-      - name: Deploy
+      - name: Kustomize the deployment
         run: |-
           cd k8s
           ../kustomize edit set image gcr.io/project/image=gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
           ../kustomize build . | kubectl apply -f -
+
+      - name: Deploy the Docker image to the GKE cluster
+        run: |-
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
