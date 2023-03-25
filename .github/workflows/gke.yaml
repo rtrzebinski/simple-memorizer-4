@@ -42,6 +42,11 @@ jobs:
         run: |-
           docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" .
 
+      # Push the Docker image to Google Container Registry
+      - name: Publish
+        run: |-
+          docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"          
+
       # Get the GKE credentials, so we can deploy to the cluster
       - run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
