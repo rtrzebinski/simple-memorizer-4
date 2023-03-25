@@ -7,6 +7,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  DB_DSN: ${{ secrets.DB_DSN }}
   IMAGE: simple-memorizer-4
   GKE_CLUSTER: gke-cluster
   GKE_ZONE: us-east1
@@ -40,11 +41,6 @@ jobs:
         run: |-
           docker push "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"      
 
-      - name: Set up Kustomize
-        run: |-
-          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
-          chmod u+x ./kustomize
-
       - name: Get the GKE credentials
         run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
@@ -53,13 +49,15 @@ jobs:
         run: |-
           gcloud components install gke-gcloud-auth-plugin
 
-      - name: Kustomize the deployment
+      - name: Deploy to GKE cluster
         run: |-
-          cd k8s
-          ../kustomize edit set image gcr.io/project/image=gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
-          ../kustomize build . | kubectl apply -f -
+          export PROJECT_ID="$PROJECT_ID"
+          export DB_DSN="$DB_DSN"
+          export IMAGE="$IMAGE"
+          export GITHUB_SHA="$GITHUB_SHA"
+          envsubst < k8s/deployment.yaml | kubectl apply -f -
 
-      - name: Deploy the Docker image to the GKE cluster
+      - name: See the Deployment rollout status
         run: |-
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
