@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hello-app
-          image: eu.gcr.io/project/image
+          image: gcr.io/project/image
           ports:
             - containerPort: 8080
           resources:
