@@ -17,10 +17,6 @@ spec:
       labels:
         app: simple-memorizer-4-app
     spec:
-      initContainers:
-        - name: migrate
-          image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
-          args: ["migrate", "--path", "migrations", "--database", "$DB_DSN", "up"]
       containers:
         - name: simple-memorizer-4
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
@@ -70,3 +66,17 @@ spec:
       targetPort: 8000
   selector:
     app: simple-memorizer-4-app
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: simple-memorizer-4-migration
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          args: [ "migrate", "--path", "migrations", "--database", "$DB_DSN", "up" ]
+      restartPolicy: Never
+  backoffLimit: 0
