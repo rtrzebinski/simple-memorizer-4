@@ -23,10 +23,14 @@ spec:
           ports:
             - containerPort: 8000
           resources:
-            requests:
-              cpu: 100m
             limits:
-              cpu: 100m
+              cpu: 250m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              ephemeral-storage: 1Gi
+              memory: 512Mi
           env:
             - name: DB_DSN
               value: "$DB_DSN"
