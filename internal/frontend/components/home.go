@@ -12,12 +12,22 @@ type Home struct {
 	app.Compo
 	api *frontend.ApiClient
 
-	question        string
-	answer          string
 	isAnswerVisible bool
-	goodAnswers     int
-	badAnswers      int
-	exerciseId      int
+	isNextPreloaded bool
+
+	// currently visible exercise
+	question    string
+	answer      string
+	goodAnswers int
+	badAnswers  int
+	exerciseId  int
+
+	// next exercise preloaded
+	nextQuestion    string
+	nextAnswer      string
+	nextGoodAnswers int
+	nextBadAnswers  int
+	nextExerciseId  int
 }
 
 // The OnMount method is run once component is mounted
@@ -103,16 +113,39 @@ func (h *Home) Render() app.UI {
 
 // handleNextExercise fetch random exercises, isAnswerVisible question, hide answer
 func (h *Home) handleNextExercise() {
+	h.isAnswerVisible = false
+
+	if h.isNextPreloaded == false {
+		exercise, err := h.api.FetchRandomExercise()
+		if err != nil {
+			app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
+		}
+		h.exerciseId = exercise.Id
+		h.question = exercise.Question
+		h.answer = exercise.Answer
+		h.goodAnswers = exercise.GoodAnswers
+		h.badAnswers = exercise.BadAnswers
+		app.Log("displayed initial exercise")
+	} else {
+		h.exerciseId = h.nextExerciseId
+		h.question = h.nextQuestion
+		h.answer = h.nextAnswer
+		h.goodAnswers = h.nextGoodAnswers
+		h.badAnswers = h.nextBadAnswers
+		app.Log("displayed preloaded exercise")
+	}
+
 	exercise, err := h.api.FetchRandomExercise()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
 	}
-	h.exerciseId = exercise.Id
-	h.isAnswerVisible = false
-	h.question = exercise.Question
-	h.answer = exercise.Answer
-	h.goodAnswers = exercise.GoodAnswers
-	h.badAnswers = exercise.BadAnswers
+	h.nextExerciseId = exercise.Id
+	h.nextQuestion = exercise.Question
+	h.nextAnswer = exercise.Answer
+	h.nextGoodAnswers = exercise.GoodAnswers
+	h.nextBadAnswers = exercise.BadAnswers
+	app.Log("preloaded")
+	h.isNextPreloaded = true
 }
 
 func (h *Home) handleViewAnswer() {
