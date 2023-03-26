@@ -165,17 +165,25 @@ func (h *Home) handleViewAnswer() {
 }
 
 func (h *Home) handleGoodAnswer() {
-	app.Log("handleGoodAnswer " + h.question)
-	if err := h.api.IncrementGoodAnswers(h.exerciseId); err != nil {
-		app.Log(fmt.Errorf("failed to increment good answers: %w", err))
-	}
+	// make a copy of h.exerciseId to prevent h.exerciseId being updated before increment was completed
+	toIncrement := h.exerciseId
+	go func() {
+		// increment in the background
+		if err := h.api.IncrementGoodAnswers(toIncrement); err != nil {
+			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+		}
+	}()
 	h.handleNextExercise()
 }
 
 func (h *Home) handleBadAnswer() {
-	app.Log("handleBadAnswer " + h.question)
-	if err := h.api.IncrementBadAnswers(h.exerciseId); err != nil {
-		app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
-	}
+	// make a copy of h.exerciseId to prevent h.exerciseId being updated before increment was completed
+	toIncrement := h.exerciseId
+	go func() {
+		// increment in the background
+		if err := h.api.IncrementBadAnswers(toIncrement); err != nil {
+			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+		}
+	}()
 	h.handleNextExercise()
 }
