@@ -45,11 +45,11 @@ spec:
           resources:
             limits:
               cpu: 250m
-              ephemeral-storage: 1Gi
+              ephemeral-storage: 100Mi
               memory: 512Mi
             requests:
               cpu: 250m
-              ephemeral-storage: 1Gi
+              ephemeral-storage: 100Mi
               memory: 512Mi
           env:
             - name: DB_DSN
