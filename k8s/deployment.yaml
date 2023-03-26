@@ -21,7 +21,12 @@ spec:
         - name: simple-memorizer-4
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
           ports:
-            - containerPort: 8000
+            - name: app
+              containerPort: 8000
+              protocol: TCP
+            - name: probes
+              containerPort: 9090
+              protocol: TCP
           readinessProbe:
             httpGet:
               path: /readyz
