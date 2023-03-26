@@ -161,7 +161,6 @@ func (h *Home) handleGoodAnswer() {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
-	h.goodAnswers++
 	h.handleNextExercise()
 }
 
@@ -172,6 +171,5 @@ func (h *Home) handleBadAnswer() {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
-	h.badAnswers++
 	h.handleNextExercise()
 }
