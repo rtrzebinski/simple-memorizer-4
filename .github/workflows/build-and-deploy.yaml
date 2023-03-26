@@ -61,7 +61,7 @@ jobs:
           export GITHUB_SHA="$GITHUB_SHA"
           envsubst < k8s/deployment.yaml | kubectl apply -f -
 
-      - name: See the Deployment rollout status
+      - name: Check deployment rollout status
         run: |-
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
