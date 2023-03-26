@@ -44,11 +44,11 @@ spec:
             periodSeconds: 5
           resources:
             limits:
-              cpu: 250m
+              cpu: 100m
               ephemeral-storage: 100Mi
               memory: 512Mi
             requests:
-              cpu: 250m
+              cpu: 100m
               ephemeral-storage: 100Mi
               memory: 512Mi
           env:
