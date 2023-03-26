@@ -3,6 +3,7 @@ module github.com/rtrzebinski/simple-memorizer-4
 go 1.19
 
 require (
+	github.com/NYTimes/gziphandler v1.1.1
 	github.com/docker/go-connections v0.4.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/kelseyhightower/envconfig v1.4.0
