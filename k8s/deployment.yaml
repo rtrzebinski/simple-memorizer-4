@@ -17,9 +17,14 @@ spec:
       labels:
         app: simple-memorizer-4-app
     spec:
+      initContainers:
+        - name: migrate
+          image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          args: ["migrate", "--path", "migrations", "--database", "$DB_DSN", "up"]
       containers:
         - name: simple-memorizer-4
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+          args: ["/app/bin/simple-memorizer"]
           ports:
             - name: app
               containerPort: 8000
