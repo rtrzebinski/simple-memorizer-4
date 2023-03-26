@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: simple-memorizer-4-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: simple-memorizer-4-app
