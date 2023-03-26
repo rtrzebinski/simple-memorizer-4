@@ -12,19 +12,37 @@ type Home struct {
 	app.Compo
 	api *frontend.ApiClient
 
-	question    string
-	answer      string
-	showAnswer  bool
-	goodAnswers int
-	badAnswers  int
-	exerciseId  int
+	question        string
+	answer          string
+	isAnswerVisible bool
+	goodAnswers     int
+	badAnswers      int
+	exerciseId      int
 }
 
 // The OnMount method is run once component is mounted
 func (h *Home) OnMount(ctx app.Context) {
 	url := app.Window().URL()
 	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.nextExercise()
+	h.handleNextExercise()
+
+	// Bind actions to keyboard shortcuts
+	app.Window().AddEventListener("keydown", func(ctx app.Context, e app.Event) {
+		switch e.Get("code").String() {
+		case "Space":
+			if h.isAnswerVisible == true {
+				h.handleNextExercise()
+			} else {
+				h.handleViewAnswer()
+			}
+		case "KeyV":
+			h.handleViewAnswer()
+		case "KeyG":
+			h.handleGoodAnswer()
+		case "KeyB":
+			h.handleBadAnswer()
+		}
+	})
 }
 
 // The Render method is where the component appearance is defined.
@@ -34,39 +52,25 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Next exercise").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.nextExercise()
+					h.handleNextExercise()
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
-				Text("Show Answer").
+				Text("View answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.showAnswer = true
+					h.handleViewAnswer()
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
-				Text("Good Answer").
+				Text("Good answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go func() {
-						err := h.api.IncrementGoodAnswers(h.exerciseId)
-						if err != nil {
-							app.Log(fmt.Errorf("failed to increment good answers: %w", err))
-						}
-					}()
-					h.goodAnswers++
-					h.nextExercise()
+					h.handleGoodAnswer()
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
-				Text("Bad Answer").
+				Text("Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					go func() {
-						err := h.api.IncrementBadAnswers(h.exerciseId)
-						if err != nil {
-							app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
-						}
-					}()
-					h.badAnswers++
-					h.nextExercise()
+					h.handleBadAnswer()
 				}).
 				Style("margin-right", "10px"),
 		),
@@ -85,7 +89,7 @@ func (h *Home) Render() app.UI {
 			).Else(
 				app.Text(""),
 			),
-		).Hidden(!h.showAnswer),
+		).Hidden(!h.isAnswerVisible),
 		app.P().Body(
 			app.Text("Good answers: "),
 			app.Text(h.goodAnswers),
@@ -97,16 +101,42 @@ func (h *Home) Render() app.UI {
 	)
 }
 
-// nextExercise fetch random exercises, showAnswer question, hide answer
-func (h *Home) nextExercise() {
+// handleNextExercise fetch random exercises, isAnswerVisible question, hide answer
+func (h *Home) handleNextExercise() {
 	exercise, err := h.api.FetchRandomExercise()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
 	}
 	h.exerciseId = exercise.Id
-	h.showAnswer = false
+	h.isAnswerVisible = false
 	h.question = exercise.Question
 	h.answer = exercise.Answer
 	h.goodAnswers = exercise.GoodAnswers
 	h.badAnswers = exercise.BadAnswers
+}
+
+func (h *Home) handleViewAnswer() {
+	h.isAnswerVisible = true
+}
+
+func (h *Home) handleGoodAnswer() {
+	go func() {
+		err := h.api.IncrementGoodAnswers(h.exerciseId)
+		if err != nil {
+			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+		}
+	}()
+	h.goodAnswers++
+	h.handleNextExercise()
+}
+
+func (h *Home) handleBadAnswer() {
+	go func() {
+		err := h.api.IncrementBadAnswers(h.exerciseId)
+		if err != nil {
+			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+		}
+	}()
+	h.badAnswers++
+	h.handleNextExercise()
 }
