@@ -72,6 +72,8 @@ kind: Job
 metadata:
   name: simple-memorizer-4-migration
 spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 1
   template:
     spec:
       containers:
@@ -79,4 +81,3 @@ spec:
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
           args: [ "migrate", "--path", "migrations", "--database", "$DB_DSN", "up" ]
       restartPolicy: Never
-  backoffLimit: 0
