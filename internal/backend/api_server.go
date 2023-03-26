@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	FetchRandomExercise  = "/fetch-random-exercise"
+	FetchNextExercise    = "/fetch-next-exercise"
 	IncrementBadAnswers  = "/increment-bad-answers"
 	IncrementGoodAnswers = "/increment-good-answers"
 )
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
-	http.Handle(FetchRandomExercise, routes.NewFetchRandomExercise(r))
+	http.Handle(FetchNextExercise, routes.NewFetchNextExercise(r))
 	http.Handle(IncrementBadAnswers, routes.NewIncrementBadAnswers(w))
 	http.Handle(IncrementGoodAnswers, routes.NewIncrementGoodAnswers(w))
 

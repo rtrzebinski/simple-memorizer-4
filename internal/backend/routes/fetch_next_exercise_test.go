@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestFetchRandomExercise(t *testing.T) {
+func TestFetchNextExercise(t *testing.T) {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -22,7 +22,7 @@ func TestFetchRandomExercise(t *testing.T) {
 	reader := storage.NewReaderMock()
 	reader.On("RandomExercise").Return(exercise)
 
-	route := NewFetchRandomExercise(reader)
+	route := NewFetchNextExercise(reader)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}

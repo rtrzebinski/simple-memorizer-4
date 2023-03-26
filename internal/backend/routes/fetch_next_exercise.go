@@ -8,15 +8,15 @@ import (
 	"net/http"
 )
 
-type FetchRandomExercise struct {
+type FetchNextExercise struct {
 	r storage.Reader
 }
 
-func NewFetchRandomExercise(r storage.Reader) *FetchRandomExercise {
-	return &FetchRandomExercise{r: r}
+func NewFetchNextExercise(r storage.Reader) *FetchNextExercise {
+	return &FetchNextExercise{r: r}
 }
 
-func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *FetchNextExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	exercise, err := h.r.RandomExercise()
 	if err != nil {
 		log.Print(fmt.Errorf("failed to find a random exercise: %w", err))
@@ -27,7 +27,7 @@ func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	encoded, err := json.Marshal(exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode FetchRandomExercise HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode FetchNextExercise HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -35,7 +35,7 @@ func (h *FetchRandomExercise) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write FetchRandomExercise HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write FetchNextExercise HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

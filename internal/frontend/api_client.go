@@ -22,10 +22,10 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 	return &ApiClient{client: client, host: host, scheme: scheme}
 }
 
-func (c *ApiClient) FetchRandomExercise() (models.Exercise, error) {
+func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
 	var output models.Exercise
 
-	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchRandomExercise, nil)
+	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchNextExercise, nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

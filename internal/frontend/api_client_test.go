@@ -35,7 +35,7 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(ApiClientSuite))
 }
 
-func (suite *ApiClientSuite) TestFetchRandomExercise() {
+func (suite *ApiClientSuite) TestFetchNextExercise() {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -51,7 +51,7 @@ func (suite *ApiClientSuite) TestFetchRandomExercise() {
 
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
-		suite.Equal(backend.FetchRandomExercise, req.URL.RequestURI())
+		suite.Equal(backend.FetchNextExercise, req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
@@ -61,7 +61,7 @@ func (suite *ApiClientSuite) TestFetchRandomExercise() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.apiClient.FetchRandomExercise()
+	result, err := suite.apiClient.FetchNextExercise()
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercise, result)

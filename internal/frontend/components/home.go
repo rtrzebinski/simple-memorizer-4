@@ -111,14 +111,13 @@ func (h *Home) Render() app.UI {
 	)
 }
 
-// handleNextExercise fetch random exercises, isAnswerVisible question, hide answer
 func (h *Home) handleNextExercise() {
 	h.isAnswerVisible = false
 
 	if h.isNextPreloaded == false {
-		exercise, err := h.api.FetchRandomExercise()
+		exercise, err := h.api.FetchNextExercise()
 		if err != nil {
-			app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
+			app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 		}
 		h.exerciseId = exercise.Id
 		h.question = exercise.Question
@@ -135,9 +134,9 @@ func (h *Home) handleNextExercise() {
 		app.Log("displayed preloaded exercise")
 	}
 
-	exercise, err := h.api.FetchRandomExercise()
+	exercise, err := h.api.FetchNextExercise()
 	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch random exercise: %w", err))
+		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}
 	h.nextExerciseId = exercise.Id
 	h.nextQuestion = exercise.Question
