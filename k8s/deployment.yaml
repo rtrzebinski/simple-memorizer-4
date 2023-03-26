@@ -44,13 +44,13 @@ spec:
             periodSeconds: 5
           resources:
             limits:
-              cpu: 100m
+              cpu: 250m
               ephemeral-storage: 100Mi
-              memory: 128Mi
+              memory: 512Mi
             requests:
-              cpu: 100m
+              cpu: 250m
               ephemeral-storage: 100Mi
-              memory: 128Mi
+              memory: 512Mi
           env:
             - name: DB_DSN
               value: "$DB_DSN"
