@@ -37,7 +37,7 @@ func (h *Home) OnMount(ctx app.Context) {
 	h.handleNextExercise()
 
 	// Bind actions to keyboard shortcuts
-	app.Window().AddEventListener("keydown", func(ctx app.Context, e app.Event) {
+	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
 		switch e.Get("code").String() {
 		case "Space":
 			if h.isAnswerVisible == true {
