@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/NYTimes/gziphandler"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
@@ -66,8 +65,8 @@ func run(ctx context.Context) error {
 	// instructions.
 	app.RunWhenOnBrowser()
 
-	// Handle home page with GzipHandler
-	withGz := gziphandler.GzipHandler(&app.Handler{
+	// Handle home page
+	http.Handle("/", &app.Handler{
 		Name:        "Home",
 		Description: "Home page",
 		Icon: app.Icon{
@@ -76,7 +75,6 @@ func run(ctx context.Context) error {
 			AppleTouch: "/web/logo-192.png",
 		},
 	})
-	http.Handle("/", withGz)
 
 	// Configuration
 	var cfg config
