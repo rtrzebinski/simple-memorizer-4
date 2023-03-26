@@ -51,6 +51,8 @@ func (h *Home) OnMount(ctx app.Context) {
 			h.handleGoodAnswer()
 		case "KeyB":
 			h.handleBadAnswer()
+		case "KeyN":
+			h.handleNextExercise()
 		}
 	})
 }
