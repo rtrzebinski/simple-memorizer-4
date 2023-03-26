@@ -3,14 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/mysignal"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"log"
 	"net/http"
+	"time"
 )
 
 type config struct {
@@ -20,6 +24,10 @@ type config struct {
 	}
 	Api struct {
 		Port string `envconfig:"API_PORT" default:":8000"`
+	}
+	Web struct {
+		ProbeAddr       string        `envconfig:"WEB_PROBE_HOST" default:"0.0.0.0:9090"`
+		ShutdownTimeout time.Duration `envconfig:"WEB_SHUTDOWN_TIMEOUT" default:"30s"`
 	}
 }
 
@@ -36,7 +44,7 @@ func main() {
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
 func run(ctx context.Context) error {
-	log.Println("App started..")
+	log.Println("application starting")
 
 	// The first thing to do is to associate the home component with a path.
 	//
@@ -84,9 +92,48 @@ func run(ctx context.Context) error {
 	r := postgres.NewReader(db)
 	w := postgres.NewWriter(db)
 
-	// Start API server
-	if err = backend.ListenAndServe(r, w, cfg.Api.Port); err != nil {
-		return err
+	// Make a channel to listen for errors coming from the listener. Use a
+	// buffered channel so the goroutine can exit if we don't collect this error.
+	serverErrors := make(chan error, 1)
+
+	probeServer := probes.SetupProbeServer(cfg.Web.ProbeAddr, db)
+
+	// Start probe server and send errors to the channel
+	go func() {
+		log.Printf("initializing probe server on host: %s", cfg.Web.ProbeAddr)
+		serverErrors <- probeServer.ListenAndServe()
+	}()
+
+	// Start API server and send errors to the channel
+	go func() {
+		log.Printf("initializing API server on port: %s", cfg.Api.Port)
+		serverErrors <- backend.ListenAndServe(r, w, cfg.Api.Port)
+	}()
+
+	// Signal notifier
+	done := mysignal.NewNotifier(ctx)
+
+	log.Println("application running")
+
+	// Blocking main and waiting for shutdown.
+	select {
+	case err := <-serverErrors:
+		return fmt.Errorf("server error: %w", err)
+	case <-done.Done():
+		log.Print("start shutdown")
+
+		// Give outstanding requests a deadline for completion.
+		ctx, cancel := context.WithTimeout(ctx, cfg.Web.ShutdownTimeout)
+		defer cancel()
+
+		// Shutdown gracefully on signal received
+		if err := probeServer.Shutdown(ctx); err != nil {
+			log.Print(fmt.Errorf("failed to gracefully shutdown the probe server %w", err))
+
+			if err = probeServer.Close(); err != nil {
+				return fmt.Errorf("could not stop probe server gracefully: %w", err)
+			}
+		}
 	}
 
 	return nil

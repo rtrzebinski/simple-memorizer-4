@@ -22,6 +22,20 @@ spec:
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
           ports:
             - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             limits:
               cpu: 250m
