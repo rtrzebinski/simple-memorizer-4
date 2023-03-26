@@ -132,19 +132,22 @@ func (h *Home) handleNextExercise() {
 		h.goodAnswers = h.nextGoodAnswers
 		h.badAnswers = h.nextBadAnswers
 		app.Log("displayed preloaded exercise")
+		h.isNextPreloaded = false
 	}
 
-	exercise, err := h.api.FetchNextExercise()
-	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
-	}
-	h.nextExerciseId = exercise.Id
-	h.nextQuestion = exercise.Question
-	h.nextAnswer = exercise.Answer
-	h.nextGoodAnswers = exercise.GoodAnswers
-	h.nextBadAnswers = exercise.BadAnswers
-	app.Log("preloaded")
-	h.isNextPreloaded = true
+	go func() {
+		exercise, err := h.api.FetchNextExercise()
+		if err != nil {
+			app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
+		}
+		h.nextExerciseId = exercise.Id
+		h.nextQuestion = exercise.Question
+		h.nextAnswer = exercise.Answer
+		h.nextGoodAnswers = exercise.GoodAnswers
+		h.nextBadAnswers = exercise.BadAnswers
+		app.Log("preloaded")
+		h.isNextPreloaded = true
+	}()
 }
 
 func (h *Home) handleViewAnswer() {
