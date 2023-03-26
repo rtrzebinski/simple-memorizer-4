@@ -156,8 +156,7 @@ func (h *Home) handleViewAnswer() {
 
 func (h *Home) handleGoodAnswer() {
 	go func() {
-		err := h.api.IncrementGoodAnswers(h.exerciseId)
-		if err != nil {
+		if err := h.api.IncrementGoodAnswers(h.exerciseId); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
@@ -166,8 +165,7 @@ func (h *Home) handleGoodAnswer() {
 
 func (h *Home) handleBadAnswer() {
 	go func() {
-		err := h.api.IncrementBadAnswers(h.exerciseId)
-		if err != nil {
+		if err := h.api.IncrementBadAnswers(h.exerciseId); err != nil {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
