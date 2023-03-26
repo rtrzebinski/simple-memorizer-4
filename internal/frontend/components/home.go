@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"net/http"
 )
 
@@ -117,10 +118,7 @@ func (h *Home) handleNextExercise() {
 	h.isAnswerVisible = false
 
 	if h.isNextPreloaded == false {
-		exercise, err := h.api.FetchNextExercise()
-		if err != nil {
-			app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
-		}
+		exercise := h.reload()
 		h.exerciseId = exercise.Id
 		h.question = exercise.Question
 		h.answer = exercise.Answer
@@ -138,10 +136,7 @@ func (h *Home) handleNextExercise() {
 	}
 
 	go func() {
-		exercise, err := h.api.FetchNextExercise()
-		if err != nil {
-			app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
-		}
+		exercise := h.reload()
 		h.nextExerciseId = exercise.Id
 		h.nextQuestion = exercise.Question
 		h.nextAnswer = exercise.Answer
@@ -152,26 +147,35 @@ func (h *Home) handleNextExercise() {
 	}()
 }
 
+func (h *Home) reload() models.Exercise {
+	exercise, err := h.api.FetchNextExercise()
+	if err != nil {
+		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
+	}
+
+	if exercise.Id == h.exerciseId {
+		return h.reload()
+	}
+
+	return exercise
+}
+
 func (h *Home) handleViewAnswer() {
 	h.isAnswerVisible = true
 }
 
 func (h *Home) handleGoodAnswer() {
-	go func() {
-		if err := h.api.IncrementGoodAnswers(h.exerciseId); err != nil {
-			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
-		}
-	}()
-	h.goodAnswers++
+	app.Log("handleGoodAnswer " + h.question)
+	if err := h.api.IncrementGoodAnswers(h.exerciseId); err != nil {
+		app.Log(fmt.Errorf("failed to increment good answers: %w", err))
+	}
 	h.handleNextExercise()
 }
 
 func (h *Home) handleBadAnswer() {
-	go func() {
-		if err := h.api.IncrementBadAnswers(h.exerciseId); err != nil {
-			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
-		}
-	}()
-	h.badAnswers++
+	app.Log("handleBadAnswer " + h.question)
+	if err := h.api.IncrementBadAnswers(h.exerciseId); err != nil {
+		app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+	}
 	h.handleNextExercise()
 }

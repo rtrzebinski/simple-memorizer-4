@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -40,6 +41,7 @@ func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
 }
 
 func (c *ApiClient) IncrementBadAnswers(exerciseId int) error {
+	app.Log(fmt.Printf("handleBadAnswer %d", exerciseId))
 	input := routes.IncrementBadAnswersReq{
 		ExerciseId: exerciseId,
 	}
@@ -63,6 +65,7 @@ func (c *ApiClient) IncrementBadAnswers(exerciseId int) error {
 }
 
 func (c *ApiClient) IncrementGoodAnswers(exerciseId int) error {
+	app.Log(fmt.Printf("handleGoodAnswer %d", exerciseId))
 	input := routes.IncrementGoodAnswersReq{
 		ExerciseId: exerciseId,
 	}
