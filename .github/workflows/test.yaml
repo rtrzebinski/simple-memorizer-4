@@ -1,5 +1,7 @@
 name: Test
 
+concurrency: test
+
 on: [ push ]
 
 jobs:
