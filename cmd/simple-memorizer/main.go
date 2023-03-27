@@ -74,6 +74,12 @@ func run(ctx context.Context) error {
 			Large:      "/web/logo-512.png",
 			AppleTouch: "/web/logo-192.png",
 		},
+		Scripts: []string{
+			"/web/swiped-events.js",
+		},
+		Styles: []string{
+			"/web/hello.css",
+		},
 	})
 
 	// Configuration

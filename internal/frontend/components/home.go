@@ -37,6 +37,7 @@ func (h *Home) OnMount(ctx app.Context) {
 	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
 	h.handleNextExercise()
 	h.bindKeys()
+	h.bindSwipes()
 }
 
 func (h *Home) bindKeys() {
@@ -70,6 +71,30 @@ func (h *Home) bindKeys() {
 				h.handleNextExercise()
 			}
 		}
+	})
+}
+
+func (h *Home) bindSwipes() {
+	app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleBadAnswer()
+		}
+	})
+	app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleGoodAnswer()
+		}
+	})
+	app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleNextExercise()
+		}
+	})
+	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
+		h.handleViewAnswer()
 	})
 }
 
