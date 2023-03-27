@@ -36,6 +36,14 @@ func (s Seeder) ExerciseSeed() {
 		"France":      "Paris",
 		"Netherlands": "Amsterdam",
 		"Spain":       "Madrid",
+		"Greece":      "Athens",
+		"Slovakia":    "Bratislava",
+		"Hungary":     "Budapest",
+		"Slovenia":    "Ljubljana",
+		"Cyprus":      "Nicosia",
+		"Iceland":     "Reykjavik",
+		"Latvia":      "Riga",
+		"Bulgaria":    "Sofia",
 	}
 
 	for q, a := range capitals {
