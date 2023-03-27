@@ -110,14 +110,14 @@ func (h *Home) Render() app.UI {
 					}
 				}).
 				Style("margin-right", "10px").
-				Style("font-size", "20px"),
+				Style("font-size", "15px"),
 			app.Button().
 				Text("View answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					h.handleViewAnswer()
 				}).
 				Style("margin-right", "10px").
-				Style("font-size", "20px"),
+				Style("font-size", "15px"),
 		),
 		app.P().Body(
 			app.Button().
@@ -129,7 +129,7 @@ func (h *Home) Render() app.UI {
 					}
 				}).
 				Style("margin-right", "10px").
-				Style("font-size", "20px"),
+				Style("font-size", "15px"),
 			app.Button().
 				Text("Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
@@ -139,7 +139,7 @@ func (h *Home) Render() app.UI {
 					}
 				}).
 				Style("margin-right", "10px").
-				Style("font-size", "20px"),
+				Style("font-size", "15px"),
 		),
 	)
 }
