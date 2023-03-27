@@ -36,24 +36,39 @@ func (h *Home) OnMount(ctx app.Context) {
 	url := app.Window().URL()
 	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
 	h.handleNextExercise()
+	h.bindKeys()
+}
 
-	// Bind actions to keyboard shortcuts
+func (h *Home) bindKeys() {
 	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
+		// bind actions to keyboard shortcuts
 		switch e.Get("code").String() {
 		case "Space":
 			if h.isAnswerVisible == true {
-				h.handleNextExercise()
+				// only allow if next exercise was preloaded (to avoid double clicks)
+				if h.isNextPreloaded == true {
+					h.handleNextExercise()
+				}
 			} else {
 				h.handleViewAnswer()
 			}
 		case "KeyV":
 			h.handleViewAnswer()
 		case "KeyG":
-			h.handleGoodAnswer()
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleGoodAnswer()
+			}
 		case "KeyB":
-			h.handleBadAnswer()
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleBadAnswer()
+			}
 		case "KeyN":
-			h.handleNextExercise()
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleNextExercise()
+			}
 		}
 	})
 }
@@ -65,7 +80,10 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Next exercise").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleNextExercise()
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleNextExercise()
+					}
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
@@ -77,13 +95,19 @@ func (h *Home) Render() app.UI {
 			app.Button().
 				Text("Good answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleGoodAnswer()
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleGoodAnswer()
+					}
 				}).
 				Style("margin-right", "10px"),
 			app.Button().
 				Text("Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleBadAnswer()
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleBadAnswer()
+					}
 				}).
 				Style("margin-right", "10px"),
 		),
@@ -118,7 +142,7 @@ func (h *Home) handleNextExercise() {
 	h.isAnswerVisible = false
 
 	if h.isNextPreloaded == false {
-		exercise := h.reload()
+		exercise := h.fetchNext()
 		h.exerciseId = exercise.Id
 		h.question = exercise.Question
 		h.answer = exercise.Answer
@@ -126,35 +150,36 @@ func (h *Home) handleNextExercise() {
 		h.badAnswers = exercise.BadAnswers
 		app.Log("displayed initial exercise")
 	} else {
+		h.isNextPreloaded = false
 		h.exerciseId = h.nextExerciseId
 		h.question = h.nextQuestion
 		h.answer = h.nextAnswer
 		h.goodAnswers = h.nextGoodAnswers
 		h.badAnswers = h.nextBadAnswers
 		app.Log("displayed preloaded exercise")
-		h.isNextPreloaded = false
 	}
 
 	go func() {
-		exercise := h.reload()
+		exercise := h.fetchNext()
 		h.nextExerciseId = exercise.Id
 		h.nextQuestion = exercise.Question
 		h.nextAnswer = exercise.Answer
 		h.nextGoodAnswers = exercise.GoodAnswers
 		h.nextBadAnswers = exercise.BadAnswers
-		app.Log("preloaded")
 		h.isNextPreloaded = true
+		app.Log("preloaded")
 	}()
 }
 
-func (h *Home) reload() models.Exercise {
+func (h *Home) fetchNext() models.Exercise {
 	exercise, err := h.api.FetchNextExercise()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}
 
+	// dummy way of avoiding duplicates todo move to the API
 	if exercise.Id == h.exerciseId {
-		return h.reload()
+		return h.fetchNext()
 	}
 
 	return exercise
