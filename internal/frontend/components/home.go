@@ -76,41 +76,6 @@ func (h *Home) bindKeys() {
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
-		app.P().Body(
-			app.Button().
-				Text("Next exercise").
-				OnClick(func(ctx app.Context, e app.Event) {
-					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleNextExercise()
-					}
-				}).
-				Style("margin-right", "10px"),
-			app.Button().
-				Text("View answer").
-				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleViewAnswer()
-				}).
-				Style("margin-right", "10px"),
-			app.Button().
-				Text("Good answer").
-				OnClick(func(ctx app.Context, e app.Event) {
-					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleGoodAnswer()
-					}
-				}).
-				Style("margin-right", "10px"),
-			app.Button().
-				Text("Bad answer").
-				OnClick(func(ctx app.Context, e app.Event) {
-					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleBadAnswer()
-					}
-				}).
-				Style("margin-right", "10px"),
-		),
 		app.H2().Body(
 			app.Text("What is the capital of "),
 			app.If(h.question != "",
@@ -134,6 +99,47 @@ func (h *Home) Render() app.UI {
 		app.P().Body(
 			app.Text("Bad answers: "),
 			app.Text(h.badAnswers),
+		),
+		app.P().Body(
+			app.Button().
+				Text("Next exercise").
+				OnClick(func(ctx app.Context, e app.Event) {
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleNextExercise()
+					}
+				}).
+				Style("margin-right", "10px").
+				Style("font-size", "20px"),
+			app.Button().
+				Text("View answer").
+				OnClick(func(ctx app.Context, e app.Event) {
+					h.handleViewAnswer()
+				}).
+				Style("margin-right", "10px").
+				Style("font-size", "20px"),
+		),
+		app.P().Body(
+			app.Button().
+				Text("Good answer").
+				OnClick(func(ctx app.Context, e app.Event) {
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleGoodAnswer()
+					}
+				}).
+				Style("margin-right", "10px").
+				Style("font-size", "20px"),
+			app.Button().
+				Text("Bad answer").
+				OnClick(func(ctx app.Context, e app.Event) {
+					// only allow if next exercise was preloaded (to avoid double clicks)
+					if h.isNextPreloaded == true {
+						h.handleBadAnswer()
+					}
+				}).
+				Style("margin-right", "10px").
+				Style("font-size", "20px"),
 		),
 	)
 }
