@@ -53,19 +53,19 @@ func (h *Home) bindKeys() {
 			} else {
 				h.handleViewAnswer()
 			}
-		case "KeyV":
+		case "KeyV", "ArrowUp":
 			h.handleViewAnswer()
-		case "KeyG":
+		case "KeyG", "ArrowRight":
 			// only allow if next exercise was preloaded (to avoid double clicks)
 			if h.isNextPreloaded == true {
 				h.handleGoodAnswer()
 			}
-		case "KeyB":
+		case "KeyB", "ArrowLeft":
 			// only allow if next exercise was preloaded (to avoid double clicks)
 			if h.isNextPreloaded == true {
 				h.handleBadAnswer()
 			}
-		case "KeyN":
+		case "KeyN", "ArrowDown":
 			// only allow if next exercise was preloaded (to avoid double clicks)
 			if h.isNextPreloaded == true {
 				h.handleNextExercise()
@@ -127,7 +127,14 @@ func (h *Home) Render() app.UI {
 		),
 		app.P().Body(
 			app.Button().
-				Text("Next exercise").
+				Text("⇧ View answer").
+				OnClick(func(ctx app.Context, e app.Event) {
+					h.handleViewAnswer()
+				}).
+				Style("margin-right", "10px").
+				Style("font-size", "15px"),
+			app.Button().
+				Text("Next exercise ⇩").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
 					if h.isNextPreloaded == true {
@@ -136,31 +143,24 @@ func (h *Home) Render() app.UI {
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
-			app.Button().
-				Text("View answer").
-				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleViewAnswer()
-				}).
-				Style("margin-right", "10px").
-				Style("font-size", "15px"),
 		),
 		app.P().Body(
 			app.Button().
-				Text("Good answer").
+				Text("⇦ Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
 					if h.isNextPreloaded == true {
-						h.handleGoodAnswer()
+						h.handleBadAnswer()
 					}
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
 			app.Button().
-				Text("Bad answer").
+				Text("Good answer ⇨").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
 					if h.isNextPreloaded == true {
-						h.handleBadAnswer()
+						h.handleGoodAnswer()
 					}
 				}).
 				Style("margin-right", "10px").
