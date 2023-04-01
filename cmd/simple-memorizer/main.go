@@ -81,7 +81,7 @@ func run(ctx context.Context) error {
 			"/web/swiped-events.js",
 		},
 		Styles: []string{
-			"/web/hello.css",
+			//"/web/hello.css",
 		},
 	})
 

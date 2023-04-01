@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
 type Writer struct {
@@ -11,6 +12,17 @@ type Writer struct {
 
 func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
+}
+
+func (w *Writer) StoreExercise(exercise models.Exercise) error {
+	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
+
+	_, err := w.db.Exec(query, exercise.Question, exercise.Answer)
+	if err != nil {
+		return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
+	}
+
+	return nil
 }
 
 func (w *Writer) IncrementBadAnswers(exerciseId int) error {
@@ -27,7 +39,7 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) error {
 
 		_, err := w.db.Exec(query, exerciseId)
 		if err != nil {
-			return fmt.Errorf("failed to execute INSERT query: %w", err)
+			return fmt.Errorf("failed to execute 'INSERT INTO exercise_result' query: %w", err)
 		}
 
 		return nil
@@ -38,7 +50,7 @@ func (w *Writer) IncrementBadAnswers(exerciseId int) error {
 
 	_, err = w.db.Exec(query, exerciseId)
 	if err != nil {
-		return fmt.Errorf("failed to execute UPDATE query: %w", err)
+		return fmt.Errorf("failed to execute 'UPDATE exercise_result' query: %w", err)
 	}
 
 	return nil
@@ -58,7 +70,7 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) error {
 
 		_, err := w.db.Exec(query, exerciseId)
 		if err != nil {
-			return fmt.Errorf("failed to execute INSERT query: %w", err)
+			return fmt.Errorf("failed to execute 'INSERT INTO exercise_result' query: %w", err)
 		}
 
 		return nil
@@ -69,7 +81,7 @@ func (w *Writer) IncrementGoodAnswers(exerciseId int) error {
 
 	_, err = w.db.Exec(query, exerciseId)
 	if err != nil {
-		return fmt.Errorf("failed to execute UPDATE query: %w", err)
+		return fmt.Errorf("failed to execute 'UPDATE exercise_result' query: %w", err)
 	}
 
 	return nil

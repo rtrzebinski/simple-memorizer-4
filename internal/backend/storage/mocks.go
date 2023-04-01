@@ -25,6 +25,12 @@ func NewWriterMock() *WriterMock {
 	return &WriterMock{}
 }
 
+func (mock *WriterMock) StoreExercise(exercise models.Exercise) error {
+	mock.Called(exercise)
+
+	return nil
+}
+
 func (mock *WriterMock) IncrementBadAnswers(exerciseId int) error {
 	mock.Called(exerciseId)
 

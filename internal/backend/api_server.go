@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	StoreExercise        = "/store-exercise"
 	FetchExercises       = "/fetch-exercises"
 	FetchNextExercise    = "/fetch-next-exercise"
 	IncrementBadAnswers  = "/increment-bad-answers"
@@ -14,6 +15,7 @@ const (
 )
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
+	http.Handle(StoreExercise, routes.NewStoreExercise(w))
 	http.Handle(FetchExercises, routes.NewFetchExercises(r))
 	http.Handle(FetchNextExercise, routes.NewFetchNextExercise(r))
 	http.Handle(IncrementBadAnswers, routes.NewIncrementBadAnswers(w))

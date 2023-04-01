@@ -22,6 +22,25 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 	return &ApiClient{client: client, host: host, scheme: scheme}
 }
 
+func (c *ApiClient) StoreExercise(exercise models.Exercise) error {
+	body, err := json.Marshal(exercise)
+	if err != nil {
+		return fmt.Errorf("failed to encode input: %w", err)
+	}
+
+	urlAddress := c.scheme + "://" + c.host + backend.StoreExercise
+	buffer := bytes.NewBuffer(body)
+
+	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
 func (c *ApiClient) FetchExercises() (models.Exercises, error) {
 	var output models.Exercises
 

@@ -3,9 +3,54 @@ package postgres
 import (
 	"context"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestStoreExercise(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	exercise := models.Exercise{
+		Question: "question",
+		Answer:   "answer",
+	}
+
+	err = w.StoreExercise(exercise)
+	assert.NoError(t, err)
+
+	stored := fetchLatestExercise(db)
+
+	assert.Equal(t, exercise.Question, stored.Question)
+	assert.Equal(t, exercise.Answer, stored.Answer)
+}
 
 func TestIncrementBadAnswers(t *testing.T) {
 	t.Parallel()

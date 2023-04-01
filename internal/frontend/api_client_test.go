@@ -35,6 +35,34 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(ApiClientSuite))
 }
 
+func (suite *ApiClientSuite) TestStoreExercise() {
+	exercise := models.Exercise{
+		Question: "question",
+		Answer:   "answer",
+	}
+
+	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("POST", req.Method)
+		suite.Equal(backend.StoreExercise, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		var input models.Exercise
+		err := json.NewDecoder(req.Body).Decode(&input)
+		suite.NoError(err)
+		suite.Equal(exercise.Question, input.Question)
+		suite.Equal(exercise.Answer, input.Answer)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader([]byte{})),
+	}, nil)
+
+	err := suite.apiClient.StoreExercise(exercise)
+	assert.NoError(suite.T(), err)
+}
+
 func (suite *ApiClientSuite) TestFetchExercises() {
 	exercise := models.Exercise{
 		Id:          1,

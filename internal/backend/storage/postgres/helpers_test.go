@@ -15,6 +15,22 @@ import (
 	"time"
 )
 
+func fetchLatestExercise(db *sql.DB) entities.Exercise {
+	var exercise entities.Exercise
+
+	const query = `
+		SELECT e.id, e.question, e.answer
+		FROM exercise e
+		ORDER BY id DESC
+		LIMIT 1;`
+
+	if err := db.QueryRow(query).Scan(&exercise.Id, &exercise.Question, &exercise.Answer); err != nil {
+		panic(err)
+	}
+
+	return exercise
+}
+
 func storeExercise(db *sql.DB, exercise *entities.Exercise) {
 	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
 
