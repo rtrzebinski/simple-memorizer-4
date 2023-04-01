@@ -7,3 +7,5 @@ type Exercise struct {
 	BadAnswers  int
 	GoodAnswers int
 }
+
+type Exercises []Exercise

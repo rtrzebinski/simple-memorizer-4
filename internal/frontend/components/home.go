@@ -17,11 +17,11 @@ type Home struct {
 	isNextPreloaded bool
 
 	// currently visible exercise
+	exerciseId  int
 	question    string
 	answer      string
 	goodAnswers int
 	badAnswers  int
-	exerciseId  int
 
 	// next exercise preloaded
 	nextQuestion    string

@@ -22,6 +22,23 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 	return &ApiClient{client: client, host: host, scheme: scheme}
 }
 
+func (c *ApiClient) FetchExercises() (models.Exercises, error) {
+	var output models.Exercises
+
+	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchExercises, nil)
+	if err != nil {
+		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
+		return output, fmt.Errorf("failed to decode output: %w", err)
+	}
+
+	return output, nil
+}
+
 func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
 	var output models.Exercise
 
