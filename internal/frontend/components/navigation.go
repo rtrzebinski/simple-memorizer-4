@@ -12,7 +12,7 @@ func (h *Navigation) Render() app.UI {
 		app.P().Body(
 			app.A().Href("/").Text("Home"),
 			app.Text(" | "),
-			app.A().Href("/exercises").Text("Exercises"),
+			app.A().Href("/exercises").Text("AllExercises"),
 		),
 	)
 }

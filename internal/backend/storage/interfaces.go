@@ -3,7 +3,7 @@ package storage
 import "github.com/rtrzebinski/simple-memorizer-4/internal/models"
 
 type Reader interface {
-	Exercises() (models.Exercises, error)
+	AllExercises() (models.Exercises, error)
 	RandomExercise() (models.Exercise, error)
 }
 

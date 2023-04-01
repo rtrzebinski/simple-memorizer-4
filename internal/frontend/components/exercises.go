@@ -67,7 +67,7 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 	h.inputQuestion = ""
 	h.inputAnswer = ""
 
-	h.fetchExercises()
+	h.fetchAllExercises()
 
 	h.saveButtonDisabled = false
 }
@@ -76,13 +76,13 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 func (h *Exercises) OnMount(ctx app.Context) {
 	url := app.Window().URL()
 	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.fetchExercises()
+	h.fetchAllExercises()
 }
 
-func (h *Exercises) fetchExercises() {
-	exercises, err := h.api.FetchExercises()
+func (h *Exercises) fetchAllExercises() {
+	exercises, err := h.api.FetchAllExercises()
 	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch exercises: %w", err))
+		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
 	for _, exercise := range exercises {

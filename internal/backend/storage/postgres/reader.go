@@ -14,7 +14,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) Exercises() (models.Exercises, error) {
+func (r *Reader) AllExercises() (models.Exercises, error) {
 	var exercises models.Exercises
 
 	const query = `

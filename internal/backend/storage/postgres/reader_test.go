@@ -45,7 +45,7 @@ func TestExercises(t *testing.T) {
 
 	storeExercise(db, exercise)
 
-	res, err := r.Exercises()
+	res, err := r.AllExercises()
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)

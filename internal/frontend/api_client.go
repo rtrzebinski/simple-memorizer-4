@@ -40,10 +40,10 @@ func (c *ApiClient) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (c *ApiClient) FetchExercises() (models.Exercises, error) {
+func (c *ApiClient) FetchAllExercises() (models.Exercises, error) {
 	var output models.Exercises
 
-	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchExercises, nil)
+	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchAllExercises, nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

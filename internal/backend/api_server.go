@@ -8,7 +8,7 @@ import (
 
 const (
 	StoreExercise        = "/store-exercise"
-	FetchExercises       = "/fetch-exercises"
+	FetchAllExercises    = "/fetch-all-exercises"
 	FetchNextExercise    = "/fetch-next-exercise"
 	IncrementBadAnswers  = "/increment-bad-answers"
 	IncrementGoodAnswers = "/increment-good-answers"
@@ -16,7 +16,7 @@ const (
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	http.Handle(StoreExercise, routes.NewStoreExercise(w))
-	http.Handle(FetchExercises, routes.NewFetchExercises(r))
+	http.Handle(FetchAllExercises, routes.NewFetchAllExercises(r))
 	http.Handle(FetchNextExercise, routes.NewFetchNextExercise(r))
 	http.Handle(IncrementBadAnswers, routes.NewIncrementBadAnswers(w))
 	http.Handle(IncrementGoodAnswers, routes.NewIncrementGoodAnswers(w))

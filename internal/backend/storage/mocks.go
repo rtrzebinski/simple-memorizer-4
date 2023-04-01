@@ -11,7 +11,7 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) Exercises() (models.Exercises, error) {
+func (mock *ReaderMock) AllExercises() (models.Exercises, error) {
 	return mock.Called().Get(0).(models.Exercises), nil
 }
 

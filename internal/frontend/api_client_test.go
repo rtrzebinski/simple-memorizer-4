@@ -62,7 +62,7 @@ func (suite *ApiClientSuite) TestStoreExercise() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ApiClientSuite) TestFetchExercises() {
+func (suite *ApiClientSuite) TestFetchAllExercises() {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -79,7 +79,7 @@ func (suite *ApiClientSuite) TestFetchExercises() {
 
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
-		suite.Equal(backend.FetchExercises, req.URL.RequestURI())
+		suite.Equal(backend.FetchAllExercises, req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
@@ -89,7 +89,7 @@ func (suite *ApiClientSuite) TestFetchExercises() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.apiClient.FetchExercises()
+	result, err := suite.apiClient.FetchAllExercises()
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercises, result)

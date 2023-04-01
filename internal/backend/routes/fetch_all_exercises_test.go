@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestFetchExercises(t *testing.T) {
+func TestFetchAllExercises(t *testing.T) {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -21,9 +21,9 @@ func TestFetchExercises(t *testing.T) {
 	exercises := models.Exercises{exercise}
 
 	reader := storage.NewReaderMock()
-	reader.On("Exercises").Return(exercises)
+	reader.On("AllExercises").Return(exercises)
 
-	route := NewFetchExercises(reader)
+	route := NewFetchAllExercises(reader)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}
