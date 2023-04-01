@@ -20,7 +20,7 @@ func TestIncrementGoodAnswers(t *testing.T) {
 	}
 
 	writer := storage.NewWriterMock()
-	writer.On("IncrementGoodAnswers", 456)
+	writer.On("IncrementGoodAnswers", models.Exercise{Id: 456})
 
 	route := NewIncrementGoodAnswers(writer)
 

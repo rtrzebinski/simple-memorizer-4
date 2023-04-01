@@ -31,14 +31,14 @@ func (mock *WriterMock) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (mock *WriterMock) IncrementBadAnswers(exerciseId int) error {
-	mock.Called(exerciseId)
+func (mock *WriterMock) IncrementBadAnswers(exercise models.Exercise) error {
+	mock.Called(exercise)
 
 	return nil
 }
 
-func (mock *WriterMock) IncrementGoodAnswers(exerciseId int) error {
-	mock.Called(exerciseId)
+func (mock *WriterMock) IncrementGoodAnswers(exercise models.Exercise) error {
+	mock.Called(exercise)
 
 	return nil
 }

@@ -27,7 +27,7 @@ func (h *IncrementBadAnswers) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.w.IncrementBadAnswers(h.exercise.Id)
+	err = h.w.IncrementBadAnswers(h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to increment bad answers: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

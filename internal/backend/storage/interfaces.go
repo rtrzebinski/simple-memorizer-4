@@ -9,6 +9,6 @@ type Reader interface {
 
 type Writer interface {
 	StoreExercise(models.Exercise) error
-	IncrementBadAnswers(int) error
-	IncrementGoodAnswers(int) error
+	IncrementBadAnswers(models.Exercise) error
+	IncrementGoodAnswers(models.Exercise) error
 }
