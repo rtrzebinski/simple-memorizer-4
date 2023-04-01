@@ -52,6 +52,9 @@ func run(ctx context.Context) error {
 	// component to display for a given path, on both client and server-side.
 	app.Route("/", &components.Home{})
 
+	// Associate other frontend routes
+	app.Route("/exercises", &components.Exercises{})
+
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
 	//
