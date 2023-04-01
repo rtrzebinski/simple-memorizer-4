@@ -32,9 +32,9 @@ func fetchLatestExercise(db *sql.DB) entities.Exercise {
 }
 
 func storeExercise(db *sql.DB, exercise *entities.Exercise) {
-	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
+	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2) RETURNING id;`
 
-	_, err := db.Exec(query, exercise.Question, exercise.Answer)
+	err := db.QueryRow(query, &exercise.Question, &exercise.Answer).Scan(&exercise.Id)
 	if err != nil {
 		panic(err)
 	}

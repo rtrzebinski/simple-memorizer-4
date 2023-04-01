@@ -50,7 +50,7 @@ func TestExercises(t *testing.T) {
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
 	assert.Len(t, res, 1)
-	assert.Equal(t, 1, res[0].Id)
+	assert.Equal(t, exercise.Id, res[0].Id)
 	assert.Equal(t, exercise.Question, res[0].Question)
 	assert.Equal(t, exercise.Answer, res[0].Answer)
 	assert.Equal(t, 0, res[0].BadAnswers)
@@ -98,7 +98,7 @@ func TestRandomExercise(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercise{}, res)
-	assert.Equal(t, 1, res.Id)
+	assert.Equal(t, exercise.Id, res.Id)
 	assert.Equal(t, exercise.Question, res.Question)
 	assert.Equal(t, exercise.Answer, res.Answer)
 	assert.Equal(t, 0, res.BadAnswers)
