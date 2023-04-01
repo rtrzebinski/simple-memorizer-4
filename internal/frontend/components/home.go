@@ -98,14 +98,11 @@ func (h *Home) bindSwipes() {
 	})
 }
 
+// //Div().Body(&hello{})
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
-		app.P().Body(
-			app.A().Href("/").Text("Home"),
-			app.Text(" | "),
-			app.A().Href("/exercises").Text("Exercises"),
-		),
+		&Navigation{},
 		app.H2().Body(
 			app.Text("What is the capital of "),
 			app.If(h.question != "",
