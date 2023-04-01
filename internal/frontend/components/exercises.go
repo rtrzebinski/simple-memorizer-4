@@ -85,6 +85,8 @@ func (h *Exercises) fetchAllExercises() {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
+	h.rows = []*ExerciseRow{}
+
 	for _, exercise := range exercises {
 		h.rows = append(h.rows, &ExerciseRow{question: exercise.Question, answer: exercise.Answer})
 	}
