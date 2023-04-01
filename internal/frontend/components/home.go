@@ -31,74 +31,6 @@ type Home struct {
 	nextExerciseId  int
 }
 
-// The OnMount method is run once component is mounted
-func (h *Home) OnMount(ctx app.Context) {
-	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.handleNextExercise()
-	h.bindKeys()
-	h.bindSwipes()
-}
-
-func (h *Home) bindKeys() {
-	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
-		// bind actions to keyboard shortcuts
-		switch e.Get("code").String() {
-		case "Space":
-			if h.isAnswerVisible == true {
-				// only allow if next exercise was preloaded (to avoid double clicks)
-				if h.isNextPreloaded == true {
-					h.handleNextExercise()
-				}
-			} else {
-				h.handleViewAnswer()
-			}
-		case "KeyV", "ArrowUp":
-			h.handleViewAnswer()
-		case "KeyG", "ArrowRight":
-			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleGoodAnswer()
-			}
-		case "KeyB", "ArrowLeft":
-			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleBadAnswer()
-			}
-		case "KeyN", "ArrowDown":
-			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleNextExercise()
-			}
-		}
-	})
-}
-
-func (h *Home) bindSwipes() {
-	app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
-		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleBadAnswer()
-		}
-	})
-	app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
-		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleGoodAnswer()
-		}
-	})
-	app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
-		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleNextExercise()
-		}
-	})
-	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
-		h.handleViewAnswer()
-	})
-}
-
-// //Div().Body(&hello{})
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
@@ -169,6 +101,73 @@ func (h *Home) Render() app.UI {
 				Style("font-size", "15px"),
 		),
 	)
+}
+
+// The OnMount method is run once component is mounted
+func (h *Home) OnMount(ctx app.Context) {
+	url := app.Window().URL()
+	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	h.handleNextExercise()
+	h.bindKeys()
+	h.bindSwipes()
+}
+
+func (h *Home) bindKeys() {
+	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
+		// bind actions to keyboard shortcuts
+		switch e.Get("code").String() {
+		case "Space":
+			if h.isAnswerVisible == true {
+				// only allow if next exercise was preloaded (to avoid double clicks)
+				if h.isNextPreloaded == true {
+					h.handleNextExercise()
+				}
+			} else {
+				h.handleViewAnswer()
+			}
+		case "KeyV", "ArrowUp":
+			h.handleViewAnswer()
+		case "KeyG", "ArrowRight":
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleGoodAnswer()
+			}
+		case "KeyB", "ArrowLeft":
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleBadAnswer()
+			}
+		case "KeyN", "ArrowDown":
+			// only allow if next exercise was preloaded (to avoid double clicks)
+			if h.isNextPreloaded == true {
+				h.handleNextExercise()
+			}
+		}
+	})
+}
+
+func (h *Home) bindSwipes() {
+	app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleBadAnswer()
+		}
+	})
+	app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleGoodAnswer()
+		}
+	})
+	app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
+		// only allow if next exercise was preloaded (to avoid double clicks)
+		if h.isNextPreloaded == true {
+			h.handleNextExercise()
+		}
+	})
+	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
+		h.handleViewAnswer()
+	})
 }
 
 func (h *Home) handleNextExercise() {
