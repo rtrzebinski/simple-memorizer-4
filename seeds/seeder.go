@@ -31,19 +31,19 @@ func (s Seeder) ExerciseSeed() {
 	}
 
 	capitals := map[string]string{
-		"Poland":      "Warsaw",
-		"Germany":     "Berlin",
-		"France":      "Paris",
-		"Netherlands": "Amsterdam",
-		"Spain":       "Madrid",
-		"Greece":      "Athens",
-		"Slovakia":    "Bratislava",
-		"Hungary":     "Budapest",
-		"Slovenia":    "Ljubljana",
-		"Cyprus":      "Nicosia",
-		"Iceland":     "Reykjavik",
-		"Latvia":      "Riga",
-		"Bulgaria":    "Sofia",
+		"Poland":  "Warsaw",
+		"Germany": "Berlin",
+		//"France":      "Paris",
+		//"Netherlands": "Amsterdam",
+		//"Spain":       "Madrid",
+		//"Greece":      "Athens",
+		//"Slovakia":    "Bratislava",
+		//"Hungary":     "Budapest",
+		//"Slovenia":    "Ljubljana",
+		//"Cyprus":      "Nicosia",
+		//"Iceland":     "Reykjavik",
+		//"Latvia":      "Riga",
+		//"Bulgaria":    "Sofia",
 	}
 
 	for q, a := range capitals {

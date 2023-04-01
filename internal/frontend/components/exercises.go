@@ -11,7 +11,7 @@ import (
 type Exercises struct {
 	app.Compo
 	api  *frontend.ApiClient
-	rows []*ExerciseRow
+	rows []ExerciseRow
 
 	// add new exercise
 	inputQuestion      string
@@ -38,7 +38,7 @@ func (h *Exercises) Render() app.UI {
 			app.Table().Style("border", "1px solid black").Body(
 				&ExerciseHeader{},
 				app.Range(h.rows).Slice(func(i int) app.UI {
-					return h.rows[i]
+					return &h.rows[i]
 				}),
 			),
 		),
@@ -66,6 +66,7 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 
 	h.inputQuestion = ""
 	h.inputAnswer = ""
+	h.rows = []ExerciseRow{}
 
 	h.fetchAllExercises()
 
@@ -85,9 +86,7 @@ func (h *Exercises) fetchAllExercises() {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
-	h.rows = []*ExerciseRow{}
-
 	for _, exercise := range exercises {
-		h.rows = append(h.rows, &ExerciseRow{question: exercise.Question, answer: exercise.Answer})
+		h.rows = append(h.rows, ExerciseRow{exercise: exercise})
 	}
 }
