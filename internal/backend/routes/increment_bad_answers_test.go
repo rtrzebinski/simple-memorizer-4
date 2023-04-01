@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,9 +12,7 @@ import (
 )
 
 func TestIncrementBadAnswers(t *testing.T) {
-	input := IncrementBadAnswersReq{
-		ExerciseId: 123,
-	}
+	input := models.Exercise{Id: 123}
 
 	body, err := json.Marshal(input)
 	if err != nil {

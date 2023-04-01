@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -129,7 +128,7 @@ func (suite *ApiClientSuite) TestFetchNextExercise() {
 }
 
 func (suite *ApiClientSuite) TestIncrementBadAnswers() {
-	exerciseId := 123
+	exercise := models.Exercise{Id: 123}
 
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
@@ -137,10 +136,10 @@ func (suite *ApiClientSuite) TestIncrementBadAnswers() {
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
-		var input routes.IncrementBadAnswersReq
+		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
 		suite.NoError(err)
-		suite.Equal(exerciseId, input.ExerciseId)
+		suite.Equal(exercise.Id, input.Id)
 
 		return true
 	})).Return(&http.Response{
@@ -148,12 +147,12 @@ func (suite *ApiClientSuite) TestIncrementBadAnswers() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.apiClient.IncrementBadAnswers(exerciseId)
+	err := suite.apiClient.IncrementBadAnswers(exercise)
 	assert.NoError(suite.T(), err)
 }
 
 func (suite *ApiClientSuite) TestIncrementGoodAnswers() {
-	exerciseId := 456
+	exercise := models.Exercise{Id: 123}
 
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
@@ -161,10 +160,10 @@ func (suite *ApiClientSuite) TestIncrementGoodAnswers() {
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
-		var input routes.IncrementGoodAnswersReq
+		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
 		suite.NoError(err)
-		suite.Equal(exerciseId, input.ExerciseId)
+		suite.Equal(exercise.Id, input.Id)
 
 		return true
 	})).Return(&http.Response{
@@ -172,6 +171,6 @@ func (suite *ApiClientSuite) TestIncrementGoodAnswers() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.apiClient.IncrementGoodAnswers(exerciseId)
+	err := suite.apiClient.IncrementGoodAnswers(exercise)
 	assert.NoError(suite.T(), err)
 }

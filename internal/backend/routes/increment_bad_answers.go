@@ -4,17 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"log"
 	"net/http"
 )
 
 type IncrementBadAnswers struct {
-	w   storage.Writer
-	req IncrementBadAnswersReq
-}
-
-type IncrementBadAnswersReq struct {
-	ExerciseId int
+	w        storage.Writer
+	exercise models.Exercise
 }
 
 func NewIncrementBadAnswers(w storage.Writer) *IncrementBadAnswers {
@@ -22,7 +19,7 @@ func NewIncrementBadAnswers(w storage.Writer) *IncrementBadAnswers {
 }
 
 func (h *IncrementBadAnswers) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.req)
+	err := json.NewDecoder(req.Body).Decode(&h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode IncrementBadAnswers HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -30,7 +27,7 @@ func (h *IncrementBadAnswers) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.w.IncrementBadAnswers(h.req.ExerciseId)
+	err = h.w.IncrementBadAnswers(h.exercise.Id)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to increment bad answers: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"io"
 	"net/http"
@@ -75,12 +74,8 @@ func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
 	return output, nil
 }
 
-func (c *ApiClient) IncrementBadAnswers(exerciseId int) error {
-	input := routes.IncrementBadAnswersReq{
-		ExerciseId: exerciseId,
-	}
-
-	body, err := json.Marshal(input)
+func (c *ApiClient) IncrementBadAnswers(exercise models.Exercise) error {
+	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
@@ -98,12 +93,8 @@ func (c *ApiClient) IncrementBadAnswers(exerciseId int) error {
 	return nil
 }
 
-func (c *ApiClient) IncrementGoodAnswers(exerciseId int) error {
-	input := routes.IncrementGoodAnswersReq{
-		ExerciseId: exerciseId,
-	}
-
-	body, err := json.Marshal(input)
+func (c *ApiClient) IncrementGoodAnswers(exercise models.Exercise) error {
+	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}

@@ -222,11 +222,10 @@ func (h *Home) handleViewAnswer() {
 }
 
 func (h *Home) handleGoodAnswer() {
-	// make a copy of h.exerciseId to prevent h.exerciseId being updated before increment was completed
-	toIncrement := h.exerciseId
+	exercise := models.Exercise{Id: h.exerciseId}
 	go func() {
 		// increment in the background
-		if err := h.api.IncrementGoodAnswers(toIncrement); err != nil {
+		if err := h.api.IncrementGoodAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
@@ -234,11 +233,10 @@ func (h *Home) handleGoodAnswer() {
 }
 
 func (h *Home) handleBadAnswer() {
-	// make a copy of h.exerciseId to prevent h.exerciseId being updated before increment was completed
-	toIncrement := h.exerciseId
+	exercise := models.Exercise{Id: h.exerciseId}
 	go func() {
 		// increment in the background
-		if err := h.api.IncrementBadAnswers(toIncrement); err != nil {
+		if err := h.api.IncrementBadAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
