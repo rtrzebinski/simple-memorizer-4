@@ -21,6 +21,11 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 	return &ApiClient{client: client, host: host, scheme: scheme}
 }
 
+func (c *ApiClient) DeleteExercise(exercise models.Exercise) error {
+	// todo implement
+	return nil
+}
+
 func (c *ApiClient) StoreExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
