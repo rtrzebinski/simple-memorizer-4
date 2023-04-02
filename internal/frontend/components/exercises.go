@@ -66,7 +66,6 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 
 	h.inputQuestion = ""
 	h.inputAnswer = ""
-	h.rows = []ExerciseRow{}
 
 	h.fetchAllExercises()
 
@@ -86,7 +85,9 @@ func (h *Exercises) fetchAllExercises() {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
-	for _, exercise := range exercises {
-		h.rows = append(h.rows, ExerciseRow{exercise: exercise})
+	h.rows = make([]ExerciseRow, len(exercises))
+
+	for i, exercise := range exercises {
+		h.rows[i] = ExerciseRow{exercise: exercise}
 	}
 }
