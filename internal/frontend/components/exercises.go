@@ -38,7 +38,7 @@ func (h *Exercises) Render() app.UI {
 			app.Table().Style("border", "1px solid black").Body(
 				&ExerciseHeader{},
 				app.Range(h.rows).Slice(func(i int) app.UI {
-					return &h.rows[i]
+					return h.rows[i].Render()
 				}),
 			),
 		),
