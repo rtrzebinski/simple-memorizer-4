@@ -81,6 +81,7 @@ func run(ctx context.Context) error {
 			"/web/swiped-events.js",
 		},
 		Styles: []string{
+			// todo find a way to only load on a learning page
 			//"/web/hello.css",
 		},
 	})

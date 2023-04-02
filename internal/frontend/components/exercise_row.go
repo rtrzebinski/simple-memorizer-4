@@ -15,10 +15,22 @@ type ExerciseRow struct {
 func (h *ExerciseRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
+			app.Text(h.exercise.Id),
+		),
+		app.Td().Style("border", "1px solid black").Body(
 			app.Text(h.exercise.Question),
 		),
 		app.Td().Style("border", "1px solid black").Body(
 			app.Text(h.exercise.Answer),
+		),
+		app.Td().Style("border", "1px solid black").Body(
+			app.Text(h.exercise.BadAnswers),
+		),
+		app.Td().Style("border", "1px solid black").Body(
+			app.Text(h.exercise.GoodAnswers),
+		),
+		app.Td().Style("border", "1px solid black").Body(
+			app.Button().Text("Delete"),
 		),
 	)
 }
