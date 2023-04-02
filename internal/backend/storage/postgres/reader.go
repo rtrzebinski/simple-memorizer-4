@@ -20,7 +20,9 @@ func (r *Reader) AllExercises() (models.Exercises, error) {
 	const query = `
 		SELECT e.id, e.question, e.answer, COALESCE(er.bad_answers, 0), COALESCE(er.good_answers, 0) 
 		FROM exercise e
-		LEFT JOIN exercise_result er on e.id = er.exercise_id`
+		LEFT JOIN exercise_result er on e.id = er.exercise_id
+		ORDER BY e.id DESC
+		`
 
 	rows, err := r.db.Query(query)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestExercises(t *testing.T) {
+func TestAllExercises(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
