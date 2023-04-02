@@ -31,10 +31,10 @@ func (s Seeder) ExerciseSeed() {
 	}
 
 	capitals := map[string]string{
-		"Poland":  "Warsaw",
-		"Germany": "Berlin",
-		//"France":      "Paris",
-		//"Netherlands": "Amsterdam",
+		"Poland":      "Warsaw",
+		"Germany":     "Berlin",
+		"France":      "Paris",
+		"Netherlands": "Amsterdam",
 		//"Spain":       "Madrid",
 		//"Greece":      "Athens",
 		//"Slovakia":    "Bratislava",

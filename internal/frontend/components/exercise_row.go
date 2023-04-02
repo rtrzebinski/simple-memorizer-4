@@ -12,6 +12,7 @@ type ExerciseRow struct {
 	app.Compo
 	api *frontend.ApiClient
 
+	parent   *Exercises
 	exercise models.Exercise
 }
 
@@ -36,10 +37,22 @@ func (h *ExerciseRow) Render() app.UI {
 		app.Td().Style("border", "1px solid black").Body(
 			app.Button().Text("Delete").OnClick(func(ctx app.Context, e app.Event) {
 				app.Logf("delete %d", h.exercise.Id)
+				app.Logf("delete %d", h.exercise.Question)
 				err := h.api.DeleteExercise(h.exercise)
 				if err != nil {
 					app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 				}
+				// remove deleted row from the parent slice
+				rows := make([]*ExerciseRow, len(h.parent.rows))
+				for i, row := range h.parent.rows {
+					if i != h.exercise.Id && row != nil {
+						app.Log("inserting", i, row.exercise.Id, row.exercise.Question)
+						rows[i] = row
+					}
+				}
+				app.Log(h.parent.rows)
+				h.parent.rows = rows
+				app.Log(rows)
 			}),
 		),
 	)
