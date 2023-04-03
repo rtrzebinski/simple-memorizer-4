@@ -39,7 +39,6 @@ func (h *Exercises) Render() app.UI {
 				&ExerciseHeader{},
 				app.Range(h.rows).Slice(func(i int) app.UI {
 					if h.rows[i] != nil {
-						app.Log("rendering", i, h.rows[i].exercise.Id, h.rows[i].exercise.Question)
 						return h.rows[i].Render()
 					}
 					return nil
@@ -88,7 +87,7 @@ func (h *Exercises) fetchAllExercises() {
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
-	app.Log("fetchAllExercises")
+
 	h.rows = make([]*ExerciseRow, len(exercises)+1)
 
 	for _, exercise := range exercises {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"io"
@@ -22,7 +23,8 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 }
 
 func (c *ApiClient) DeleteExercise(exercise models.Exercise) error {
-	// todo implement
+	app.Logf("delete %d", exercise.Id)
+
 	return nil
 }
 
