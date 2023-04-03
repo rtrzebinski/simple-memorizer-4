@@ -34,6 +34,33 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(ApiClientSuite))
 }
 
+func (suite *ApiClientSuite) TestDeleteExercise() {
+	exercise := models.Exercise{
+		Id: 123,
+	}
+
+	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("POST", req.Method)
+		suite.Equal(backend.DeleteExercise, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		var input models.Exercise
+		err := json.NewDecoder(req.Body).Decode(&input)
+		suite.NoError(err)
+		suite.Equal(exercise.Question, input.Question)
+		suite.Equal(exercise.Answer, input.Answer)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader([]byte{})),
+	}, nil)
+
+	err := suite.apiClient.DeleteExercise(exercise)
+	assert.NoError(suite.T(), err)
+}
+
 func (suite *ApiClientSuite) TestStoreExercise() {
 	exercise := models.Exercise{
 		Question: "question",

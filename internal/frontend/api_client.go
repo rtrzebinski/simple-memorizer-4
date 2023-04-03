@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"io"
@@ -23,7 +22,20 @@ func NewApiClient(client HttpClient, host string, scheme string) *ApiClient {
 }
 
 func (c *ApiClient) DeleteExercise(exercise models.Exercise) error {
-	app.Logf("delete %d", exercise.Id)
+	body, err := json.Marshal(exercise)
+	if err != nil {
+		return fmt.Errorf("failed to encode input: %w", err)
+	}
+
+	urlAddress := c.scheme + "://" + c.host + backend.DeleteExercise
+	buffer := bytes.NewBuffer(body)
+
+	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
 
 	return nil
 }

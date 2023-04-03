@@ -88,9 +88,22 @@ func (h *Exercises) fetchAllExercises() {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
+	// no exercises in the database
+	if len(exercises) == 0 {
+		return
+	}
+
+	// find maxId so we know the rows slice capacity
+	maxId := exercises[0].Id
+	for _, exercise := range exercises {
+		if exercise.Id > maxId {
+			maxId = exercise.Id
+		}
+	}
+
 	// add +1 to len as IDs from the DB are 1 indexed, while slices are 0 indexed,
 	// so we need to shift by one to have space for the latest row
-	h.rows = make([]*ExerciseRow, len(exercises)+1)
+	h.rows = make([]*ExerciseRow, maxId+1)
 
 	for _, exercise := range exercises {
 		h.rows[exercise.Id] = &ExerciseRow{exercise: exercise, parent: h}

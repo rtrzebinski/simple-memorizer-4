@@ -8,6 +8,55 @@ import (
 	"testing"
 )
 
+func TestDeleteExercise(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	storeExercise(db, &entities.Exercise{
+		Question: "question",
+		Answer:   "answer",
+	})
+	stored := fetchLatestExercise(db)
+
+	storeExercise(db, &entities.Exercise{
+		Question: "another",
+		Answer:   "another",
+	})
+	another := fetchLatestExercise(db)
+
+	err = w.DeleteExercise(models.Exercise{Id: stored.Id})
+	assert.NoError(t, err)
+
+	assert.Nil(t, findExerciseById(db, stored.Id))
+	assert.Equal(t, "another", findExerciseById(db, another.Id).Question)
+}
+
 func TestStoreExercise(t *testing.T) {
 	t.Parallel()
 

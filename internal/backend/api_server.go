@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	DeleteExercise       = "/delete-exercise"
 	StoreExercise        = "/store-exercise"
 	FetchAllExercises    = "/fetch-all-exercises"
 	FetchNextExercise    = "/fetch-next-exercise"
@@ -15,6 +16,7 @@ const (
 )
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
+	http.Handle(DeleteExercise, routes.NewDeleteExercise(w))
 	http.Handle(StoreExercise, routes.NewStoreExercise(w))
 	http.Handle(FetchAllExercises, routes.NewFetchAllExercises(r))
 	http.Handle(FetchNextExercise, routes.NewFetchNextExercise(r))

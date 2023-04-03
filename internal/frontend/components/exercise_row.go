@@ -3,16 +3,12 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"net/http"
 	"strconv"
 )
 
 type ExerciseRow struct {
 	app.Compo
-	api *frontend.ApiClient
-
 	parent   *Exercises
 	exercise models.Exercise
 }
@@ -45,7 +41,7 @@ func (h *ExerciseRow) Render() app.UI {
 					app.Log(fmt.Errorf("failed to convert row id to int: %w", err))
 				}
 				// delete exercise via API
-				err = h.api.DeleteExercise(models.Exercise{Id: id})
+				err = h.parent.api.DeleteExercise(models.Exercise{Id: id})
 				if err != nil {
 					app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 				}
@@ -62,10 +58,4 @@ func (h *ExerciseRow) Render() app.UI {
 			}),
 		),
 	)
-}
-
-// The OnMount method is run once component is mounted
-func (h *ExerciseRow) OnMount(ctx app.Context) {
-	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
 }

@@ -8,6 +8,7 @@ type Reader interface {
 }
 
 type Writer interface {
+	DeleteExercise(models.Exercise) error
 	StoreExercise(models.Exercise) error
 	IncrementBadAnswers(models.Exercise) error
 	IncrementGoodAnswers(models.Exercise) error

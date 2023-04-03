@@ -14,6 +14,17 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
+func (w *Writer) DeleteExercise(exercise models.Exercise) error {
+	query := `DELETE FROM exercise WHERE id = $1;`
+
+	_, err := w.db.Exec(query, exercise.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute 'DELETE FROM exercise' query: %w", err)
+	}
+
+	return nil
+}
+
 func (w *Writer) StoreExercise(exercise models.Exercise) error {
 	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
 

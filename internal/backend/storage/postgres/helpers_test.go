@@ -15,6 +15,32 @@ import (
 	"time"
 )
 
+func findExerciseById(db *sql.DB, exerciseId int) *entities.Exercise {
+
+	const query = `
+		SELECT e.id, e.question, e.answer
+		FROM exercise e
+		WHERE e.id = $1;`
+
+	rows, err := db.Query(query, exerciseId)
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		var exercise entities.Exercise
+
+		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
+		if err != nil {
+			panic(err)
+		}
+
+		return &exercise
+	}
+
+	return nil
+}
+
 func fetchLatestExercise(db *sql.DB) entities.Exercise {
 	var exercise entities.Exercise
 
