@@ -13,10 +13,10 @@ type Exercises struct {
 	api  *frontend.ApiClient
 	rows []*ExerciseRow
 
-	inputId            int
-	inputQuestion      string
-	inputAnswer        string
-	saveButtonDisabled bool
+	inputId             int
+	inputQuestion       string
+	inputAnswer         string
+	storeButtonDisabled bool
 }
 
 // The OnMount method is run once component is mounted
@@ -38,7 +38,8 @@ func (h *Exercises) Render() app.UI {
 			app.Textarea().ID("input_answer").Cols(30).Rows(3).Placeholder("Answer").
 				Required(true).OnInput(h.ValueTo(&h.inputAnswer)).Text(h.inputAnswer),
 			app.Br(),
-			app.Button().Text("Save").OnClick(h.storeExercise).Disabled(h.saveButtonDisabled),
+			app.Button().Text("Store").OnClick(h.handleStore).Disabled(h.storeButtonDisabled),
+			app.Button().Text("Cancel").OnClick(h.handleCancel),
 		),
 		app.Div().Body(
 			app.H2().Text("All exercises"),
@@ -55,7 +56,8 @@ func (h *Exercises) Render() app.UI {
 	)
 }
 
-func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
+// handleStore create new or update existing exercise
+func (h *Exercises) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
 	// todo implement input validation
@@ -64,7 +66,7 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 		return
 	}
 
-	h.saveButtonDisabled = true
+	h.storeButtonDisabled = true
 
 	err := h.api.StoreExercise(models.Exercise{
 		Id:       h.inputId,
@@ -81,7 +83,14 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 
 	h.fetchAllExercises()
 
-	h.saveButtonDisabled = false
+	h.storeButtonDisabled = false
+}
+
+// handleCancel cleanup exercise input UI
+func (h *Exercises) handleCancel(ctx app.Context, e app.Event) {
+	h.inputId = 0
+	h.inputQuestion = ""
+	h.inputAnswer = ""
 }
 
 func (h *Exercises) fetchAllExercises() {
