@@ -9,3 +9,10 @@ type Exercise struct {
 }
 
 type Exercises []Exercise
+
+type Lesson struct {
+	Id   int
+	Name string
+}
+
+type Lessons []Lesson

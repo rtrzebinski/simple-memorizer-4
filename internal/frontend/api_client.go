@@ -76,6 +76,61 @@ func (c *ApiClient) FetchAllExercises() (models.Exercises, error) {
 	return output, nil
 }
 
+func (c *ApiClient) DeleteLesson(lesson models.Lesson) error {
+	body, err := json.Marshal(lesson)
+	if err != nil {
+		return fmt.Errorf("failed to encode input: %w", err)
+	}
+
+	urlAddress := c.scheme + "://" + c.host + backend.DeleteLesson
+	buffer := bytes.NewBuffer(body)
+
+	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *ApiClient) StoreLesson(lesson models.Lesson) error {
+	body, err := json.Marshal(lesson)
+	if err != nil {
+		return fmt.Errorf("failed to encode input: %w", err)
+	}
+
+	urlAddress := c.scheme + "://" + c.host + backend.StoreLesson
+	buffer := bytes.NewBuffer(body)
+
+	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *ApiClient) FetchAllLessons() (models.Lessons, error) {
+	var output models.Lessons
+
+	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchAllLessons, nil)
+	if err != nil {
+		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
+		return output, fmt.Errorf("failed to decode output: %w", err)
+	}
+
+	return output, nil
+}
+
 func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
 	var output models.Exercise
 

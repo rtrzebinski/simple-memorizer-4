@@ -122,6 +122,88 @@ func (suite *ApiClientSuite) TestFetchAllExercises() {
 	suite.Assert().Equal(exercises, result)
 }
 
+func (suite *ApiClientSuite) TestDeleteLeson() {
+	lesson := models.Lesson{
+		Id: 123,
+	}
+
+	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("POST", req.Method)
+		suite.Equal(backend.DeleteLesson, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		var input models.Lesson
+		err := json.NewDecoder(req.Body).Decode(&input)
+		suite.NoError(err)
+		suite.Equal(lesson.Name, input.Name)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader([]byte{})),
+	}, nil)
+
+	err := suite.apiClient.DeleteLesson(lesson)
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *ApiClientSuite) TestStoreLesson() {
+	lesson := models.Lesson{
+		Name: "name",
+	}
+
+	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("POST", req.Method)
+		suite.Equal(backend.StoreLesson, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		var input models.Lesson
+		err := json.NewDecoder(req.Body).Decode(&input)
+		suite.NoError(err)
+		suite.Equal(lesson.Name, input.Name)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader([]byte{})),
+	}, nil)
+
+	err := suite.apiClient.StoreLesson(lesson)
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *ApiClientSuite) TestFetchAllLessons() {
+	lesson := models.Lesson{
+		Id:   1,
+		Name: "name",
+	}
+	lessons := models.Lessons{lesson}
+
+	responseBody, err := json.Marshal(lessons)
+	if err != nil {
+		suite.Error(err)
+	}
+
+	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("GET", req.Method)
+		suite.Equal(backend.FetchAllLessons, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader(responseBody)),
+	}, nil)
+
+	result, err := suite.apiClient.FetchAllLessons()
+	assert.NoError(suite.T(), err)
+
+	suite.Assert().Equal(lessons, result)
+}
+
 func (suite *ApiClientSuite) TestFetchNextExercise() {
 	exercise := models.Exercise{
 		Id:          1,
