@@ -32,47 +32,47 @@ type Home struct {
 }
 
 // The OnMount method is run once component is mounted
-func (h *Home) OnMount(ctx app.Context) {
+func (c *Home) OnMount(ctx app.Context) {
 	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.handleNextExercise()
-	h.bindKeys()
-	h.bindSwipes()
+	c.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	c.handleNextExercise()
+	c.bindKeys()
+	c.bindSwipes()
 }
 
 // The Render method is where the component appearance is defined.
-func (h *Home) Render() app.UI {
+func (c *Home) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.H2().Body(
 			app.Text("What is the capital of "),
-			app.If(h.question != "",
-				app.Text(h.question),
+			app.If(c.question != "",
+				app.Text(c.question),
 			).Else(
 				app.Text(""),
 			),
 			app.Text("?"),
 		),
 		app.H2().Body(
-			app.If(h.answer != "",
-				app.Text(h.answer),
+			app.If(c.answer != "",
+				app.Text(c.answer),
 			).Else(
 				app.Text(""),
 			),
-		).Hidden(!h.isAnswerVisible),
+		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
 			app.Text("Good answers: "),
-			app.Text(h.goodAnswers),
+			app.Text(c.goodAnswers),
 		),
 		app.P().Body(
 			app.Text("Bad answers: "),
-			app.Text(h.badAnswers),
+			app.Text(c.badAnswers),
 		),
 		app.P().Body(
 			app.Button().
 				Text("⇧ View answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					h.handleViewAnswer()
+					c.handleViewAnswer()
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
@@ -80,8 +80,8 @@ func (h *Home) Render() app.UI {
 				Text("Next exercise ⇩").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleNextExercise()
+					if c.isNextPreloaded == true {
+						c.handleNextExercise()
 					}
 				}).
 				Style("margin-right", "10px").
@@ -92,8 +92,8 @@ func (h *Home) Render() app.UI {
 				Text("⇦ Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleBadAnswer()
+					if c.isNextPreloaded == true {
+						c.handleBadAnswer()
 					}
 				}).
 				Style("margin-right", "10px").
@@ -102,8 +102,8 @@ func (h *Home) Render() app.UI {
 				Text("Good answer ⇨").
 				OnClick(func(ctx app.Context, e app.Event) {
 					// only allow if next exercise was preloaded (to avoid double clicks)
-					if h.isNextPreloaded == true {
-						h.handleGoodAnswer()
+					if c.isNextPreloaded == true {
+						c.handleGoodAnswer()
 					}
 				}).
 				Style("margin-right", "10px").
@@ -112,133 +112,133 @@ func (h *Home) Render() app.UI {
 	)
 }
 
-func (h *Home) bindKeys() {
+func (c *Home) bindKeys() {
 	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
 		// bind actions to keyboard shortcuts
 		switch e.Get("code").String() {
 		case "Space":
-			if h.isAnswerVisible == true {
+			if c.isAnswerVisible == true {
 				// only allow if next exercise was preloaded (to avoid double clicks)
-				if h.isNextPreloaded == true {
-					h.handleNextExercise()
+				if c.isNextPreloaded == true {
+					c.handleNextExercise()
 				}
 			} else {
-				h.handleViewAnswer()
+				c.handleViewAnswer()
 			}
 		case "KeyV", "ArrowUp":
-			h.handleViewAnswer()
+			c.handleViewAnswer()
 		case "KeyG", "ArrowRight":
 			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleGoodAnswer()
+			if c.isNextPreloaded == true {
+				c.handleGoodAnswer()
 			}
 		case "KeyB", "ArrowLeft":
 			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleBadAnswer()
+			if c.isNextPreloaded == true {
+				c.handleBadAnswer()
 			}
 		case "KeyN", "ArrowDown":
 			// only allow if next exercise was preloaded (to avoid double clicks)
-			if h.isNextPreloaded == true {
-				h.handleNextExercise()
+			if c.isNextPreloaded == true {
+				c.handleNextExercise()
 			}
 		}
 	})
 }
 
-func (h *Home) bindSwipes() {
+func (c *Home) bindSwipes() {
 	app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleBadAnswer()
+		if c.isNextPreloaded == true {
+			c.handleBadAnswer()
 		}
 	})
 	app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleGoodAnswer()
+		if c.isNextPreloaded == true {
+			c.handleGoodAnswer()
 		}
 	})
 	app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
-		if h.isNextPreloaded == true {
-			h.handleNextExercise()
+		if c.isNextPreloaded == true {
+			c.handleNextExercise()
 		}
 	})
 	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
-		h.handleViewAnswer()
+		c.handleViewAnswer()
 	})
 }
 
-func (h *Home) handleNextExercise() {
-	h.isAnswerVisible = false
+func (c *Home) handleNextExercise() {
+	c.isAnswerVisible = false
 
-	if h.isNextPreloaded == false {
-		exercise := h.fetchNext()
-		h.exerciseId = exercise.Id
-		h.question = exercise.Question
-		h.answer = exercise.Answer
-		h.goodAnswers = exercise.GoodAnswers
-		h.badAnswers = exercise.BadAnswers
+	if c.isNextPreloaded == false {
+		exercise := c.fetchNext()
+		c.exerciseId = exercise.Id
+		c.question = exercise.Question
+		c.answer = exercise.Answer
+		c.goodAnswers = exercise.GoodAnswers
+		c.badAnswers = exercise.BadAnswers
 		app.Log("displayed initial exercise")
 	} else {
-		h.isNextPreloaded = false
-		h.exerciseId = h.nextExerciseId
-		h.question = h.nextQuestion
-		h.answer = h.nextAnswer
-		h.goodAnswers = h.nextGoodAnswers
-		h.badAnswers = h.nextBadAnswers
+		c.isNextPreloaded = false
+		c.exerciseId = c.nextExerciseId
+		c.question = c.nextQuestion
+		c.answer = c.nextAnswer
+		c.goodAnswers = c.nextGoodAnswers
+		c.badAnswers = c.nextBadAnswers
 		app.Log("displayed preloaded exercise")
 	}
 
 	go func() {
-		exercise := h.fetchNext()
-		h.nextExerciseId = exercise.Id
-		h.nextQuestion = exercise.Question
-		h.nextAnswer = exercise.Answer
-		h.nextGoodAnswers = exercise.GoodAnswers
-		h.nextBadAnswers = exercise.BadAnswers
-		h.isNextPreloaded = true
+		exercise := c.fetchNext()
+		c.nextExerciseId = exercise.Id
+		c.nextQuestion = exercise.Question
+		c.nextAnswer = exercise.Answer
+		c.nextGoodAnswers = exercise.GoodAnswers
+		c.nextBadAnswers = exercise.BadAnswers
+		c.isNextPreloaded = true
 		app.Log("preloaded")
 	}()
 }
 
-func (h *Home) fetchNext() models.Exercise {
-	exercise, err := h.api.FetchNextExercise()
+func (c *Home) fetchNext() models.Exercise {
+	exercise, err := c.api.FetchNextExercise()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}
 
 	// dummy way of avoiding duplicates todo move to the API
-	if exercise.Id == h.exerciseId {
-		return h.fetchNext()
+	if exercise.Id == c.exerciseId {
+		return c.fetchNext()
 	}
 
 	return exercise
 }
 
-func (h *Home) handleViewAnswer() {
-	h.isAnswerVisible = true
+func (c *Home) handleViewAnswer() {
+	c.isAnswerVisible = true
 }
 
-func (h *Home) handleGoodAnswer() {
-	exercise := models.Exercise{Id: h.exerciseId}
+func (c *Home) handleGoodAnswer() {
+	exercise := models.Exercise{Id: c.exerciseId}
 	go func() {
 		// increment in the background
-		if err := h.api.IncrementGoodAnswers(exercise); err != nil {
+		if err := c.api.IncrementGoodAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
-	h.handleNextExercise()
+	c.handleNextExercise()
 }
 
-func (h *Home) handleBadAnswer() {
-	exercise := models.Exercise{Id: h.exerciseId}
+func (c *Home) handleBadAnswer() {
+	exercise := models.Exercise{Id: c.exerciseId}
 	go func() {
 		// increment in the background
-		if err := h.api.IncrementBadAnswers(exercise); err != nil {
+		if err := c.api.IncrementBadAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
-	h.handleNextExercise()
+	c.handleNextExercise()
 }

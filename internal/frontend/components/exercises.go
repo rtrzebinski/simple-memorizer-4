@@ -20,34 +20,34 @@ type Exercises struct {
 }
 
 // The OnMount method is run once component is mounted
-func (h *Exercises) OnMount(ctx app.Context) {
+func (c *Exercises) OnMount(ctx app.Context) {
 	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.fetchAllExercises()
+	c.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	c.displayAllExercises()
 }
 
 // The Render method is where the component appearance is defined.
-func (h *Exercises) Render() app.UI {
+func (c *Exercises) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.Div().Body(
 			app.H2().Text("Store exercise"),
 			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
-				Required(true).OnInput(h.ValueTo(&h.inputQuestion)).Text(h.inputQuestion),
+				Required(true).OnInput(c.ValueTo(&c.inputQuestion)).Text(c.inputQuestion),
 			app.Br(),
 			app.Textarea().ID("input_answer").Cols(30).Rows(3).Placeholder("Answer").
-				Required(true).OnInput(h.ValueTo(&h.inputAnswer)).Text(h.inputAnswer),
+				Required(true).OnInput(c.ValueTo(&c.inputAnswer)).Text(c.inputAnswer),
 			app.Br(),
-			app.Button().Text("Store").OnClick(h.handleStore).Disabled(h.storeButtonDisabled),
-			app.Button().Text("Cancel").OnClick(h.handleCancel),
+			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
+			app.Button().Text("Cancel").OnClick(c.handleCancel),
 		),
 		app.Div().Body(
 			app.H2().Text("All exercises"),
 			app.Table().Style("border", "1px solid black").Body(
 				&ExerciseHeader{},
-				app.Range(h.rows).Slice(func(i int) app.UI {
-					if h.rows[i] != nil {
-						return h.rows[i].Render()
+				app.Range(c.rows).Slice(func(i int) app.UI {
+					if c.rows[i] != nil {
+						return c.rows[i].Render()
 					}
 					return nil
 				}),
@@ -57,44 +57,44 @@ func (h *Exercises) Render() app.UI {
 }
 
 // handleStore create new or update existing exercise
-func (h *Exercises) handleStore(ctx app.Context, e app.Event) {
+func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
 	// todo implement input validation
-	if h.inputQuestion == "" || h.inputAnswer == "" {
+	if c.inputQuestion == "" || c.inputAnswer == "" {
 		app.Log("invalid input")
 		return
 	}
 
-	h.storeButtonDisabled = true
+	c.storeButtonDisabled = true
 
-	err := h.api.StoreExercise(models.Exercise{
-		Id:       h.inputId,
-		Question: h.inputQuestion,
-		Answer:   h.inputAnswer,
+	err := c.api.StoreExercise(models.Exercise{
+		Id:       c.inputId,
+		Question: c.inputQuestion,
+		Answer:   c.inputAnswer,
 	})
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
 
-	h.inputId = 0
-	h.inputQuestion = ""
-	h.inputAnswer = ""
+	c.inputId = 0
+	c.inputQuestion = ""
+	c.inputAnswer = ""
 
-	h.fetchAllExercises()
+	c.displayAllExercises()
 
-	h.storeButtonDisabled = false
+	c.storeButtonDisabled = false
 }
 
 // handleCancel cleanup exercise input UI
-func (h *Exercises) handleCancel(ctx app.Context, e app.Event) {
-	h.inputId = 0
-	h.inputQuestion = ""
-	h.inputAnswer = ""
+func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
+	c.inputId = 0
+	c.inputQuestion = ""
+	c.inputAnswer = ""
 }
 
-func (h *Exercises) fetchAllExercises() {
-	exercises, err := h.api.FetchAllExercises()
+func (c *Exercises) displayAllExercises() {
+	exercises, err := c.api.FetchAllExercises()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
@@ -114,9 +114,9 @@ func (h *Exercises) fetchAllExercises() {
 
 	// add +1 to len as IDs from the DB are 1 indexed, while slices are 0 indexed,
 	// so we need to shift by one to have space for the latest row
-	h.rows = make([]*ExerciseRow, maxId+1)
+	c.rows = make([]*ExerciseRow, maxId+1)
 
 	for _, exercise := range exercises {
-		h.rows[exercise.Id] = &ExerciseRow{exercise: exercise, parent: h}
+		c.rows[exercise.Id] = &ExerciseRow{exercise: exercise, parent: c}
 	}
 }

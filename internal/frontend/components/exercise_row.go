@@ -13,54 +13,54 @@ type ExerciseRow struct {
 }
 
 // The Render method is where the component appearance is defined.
-func (h *ExerciseRow) Render() app.UI {
+func (c *ExerciseRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(h.exercise.Id),
+			app.Text(c.exercise.Id),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(h.exercise.Question),
+			app.Text(c.exercise.Question),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(h.exercise.Answer),
+			app.Text(c.exercise.Answer),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(h.exercise.BadAnswers),
+			app.Text(c.exercise.BadAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(h.exercise.GoodAnswers),
+			app.Text(c.exercise.GoodAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(h.onEdit(h.exercise.Id), fmt.Sprintf("%p", h)),
-			app.Button().Text("Delete").OnClick(h.onDelete(h.exercise.Id), fmt.Sprintf("%p", h)),
+			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
+			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id), fmt.Sprintf("%p", c)),
 		),
 	)
 }
 
-func (h *ExerciseRow) onDelete(id int) app.EventHandler {
+func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise via API
-		err := h.parent.api.DeleteExercise(models.Exercise{Id: id})
+		err := c.parent.api.DeleteExercise(models.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}
 		// create a new rows slice to be replaced in parent component
-		rows := make([]*ExerciseRow, len(h.parent.rows))
-		for i, row := range h.parent.rows {
+		rows := make([]*ExerciseRow, len(c.parent.rows))
+		for i, row := range c.parent.rows {
 			// add all rows but current one (which is being deleted)
 			if i != id && row != nil {
 				rows[i] = row
 			}
 		}
 		// replace parent rows slice with a new one - this will update the UI
-		h.parent.rows = rows
+		c.parent.rows = rows
 	}
 }
 
-func (h *ExerciseRow) onEdit(id int) app.EventHandler {
+func (c *ExerciseRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		h.parent.inputId = h.exercise.Id
-		h.parent.inputQuestion = h.exercise.Question
-		h.parent.inputAnswer = h.exercise.Answer
+		c.parent.inputId = c.exercise.Id
+		c.parent.inputQuestion = c.exercise.Question
+		c.parent.inputAnswer = c.exercise.Answer
 	}
 }
