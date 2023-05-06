@@ -43,6 +43,14 @@ func (r *Reader) AllExercises() (models.Exercises, error) {
 	return exercises, nil
 }
 
+func (r *Reader) AllLessons() (models.Lessons, error) {
+	var lessons models.Lessons
+
+	// todo
+
+	return lessons, nil
+}
+
 func (r *Reader) RandomExercise() (models.Exercise, error) {
 	var exercise models.Exercise
 

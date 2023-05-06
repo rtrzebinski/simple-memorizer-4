@@ -47,6 +47,18 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
+func (w *Writer) DeleteLesson(lesson models.Lesson) error {
+	// todo
+
+	return nil
+}
+
+func (w *Writer) StoreLesson(lesson models.Lesson) error {
+	// todo
+
+	return nil
+}
+
 func (w *Writer) IncrementBadAnswers(exercise models.Exercise) error {
 	// check for existing exercise result
 	query := `SELECT id FROM exercise_result where exercise_id = $1`
