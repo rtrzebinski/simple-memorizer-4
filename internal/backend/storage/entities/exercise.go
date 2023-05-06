@@ -5,3 +5,8 @@ type Exercise struct {
 	Question string
 	Answer   string
 }
+
+type Lesson struct {
+	Id   int
+	Name string
+}

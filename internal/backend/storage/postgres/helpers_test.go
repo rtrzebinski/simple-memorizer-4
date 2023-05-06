@@ -41,6 +41,32 @@ func findExerciseById(db *sql.DB, exerciseId int) *entities.Exercise {
 	return nil
 }
 
+func findLessonById(db *sql.DB, lessonId int) *entities.Lesson {
+
+	const query = `
+		SELECT l.id, l.name
+		FROM lesson l
+		WHERE l.id = $1;`
+
+	rows, err := db.Query(query, lessonId)
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		var lesson entities.Lesson
+
+		err = rows.Scan(&lesson.Id, &lesson.Name)
+		if err != nil {
+			panic(err)
+		}
+
+		return &lesson
+	}
+
+	return nil
+}
+
 func fetchLatestExercise(db *sql.DB) entities.Exercise {
 	var exercise entities.Exercise
 
@@ -57,10 +83,35 @@ func fetchLatestExercise(db *sql.DB) entities.Exercise {
 	return exercise
 }
 
+func fetchLatestLesson(db *sql.DB) entities.Lesson {
+	var lesson entities.Lesson
+
+	const query = `
+		SELECT l.id, l.name
+		FROM lesson l
+		ORDER BY id DESC
+		LIMIT 1;`
+
+	if err := db.QueryRow(query).Scan(&lesson.Id, &lesson.Name); err != nil {
+		panic(err)
+	}
+
+	return lesson
+}
+
 func storeExercise(db *sql.DB, exercise *entities.Exercise) {
 	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2) RETURNING id;`
 
 	err := db.QueryRow(query, &exercise.Question, &exercise.Answer).Scan(&exercise.Id)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func storeLesson(db *sql.DB, lesson *entities.Lesson) {
+	query := `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
+
+	err := db.QueryRow(query, &lesson.Name).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}

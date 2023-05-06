@@ -48,13 +48,34 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 }
 
 func (w *Writer) DeleteLesson(lesson models.Lesson) error {
-	// todo
+	query := `DELETE FROM lesson WHERE id = $1;`
+
+	_, err := w.db.Exec(query, lesson.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute 'DELETE FROM lesson' query: %w", err)
+	}
 
 	return nil
 }
 
 func (w *Writer) StoreLesson(lesson models.Lesson) error {
-	// todo
+	var query string
+
+	if lesson.Id > 0 {
+		query = `UPDATE lesson set name = $1 where id = $2;`
+
+		_, err := w.db.Exec(query, lesson.Name, lesson.Id)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
+		}
+	} else {
+		query = `INSERT INTO lesson (name) VALUES ($1);`
+
+		_, err := w.db.Exec(query, lesson.Name)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
+		}
+	}
 
 	return nil
 }

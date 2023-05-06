@@ -151,6 +151,142 @@ func TestStoreExercise_editExisting(t *testing.T) {
 	assert.Equal(t, "newAnswer", stored.Answer)
 }
 
+func TestDeleteLesson(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	storeLesson(db, &entities.Lesson{
+		Name: "name",
+	})
+	stored := fetchLatestLesson(db)
+
+	storeLesson(db, &entities.Lesson{
+		Name: "another",
+	})
+	another := fetchLatestLesson(db)
+
+	err = w.DeleteLesson(models.Lesson{Id: stored.Id})
+	assert.NoError(t, err)
+
+	assert.Nil(t, findLessonById(db, stored.Id))
+	assert.Equal(t, "another", findLessonById(db, another.Id).Name)
+}
+
+func TestStoreLesson_createNew(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	lesson := models.Lesson{
+		Name: "name",
+	}
+
+	err = w.StoreLesson(lesson)
+	assert.NoError(t, err)
+
+	stored := fetchLatestLesson(db)
+
+	assert.Equal(t, lesson.Name, stored.Name)
+}
+
+func TestStoreLesson_editExisting(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	lesson := &entities.Lesson{
+		Name: "name",
+	}
+
+	storeLesson(db, lesson)
+
+	err = w.StoreLesson(models.Lesson{
+		Id:   1,
+		Name: "newName",
+	})
+	assert.NoError(t, err)
+
+	stored := fetchLatestLesson(db)
+
+	assert.Equal(t, "newName", stored.Name)
+}
+
 func TestIncrementBadAnswers(t *testing.T) {
 	t.Parallel()
 

@@ -46,7 +46,27 @@ func (r *Reader) AllExercises() (models.Exercises, error) {
 func (r *Reader) AllLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
-	// todo
+	const query = `
+		SELECT l.id, l.name
+		FROM lesson l
+		ORDER BY l.id DESC
+		`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return lessons, err
+	}
+
+	for rows.Next() {
+		var lesson models.Lesson
+
+		err = rows.Scan(&lesson.Id, &lesson.Name)
+		if err != nil {
+			return lessons, err
+		}
+
+		lessons = append(lessons, lesson)
+	}
 
 	return lessons, nil
 }
