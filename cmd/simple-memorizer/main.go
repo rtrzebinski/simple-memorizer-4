@@ -54,6 +54,7 @@ func run(ctx context.Context) error {
 
 	// Associate other frontend routes
 	app.Route("/exercises", &components.Exercises{})
+	app.Route("/lessons", &components.Lessons{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
