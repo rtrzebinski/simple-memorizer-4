@@ -13,10 +13,17 @@ type Exercises struct {
 	api  *frontend.ApiClient
 	rows []*ExerciseRow
 
-	// add new exercise
+	inputId            int
 	inputQuestion      string
 	inputAnswer        string
 	saveButtonDisabled bool
+}
+
+// The OnMount method is run once component is mounted
+func (h *Exercises) OnMount(ctx app.Context) {
+	url := app.Window().URL()
+	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	h.fetchAllExercises()
 }
 
 // The Render method is where the component appearance is defined.
@@ -24,7 +31,7 @@ func (h *Exercises) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.Div().Body(
-			app.H2().Text("Add new exercise"),
+			app.H2().Text("Store exercise"),
 			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
 				Required(true).OnInput(h.ValueTo(&h.inputQuestion)).Text(h.inputQuestion),
 			app.Br(),
@@ -60,6 +67,7 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 	h.saveButtonDisabled = true
 
 	err := h.api.StoreExercise(models.Exercise{
+		Id:       h.inputId,
 		Question: h.inputQuestion,
 		Answer:   h.inputAnswer,
 	})
@@ -67,19 +75,13 @@ func (h *Exercises) storeExercise(ctx app.Context, e app.Event) {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
 
+	h.inputId = 0
 	h.inputQuestion = ""
 	h.inputAnswer = ""
 
 	h.fetchAllExercises()
 
 	h.saveButtonDisabled = false
-}
-
-// The OnMount method is run once component is mounted
-func (h *Exercises) OnMount(ctx app.Context) {
-	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.fetchAllExercises()
 }
 
 func (h *Exercises) fetchAllExercises() {

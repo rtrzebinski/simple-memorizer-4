@@ -31,6 +31,7 @@ func (h *ExerciseRow) Render() app.UI {
 			app.Text(h.exercise.GoodAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
+			app.Button().Text("Edit").OnClick(h.onEdit(h.exercise.Id), fmt.Sprintf("%p", h)),
 			app.Button().Text("Delete").OnClick(h.onDelete(h.exercise.Id), fmt.Sprintf("%p", h)),
 		),
 	)
@@ -53,5 +54,13 @@ func (h *ExerciseRow) onDelete(id int) app.EventHandler {
 		}
 		// replace parent rows slice with a new one - this will update the UI
 		h.parent.rows = rows
+	}
+}
+
+func (h *ExerciseRow) onEdit(id int) app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		h.parent.inputId = h.exercise.Id
+		h.parent.inputQuestion = h.exercise.Question
+		h.parent.inputAnswer = h.exercise.Answer
 	}
 }

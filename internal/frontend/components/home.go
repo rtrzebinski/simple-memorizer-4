@@ -31,6 +31,15 @@ type Home struct {
 	nextExerciseId  int
 }
 
+// The OnMount method is run once component is mounted
+func (h *Home) OnMount(ctx app.Context) {
+	url := app.Window().URL()
+	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	h.handleNextExercise()
+	h.bindKeys()
+	h.bindSwipes()
+}
+
 // The Render method is where the component appearance is defined.
 func (h *Home) Render() app.UI {
 	return app.Div().Body(
@@ -101,15 +110,6 @@ func (h *Home) Render() app.UI {
 				Style("font-size", "15px"),
 		),
 	)
-}
-
-// The OnMount method is run once component is mounted
-func (h *Home) OnMount(ctx app.Context) {
-	url := app.Window().URL()
-	h.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	h.handleNextExercise()
-	h.bindKeys()
-	h.bindSwipes()
 }
 
 func (h *Home) bindKeys() {

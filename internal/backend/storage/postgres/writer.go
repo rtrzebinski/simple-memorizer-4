@@ -26,11 +26,22 @@ func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 }
 
 func (w *Writer) StoreExercise(exercise models.Exercise) error {
-	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
+	var query string
 
-	_, err := w.db.Exec(query, exercise.Question, exercise.Answer)
-	if err != nil {
-		return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
+	if exercise.Id > 0 {
+		query = `UPDATE exercise set question = $1, answer = $2 where id = $3;`
+
+		_, err := w.db.Exec(query, exercise.Question, exercise.Answer, exercise.Id)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'UPDATE exercise' query: %w", err)
+		}
+	} else {
+		query = `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
+
+		_, err := w.db.Exec(query, exercise.Question, exercise.Answer)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
+		}
 	}
 
 	return nil

@@ -57,7 +57,7 @@ func TestDeleteExercise(t *testing.T) {
 	assert.Equal(t, "another", findExerciseById(db, another.Id).Question)
 }
 
-func TestStoreExercise(t *testing.T) {
+func TestStoreExercise_createNew(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -99,6 +99,56 @@ func TestStoreExercise(t *testing.T) {
 
 	assert.Equal(t, exercise.Question, stored.Question)
 	assert.Equal(t, exercise.Answer, stored.Answer)
+}
+
+func TestStoreExercise_editExisting(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	exercise := &entities.Exercise{
+		Question: "question",
+		Answer:   "answer",
+	}
+
+	storeExercise(db, exercise)
+
+	err = w.StoreExercise(models.Exercise{
+		Id:       1,
+		Question: "newQuestion",
+		Answer:   "newAnswer",
+	})
+	assert.NoError(t, err)
+
+	stored := fetchLatestExercise(db)
+
+	assert.Equal(t, "newQuestion", stored.Question)
+	assert.Equal(t, "newAnswer", stored.Answer)
 }
 
 func TestIncrementBadAnswers(t *testing.T) {
