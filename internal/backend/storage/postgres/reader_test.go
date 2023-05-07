@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -38,7 +37,7 @@ func TestAllExercises(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{}
+	exercise := &Exercise{}
 	createExercise(db, exercise)
 
 	res, err := r.AllExercises()
@@ -83,7 +82,7 @@ func TestAllLessons(t *testing.T) {
 
 	r := NewReader(db)
 
-	lesson := &entities.Lesson{}
+	lesson := &Lesson{}
 	createLesson(db, lesson)
 
 	res, err := r.AllLessons()
@@ -125,7 +124,7 @@ func TestRandomExercise(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{}
+	exercise := &Exercise{}
 	createExercise(db, exercise)
 
 	res, err := r.RandomExercise()

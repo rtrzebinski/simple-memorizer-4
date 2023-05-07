@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -38,10 +37,10 @@ func TestDeleteExercise(t *testing.T) {
 
 	w := NewWriter(db)
 
-	createExercise(db, &entities.Exercise{})
+	createExercise(db, &Exercise{})
 	stored := fetchLatestExercise(db)
 
-	createExercise(db, &entities.Exercise{
+	createExercise(db, &Exercise{
 		Question: "another",
 	})
 	another := fetchLatestExercise(db)
@@ -83,7 +82,7 @@ func TestStoreExercise_createNew(t *testing.T) {
 
 	w := NewWriter(db)
 
-	lesson := entities.Lesson{}
+	lesson := Lesson{}
 	createLesson(db, &lesson)
 
 	exercise := models.Exercise{
@@ -134,10 +133,10 @@ func TestStoreExercise_updateExisting(t *testing.T) {
 
 	w := NewWriter(db)
 
-	lesson := entities.Lesson{}
+	lesson := Lesson{}
 	createLesson(db, &lesson)
 
-	exercise := entities.Exercise{LessonId: lesson.Id}
+	exercise := Exercise{LessonId: lesson.Id}
 	createExercise(db, &exercise)
 
 	err = w.StoreExercise(models.Exercise{
@@ -183,10 +182,10 @@ func TestDeleteLesson(t *testing.T) {
 
 	w := NewWriter(db)
 
-	createLesson(db, &entities.Lesson{})
+	createLesson(db, &Lesson{})
 	stored := fetchLatestLesson(db)
 
-	createLesson(db, &entities.Lesson{
+	createLesson(db, &Lesson{
 		Name: "another",
 	})
 	another := fetchLatestLesson(db)
@@ -270,7 +269,7 @@ func TestStoreLesson_updateExisting(t *testing.T) {
 
 	w := NewWriter(db)
 
-	lesson := &entities.Lesson{}
+	lesson := &Lesson{}
 	createLesson(db, lesson)
 
 	err = w.StoreLesson(models.Lesson{
@@ -314,7 +313,7 @@ func TestIncrementBadAnswers(t *testing.T) {
 
 	w := NewWriter(db)
 
-	exercise := &entities.Exercise{}
+	exercise := &Exercise{}
 	createExercise(db, exercise)
 
 	t.Run(
@@ -370,7 +369,7 @@ func TestIncrementGoodAnswers(t *testing.T) {
 
 	w := NewWriter(db)
 
-	exercise := &entities.Exercise{}
+	exercise := &Exercise{}
 	createExercise(db, exercise)
 
 	t.Run(

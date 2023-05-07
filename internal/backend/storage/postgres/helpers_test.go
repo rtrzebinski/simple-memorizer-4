@@ -9,15 +9,34 @@ import (
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"log"
 	"time"
 )
 
-func findExerciseById(db *sql.DB, exerciseId int) *entities.Exercise {
+type (
+	Lesson struct {
+		Id   int
+		Name string
+	}
 
+	Exercise struct {
+		Id       int
+		LessonId int
+		Question string
+		Answer   string
+	}
+
+	ExerciseResult struct {
+		Id          int
+		ExerciseId  int
+		BadAnswers  int
+		GoodAnswers int
+	}
+)
+
+func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
 	const query = `
 		SELECT e.id, e.question, e.answer
 		FROM exercise e
@@ -29,7 +48,7 @@ func findExerciseById(db *sql.DB, exerciseId int) *entities.Exercise {
 	}
 
 	for rows.Next() {
-		var exercise entities.Exercise
+		var exercise Exercise
 
 		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
 		if err != nil {
@@ -42,8 +61,7 @@ func findExerciseById(db *sql.DB, exerciseId int) *entities.Exercise {
 	return nil
 }
 
-func findLessonById(db *sql.DB, lessonId int) *entities.Lesson {
-
+func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	const query = `
 		SELECT l.id, l.name
 		FROM lesson l
@@ -55,7 +73,7 @@ func findLessonById(db *sql.DB, lessonId int) *entities.Lesson {
 	}
 
 	for rows.Next() {
-		var lesson entities.Lesson
+		var lesson Lesson
 
 		err = rows.Scan(&lesson.Id, &lesson.Name)
 		if err != nil {
@@ -68,8 +86,8 @@ func findLessonById(db *sql.DB, lessonId int) *entities.Lesson {
 	return nil
 }
 
-func fetchLatestExercise(db *sql.DB) entities.Exercise {
-	var exercise entities.Exercise
+func fetchLatestExercise(db *sql.DB) Exercise {
+	var exercise Exercise
 
 	const query = `
 		SELECT e.id, e.lesson_id, e.question, e.answer
@@ -84,8 +102,8 @@ func fetchLatestExercise(db *sql.DB) entities.Exercise {
 	return exercise
 }
 
-func fetchLatestLesson(db *sql.DB) entities.Lesson {
-	var lesson entities.Lesson
+func fetchLatestLesson(db *sql.DB) Lesson {
+	var lesson Lesson
 
 	const query = `
 		SELECT l.id, l.name
@@ -100,11 +118,11 @@ func fetchLatestLesson(db *sql.DB) entities.Lesson {
 	return lesson
 }
 
-func createExercise(db *sql.DB, exercise *entities.Exercise) {
+func createExercise(db *sql.DB, exercise *Exercise) {
 	query := `INSERT INTO exercise (lesson_id, question, answer) VALUES ($1, $2, $3) RETURNING id;`
 
 	if exercise.LessonId == 0 {
-		lesson := entities.Lesson{}
+		lesson := Lesson{}
 		createLesson(db, &lesson)
 		exercise.LessonId = lesson.Id
 	}
@@ -123,7 +141,7 @@ func createExercise(db *sql.DB, exercise *entities.Exercise) {
 	}
 }
 
-func createLesson(db *sql.DB, lesson *entities.Lesson) {
+func createLesson(db *sql.DB, lesson *Lesson) {
 	query := `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
 
 	if lesson.Name == "" {
@@ -140,8 +158,8 @@ func randomString() string {
 	return uuid.NewString()
 }
 
-func findExerciseResultByExerciseId(db *sql.DB, exerciseId int) entities.ExerciseResult {
-	var exerciseResult entities.ExerciseResult
+func findExerciseResultByExerciseId(db *sql.DB, exerciseId int) ExerciseResult {
+	var exerciseResult ExerciseResult
 
 	const query = `
 		SELECT er.id, er.exercise_id, er.bad_answers, er.good_answers
