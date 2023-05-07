@@ -86,7 +86,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = false
 }
 
-// handleCancel cleanup exercise input UI
+// handleCancel cleanup input UI
 func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
 	c.inputId = 0
 	c.inputQuestion = ""
@@ -99,16 +99,16 @@ func (c *Exercises) displayAllExercises() {
 		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
 	}
 
-	// no exercises in the database
+	// no entries in the database
 	if len(exercises) == 0 {
 		return
 	}
 
 	// find maxId so we know the rows slice capacity
 	maxId := exercises[0].Id
-	for _, exercise := range exercises {
-		if exercise.Id > maxId {
-			maxId = exercise.Id
+	for _, row := range exercises {
+		if row.Id > maxId {
+			maxId = row.Id
 		}
 	}
 
@@ -116,7 +116,7 @@ func (c *Exercises) displayAllExercises() {
 	// so we need to shift by one to have space for the latest row
 	c.rows = make([]*ExerciseRow, maxId+1)
 
-	for _, exercise := range exercises {
-		c.rows[exercise.Id] = &ExerciseRow{exercise: exercise, parent: c}
+	for _, row := range exercises {
+		c.rows[row.Id] = &ExerciseRow{exercise: row, parent: c}
 	}
 }
