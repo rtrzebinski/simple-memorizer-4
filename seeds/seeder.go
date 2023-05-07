@@ -23,9 +23,27 @@ func seed(s Seeder, seedMethodName string) {
 	m.Call(nil)
 }
 
+func (s Seeder) LessonSeed() {
+	//prepare the statement
+	stmt, err := s.db.Prepare(`INSERT INTO lesson(name) VALUES ($1)`)
+	if err != nil {
+		panic(err)
+	}
+
+	lessons := []string{"Capitals"}
+
+	for _, n := range lessons {
+		// execute query
+		_, err = stmt.Exec(n)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func (s Seeder) ExerciseSeed() {
 	//prepare the statement
-	stmt, err := s.db.Prepare(`INSERT INTO exercise(question, answer) VALUES ($1, $2)`)
+	stmt, err := s.db.Prepare(`INSERT INTO exercise(question, answer, lesson_id) VALUES ($1, $2, $3)`)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +66,7 @@ func (s Seeder) ExerciseSeed() {
 
 	for q, a := range capitals {
 		// execute query
-		_, err = stmt.Exec(q, a)
+		_, err = stmt.Exec(q, a, 1)
 		if err != nil {
 			panic(err)
 		}
@@ -84,6 +102,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error opening DB: %v", err)
 	}
-	execute(db)
+	execute(db, "LessonSeed", "ExerciseSeed")
 	os.Exit(0)
 }
