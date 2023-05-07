@@ -38,15 +38,11 @@ func TestDeleteExercise(t *testing.T) {
 
 	w := NewWriter(db)
 
-	storeExercise(db, &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	})
+	createExercise(db, &entities.Exercise{})
 	stored := fetchLatestExercise(db)
 
-	storeExercise(db, &entities.Exercise{
+	createExercise(db, &entities.Exercise{
 		Question: "another",
-		Answer:   "another",
 	})
 	another := fetchLatestExercise(db)
 
@@ -87,7 +83,13 @@ func TestStoreExercise_createNew(t *testing.T) {
 
 	w := NewWriter(db)
 
+	lesson := entities.Lesson{}
+	createLesson(db, &lesson)
+
 	exercise := models.Exercise{
+		Lesson: &models.Lesson{
+			Id: lesson.Id,
+		},
 		Question: "question",
 		Answer:   "answer",
 	}
@@ -97,11 +99,12 @@ func TestStoreExercise_createNew(t *testing.T) {
 
 	stored := fetchLatestExercise(db)
 
+	assert.Equal(t, exercise.Lesson.Id, stored.LessonId)
 	assert.Equal(t, exercise.Question, stored.Question)
 	assert.Equal(t, exercise.Answer, stored.Answer)
 }
 
-func TestStoreExercise_editExisting(t *testing.T) {
+func TestStoreExercise_updateExisting(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -131,12 +134,11 @@ func TestStoreExercise_editExisting(t *testing.T) {
 
 	w := NewWriter(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
+	lesson := entities.Lesson{}
+	createLesson(db, &lesson)
 
-	storeExercise(db, exercise)
+	exercise := entities.Exercise{LessonId: lesson.Id}
+	createExercise(db, &exercise)
 
 	err = w.StoreExercise(models.Exercise{
 		Id:       1,
@@ -181,12 +183,10 @@ func TestDeleteLesson(t *testing.T) {
 
 	w := NewWriter(db)
 
-	storeLesson(db, &entities.Lesson{
-		Name: "name",
-	})
+	createLesson(db, &entities.Lesson{})
 	stored := fetchLatestLesson(db)
 
-	storeLesson(db, &entities.Lesson{
+	createLesson(db, &entities.Lesson{
 		Name: "another",
 	})
 	another := fetchLatestLesson(db)
@@ -240,7 +240,7 @@ func TestStoreLesson_createNew(t *testing.T) {
 	assert.Equal(t, lesson.Name, stored.Name)
 }
 
-func TestStoreLesson_editExisting(t *testing.T) {
+func TestStoreLesson_updateExisting(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -270,11 +270,8 @@ func TestStoreLesson_editExisting(t *testing.T) {
 
 	w := NewWriter(db)
 
-	lesson := &entities.Lesson{
-		Name: "name",
-	}
-
-	storeLesson(db, lesson)
+	lesson := &entities.Lesson{}
+	createLesson(db, lesson)
 
 	err = w.StoreLesson(models.Lesson{
 		Id:   1,
@@ -317,12 +314,8 @@ func TestIncrementBadAnswers(t *testing.T) {
 
 	w := NewWriter(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
-
-	storeExercise(db, exercise)
+	exercise := &entities.Exercise{}
+	createExercise(db, exercise)
 
 	t.Run(
 		"not existing exercise result", func(t *testing.T) {
@@ -377,12 +370,8 @@ func TestIncrementGoodAnswers(t *testing.T) {
 
 	w := NewWriter(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
-
-	storeExercise(db, exercise)
+	exercise := &entities.Exercise{}
+	createExercise(db, exercise)
 
 	t.Run(
 		"not existing exercise result", func(t *testing.T) {

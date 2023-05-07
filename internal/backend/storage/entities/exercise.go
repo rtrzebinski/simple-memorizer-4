@@ -2,6 +2,7 @@ package entities
 
 type Exercise struct {
 	Id       int
+	LessonId int
 	Question string
 	Answer   string
 }

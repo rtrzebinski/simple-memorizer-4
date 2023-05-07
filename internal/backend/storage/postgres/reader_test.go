@@ -38,12 +38,8 @@ func TestAllExercises(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
-
-	storeExercise(db, exercise)
+	exercise := &entities.Exercise{}
+	createExercise(db, exercise)
 
 	res, err := r.AllExercises()
 
@@ -87,11 +83,8 @@ func TestAllLessons(t *testing.T) {
 
 	r := NewReader(db)
 
-	lesson := &entities.Lesson{
-		Name: "name",
-	}
-
-	storeLesson(db, lesson)
+	lesson := &entities.Lesson{}
+	createLesson(db, lesson)
 
 	res, err := r.AllLessons()
 
@@ -132,12 +125,8 @@ func TestRandomExercise(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
-
-	storeExercise(db, exercise)
+	exercise := &entities.Exercise{}
+	createExercise(db, exercise)
 
 	res, err := r.RandomExercise()
 

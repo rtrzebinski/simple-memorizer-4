@@ -8,6 +8,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/google/uuid"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -71,12 +72,12 @@ func fetchLatestExercise(db *sql.DB) entities.Exercise {
 	var exercise entities.Exercise
 
 	const query = `
-		SELECT e.id, e.question, e.answer
+		SELECT e.id, e.lesson_id, e.question, e.answer
 		FROM exercise e
 		ORDER BY id DESC
 		LIMIT 1;`
 
-	if err := db.QueryRow(query).Scan(&exercise.Id, &exercise.Question, &exercise.Answer); err != nil {
+	if err := db.QueryRow(query).Scan(&exercise.Id, &exercise.LessonId, &exercise.Question, &exercise.Answer); err != nil {
 		panic(err)
 	}
 
@@ -99,22 +100,44 @@ func fetchLatestLesson(db *sql.DB) entities.Lesson {
 	return lesson
 }
 
-func storeExercise(db *sql.DB, exercise *entities.Exercise) {
-	query := `INSERT INTO exercise (question, answer) VALUES ($1, $2) RETURNING id;`
+func createExercise(db *sql.DB, exercise *entities.Exercise) {
+	query := `INSERT INTO exercise (lesson_id, question, answer) VALUES ($1, $2, $3) RETURNING id;`
 
-	err := db.QueryRow(query, &exercise.Question, &exercise.Answer).Scan(&exercise.Id)
+	if exercise.LessonId == 0 {
+		lesson := entities.Lesson{}
+		createLesson(db, &lesson)
+		exercise.LessonId = lesson.Id
+	}
+
+	if exercise.Question == "" {
+		exercise.Question = randomString()
+	}
+
+	if exercise.Answer == "" {
+		exercise.Answer = randomString()
+	}
+
+	err := db.QueryRow(query, &exercise.LessonId, &exercise.Question, &exercise.Answer).Scan(&exercise.Id)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func storeLesson(db *sql.DB, lesson *entities.Lesson) {
+func createLesson(db *sql.DB, lesson *entities.Lesson) {
 	query := `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
+
+	if lesson.Name == "" {
+		lesson.Name = randomString()
+	}
 
 	err := db.QueryRow(query, &lesson.Name).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func randomString() string {
+	return uuid.NewString()
 }
 
 func findExerciseResultByExerciseId(db *sql.DB, exerciseId int) entities.ExerciseResult {
