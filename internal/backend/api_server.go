@@ -7,21 +7,21 @@ import (
 )
 
 const (
-	DeleteExercise       = "/delete-exercise"
-	StoreExercise        = "/store-exercise"
-	FetchAllExercises    = "/fetch-all-exercises"
-	DeleteLesson         = "/delete-lesson"
-	StoreLesson          = "/store-lesson"
-	FetchAllLessons      = "/fetch-all-lessons"
-	FetchNextExercise    = "/fetch-next-exercise"
-	IncrementBadAnswers  = "/increment-bad-answers"
-	IncrementGoodAnswers = "/increment-good-answers"
+	DeleteExercise         = "/delete-exercise"
+	StoreExercise          = "/store-exercise"
+	FetchExercisesOfLesson = "/fetch-exercises-of-lesson"
+	DeleteLesson           = "/delete-lesson"
+	StoreLesson            = "/store-lesson"
+	FetchAllLessons        = "/fetch-all-lessons"
+	FetchNextExercise      = "/fetch-next-exercise"
+	IncrementBadAnswers    = "/increment-bad-answers"
+	IncrementGoodAnswers   = "/increment-good-answers"
 )
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	http.Handle(DeleteExercise, routes.NewDeleteExercise(w))
 	http.Handle(StoreExercise, routes.NewStoreExercise(w))
-	http.Handle(FetchAllExercises, routes.NewFetchAllExercises(r))
+	http.Handle(FetchExercisesOfLesson, routes.NewFetchExercisesOfLesson(r))
 	http.Handle(DeleteLesson, routes.NewDeleteLesson(w))
 	http.Handle(StoreLesson, routes.NewStoreLesson(w))
 	http.Handle(FetchAllLessons, routes.NewFetchAllLessons(r))

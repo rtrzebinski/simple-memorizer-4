@@ -9,6 +9,8 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"io"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type ApiClient struct {
@@ -27,10 +29,10 @@ func (c *ApiClient) DeleteExercise(exercise models.Exercise) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.DeleteExercise
+	u := c.scheme + "://" + c.host + backend.DeleteExercise
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -46,10 +48,10 @@ func (c *ApiClient) StoreExercise(exercise models.Exercise) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.StoreExercise
+	u := c.scheme + "://" + c.host + backend.StoreExercise
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -59,10 +61,17 @@ func (c *ApiClient) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (c *ApiClient) FetchAllExercises() (models.Exercises, error) {
+func (c *ApiClient) FetchExercisesOfLesson(lessonId int) (models.Exercises, error) {
 	var output models.Exercises
 
-	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchAllExercises, nil)
+	u, _ := url.Parse(c.scheme + "://" + c.host + backend.FetchExercisesOfLesson)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lessonId))
+	u.RawQuery = params.Encode()
+
+	resp, err := c.performRequestTo("GET", u.String(), nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -82,10 +91,10 @@ func (c *ApiClient) DeleteLesson(lesson models.Lesson) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.DeleteLesson
+	u := c.scheme + "://" + c.host + backend.DeleteLesson
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -101,10 +110,10 @@ func (c *ApiClient) StoreLesson(lesson models.Lesson) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.StoreLesson
+	u := c.scheme + "://" + c.host + backend.StoreLesson
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -154,10 +163,10 @@ func (c *ApiClient) IncrementBadAnswers(exercise models.Exercise) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.IncrementBadAnswers
+	u := c.scheme + "://" + c.host + backend.IncrementBadAnswers
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -173,10 +182,10 @@ func (c *ApiClient) IncrementGoodAnswers(exercise models.Exercise) error {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	urlAddress := c.scheme + "://" + c.host + backend.IncrementGoodAnswers
+	u := c.scheme + "://" + c.host + backend.IncrementGoodAnswers
 	buffer := bytes.NewBuffer(body)
 
-	resp, err := c.performRequestTo("POST", urlAddress, buffer)
+	resp, err := c.performRequestTo("POST", u, buffer)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

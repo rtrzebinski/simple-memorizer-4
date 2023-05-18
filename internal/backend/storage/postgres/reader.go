@@ -14,17 +14,18 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) AllExercises() (models.Exercises, error) {
+func (r *Reader) ExercisesOfLesson(lessonId int) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	const query = `
 		SELECT e.id, e.question, e.answer, COALESCE(er.bad_answers, 0), COALESCE(er.good_answers, 0) 
 		FROM exercise e
 		LEFT JOIN exercise_result er on e.id = er.exercise_id
+		WHERE lesson_id = $1
 		ORDER BY e.id DESC
 		`
 
-	rows, err := r.db.Query(query)
+	rows, err := r.db.Query(query, lessonId)
 	if err != nil {
 		return exercises, err
 	}

@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+var pathHome = "/"
+
 // A Home component
 type Home struct {
 	app.Compo

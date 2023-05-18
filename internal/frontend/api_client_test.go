@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"io"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
@@ -89,7 +90,7 @@ func (suite *ApiClientSuite) TestStoreExercise() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ApiClientSuite) TestFetchAllExercises() {
+func (suite *ApiClientSuite) TestFetchExercisesOfLesson() {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -99,6 +100,8 @@ func (suite *ApiClientSuite) TestFetchAllExercises() {
 	}
 	exercises := models.Exercises{exercise}
 
+	lessonId := 10
+
 	responseBody, err := json.Marshal(exercises)
 	if err != nil {
 		suite.Error(err)
@@ -106,9 +109,12 @@ func (suite *ApiClientSuite) TestFetchAllExercises() {
 
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
-		suite.Equal(backend.FetchAllExercises, req.URL.RequestURI())
+		suite.Equal(backend.FetchExercisesOfLesson+"?lesson_id=10", req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
+
+		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
+		suite.Equal(lessonId, lId)
 
 		return true
 	})).Return(&http.Response{
@@ -116,7 +122,7 @@ func (suite *ApiClientSuite) TestFetchAllExercises() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.apiClient.FetchAllExercises()
+	result, err := suite.apiClient.FetchExercisesOfLesson(lessonId)
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercises, result)

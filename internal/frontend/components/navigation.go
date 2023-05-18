@@ -10,11 +10,9 @@ type Navigation struct {
 func (c *Navigation) Render() app.UI {
 	return app.Div().Body(
 		app.P().Body(
-			app.A().Href("/").Text("Home"),
+			app.A().Href(pathHome).Text("Home"),
 			app.Text(" | "),
-			app.A().Href("/exercises").Text("All Exercises"),
-			app.Text(" | "),
-			app.A().Href("/lessons").Text("Lessons"),
+			app.A().Href(pathLessons).Text("Lessons"),
 		),
 	)
 }

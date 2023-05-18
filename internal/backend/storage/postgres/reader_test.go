@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestAllExercises(t *testing.T) {
+func TestExercisesOfLesson(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -40,7 +40,7 @@ func TestAllExercises(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.AllExercises()
+	res, err := r.ExercisesOfLesson(exercise.LessonId)
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
