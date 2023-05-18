@@ -3,7 +3,6 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"log"
 	"net/http"
@@ -21,7 +20,9 @@ func NewFetchExercisesOfLesson(r storage.Reader) *FetchExercisesOfLesson {
 func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
-		app.Log("invalid lesson_id")
+		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
+		res.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
 
