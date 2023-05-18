@@ -6,12 +6,16 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"net/http"
+	"strconv"
 )
+
+var pathExercises = "/exercises"
 
 type Exercises struct {
 	app.Compo
-	api  *frontend.ApiClient
-	rows []*ExerciseRow
+	api      *frontend.ApiClient
+	lessonId int
+	rows     []*ExerciseRow
 
 	inputId             int
 	inputQuestion       string
@@ -22,8 +26,16 @@ type Exercises struct {
 // The OnMount method is run once component is mounted
 func (c *Exercises) OnMount(ctx app.Context) {
 	url := app.Window().URL()
+
+	lessonId, err := strconv.Atoi(url.Query().Get("lesson_id"))
+	if err != nil {
+		app.Log("invalid lesson_id")
+		return
+	}
+	c.lessonId = lessonId
+
 	c.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
-	c.displayAllExercises()
+	c.displayExercisesOfLesson()
 }
 
 // The Render method is where the component appearance is defined.
@@ -72,6 +84,9 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 		Id:       c.inputId,
 		Question: c.inputQuestion,
 		Answer:   c.inputAnswer,
+		Lesson: &models.Lesson{
+			Id: c.lessonId,
+		},
 	})
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
@@ -81,7 +96,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.inputQuestion = ""
 	c.inputAnswer = ""
 
-	c.displayAllExercises()
+	c.displayExercisesOfLesson()
 
 	c.storeButtonDisabled = false
 }
@@ -93,10 +108,10 @@ func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
 	c.inputAnswer = ""
 }
 
-func (c *Exercises) displayAllExercises() {
-	exercises, err := c.api.FetchAllExercises()
+func (c *Exercises) displayExercisesOfLesson() {
+	exercises, err := c.api.FetchExercisesOfLesson(c.lessonId)
 	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch all exercises: %w", err))
+		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}
 
 	// no entries in the database

@@ -8,6 +8,8 @@ import (
 	"net/http"
 )
 
+var pathLessons = "/lessons"
+
 type Lessons struct {
 	app.Compo
 	api  *frontend.ApiClient

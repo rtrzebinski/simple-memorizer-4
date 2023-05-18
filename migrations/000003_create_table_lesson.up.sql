@@ -1,5 +1,0 @@
-CREATE TABLE lesson
-(
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL
-);

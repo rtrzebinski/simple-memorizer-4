@@ -2,13 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/entities"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestAllExercises(t *testing.T) {
+func TestExercisesOfLesson(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -38,14 +37,10 @@ func TestAllExercises(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
+	exercise := &Exercise{}
+	createExercise(db, exercise)
 
-	storeExercise(db, exercise)
-
-	res, err := r.AllExercises()
+	res, err := r.ExercisesOfLesson(exercise.LessonId)
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
@@ -87,11 +82,8 @@ func TestAllLessons(t *testing.T) {
 
 	r := NewReader(db)
 
-	lesson := &entities.Lesson{
-		Name: "name",
-	}
-
-	storeLesson(db, lesson)
+	lesson := &Lesson{}
+	createLesson(db, lesson)
 
 	res, err := r.AllLessons()
 
@@ -132,12 +124,8 @@ func TestRandomExercise(t *testing.T) {
 
 	r := NewReader(db)
 
-	exercise := &entities.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
-
-	storeExercise(db, exercise)
+	exercise := &Exercise{}
+	createExercise(db, exercise)
 
 	res, err := r.RandomExercise()
 

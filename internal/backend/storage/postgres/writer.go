@@ -36,9 +36,9 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 			return fmt.Errorf("failed to execute 'UPDATE exercise' query: %w", err)
 		}
 	} else {
-		query = `INSERT INTO exercise (question, answer) VALUES ($1, $2);`
+		query = `INSERT INTO exercise (lesson_id, question, answer) VALUES ($1, $2, $3);`
 
-		_, err := w.db.Exec(query, exercise.Question, exercise.Answer)
+		_, err := w.db.Exec(query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
 		}

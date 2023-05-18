@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"net/url"
+	"strconv"
 )
 
 type LessonRow struct {
@@ -24,8 +26,16 @@ func (c *LessonRow) Render() app.UI {
 		app.Td().Style("border", "1px solid black").Body(
 			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
 			app.Button().Text("Delete").OnClick(c.onDelete(c.lesson.Id), fmt.Sprintf("%p", c)),
+			app.Button().Text("Exercises").OnClick(c.onExercises(c.lesson.Id), fmt.Sprintf("%p", c)),
 		),
 	)
+}
+
+func (c *LessonRow) onEdit() app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		c.parent.inputId = c.lesson.Id
+		c.parent.inputName = c.lesson.Name
+	}
 }
 
 func (c *LessonRow) onDelete(id int) app.EventHandler {
@@ -48,9 +58,15 @@ func (c *LessonRow) onDelete(id int) app.EventHandler {
 	}
 }
 
-func (c *LessonRow) onEdit() app.EventHandler {
+func (c *LessonRow) onExercises(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		c.parent.inputId = c.lesson.Id
-		c.parent.inputName = c.lesson.Name
+		u, _ := url.Parse(pathExercises)
+
+		// set lesson_id in the url
+		params := u.Query()
+		params.Add("lesson_id", strconv.Itoa(id))
+		u.RawQuery = params.Encode()
+
+		ctx.NavigateTo(u)
 	}
 }
