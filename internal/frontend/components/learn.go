@@ -38,16 +38,16 @@ type Learn struct {
 
 // The OnMount method is run once component is mounted
 func (c *Learn) OnMount(ctx app.Context) {
-	url := app.Window().URL()
+	u := app.Window().URL()
 
-	lessonId, err := strconv.Atoi(url.Query().Get("lesson_id"))
+	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
 		app.Log("invalid lesson_id")
 		return
 	}
 	c.lessonId = lessonId
 
-	c.api = frontend.NewApiClient(&http.Client{}, url.Host, url.Scheme)
+	c.api = frontend.NewApiClient(&http.Client{}, u.Host, u.Scheme)
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()
