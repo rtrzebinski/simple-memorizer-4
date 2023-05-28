@@ -6,6 +6,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -17,10 +18,11 @@ type Exercises struct {
 	lessonId int
 	rows     []*ExerciseRow
 
-	inputId             int
-	inputQuestion       string
-	inputAnswer         string
-	storeButtonDisabled bool
+	addExerciseFormVisible bool
+	inputId                int
+	inputQuestion          string
+	inputAnswer            string
+	storeButtonDisabled    bool
 }
 
 // The OnMount method is run once component is mounted
@@ -42,8 +44,12 @@ func (c *Exercises) OnMount(ctx app.Context) {
 func (c *Exercises) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.P().Body(
+			app.Button().Text("Start learning").OnClick(c.handleStartLearning),
+			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.addExerciseFormVisible),
+		),
 		app.Div().Body(
-			app.H2().Text("Store exercise"),
+			app.H3().Text("Add a new exercise"),
 			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
 				Required(true).OnInput(c.ValueTo(&c.inputQuestion)).Text(c.inputQuestion),
 			app.Br(),
@@ -52,9 +58,9 @@ func (c *Exercises) Render() app.UI {
 			app.Br(),
 			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
-		),
+		).Hidden(!c.addExerciseFormVisible),
 		app.Div().Body(
-			app.H2().Text("All exercises"),
+			app.H3().Text("Exercises"),
 			app.Table().Style("border", "1px solid black").Body(
 				&ExerciseHeader{},
 				app.Range(c.rows).Slice(func(i int) app.UI {
@@ -66,6 +72,23 @@ func (c *Exercises) Render() app.UI {
 			),
 		),
 	)
+}
+
+// handleStartLearning start learning a current lesson
+func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
+	u, _ := url.Parse(pathLearn)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(c.lessonId))
+	u.RawQuery = params.Encode()
+
+	ctx.NavigateTo(u)
+}
+
+// handleAddExercise display add exercise form
+func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
+	c.addExerciseFormVisible = true
 }
 
 // handleStore create new or update existing exercise
@@ -106,6 +129,7 @@ func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
 	c.inputId = 0
 	c.inputQuestion = ""
 	c.inputAnswer = ""
+	c.addExerciseFormVisible = false
 }
 
 func (c *Exercises) displayExercisesOfLesson() {

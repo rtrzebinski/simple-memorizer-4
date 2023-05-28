@@ -15,9 +15,10 @@ type Lessons struct {
 	api  *frontend.ApiClient
 	rows []*LessonRow
 
-	inputId             int
-	inputName           string
-	storeButtonDisabled bool
+	addLessonFormVisible bool
+	inputId              int
+	inputName            string
+	storeButtonDisabled  bool
 }
 
 // The OnMount method is run once component is mounted
@@ -31,16 +32,19 @@ func (c *Lessons) OnMount(ctx app.Context) {
 func (c *Lessons) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.P().Body(
+			app.Button().Text("Add a new lesson").OnClick(c.handleAddLesson).Hidden(c.addLessonFormVisible),
+		),
 		app.Div().Body(
-			app.H2().Text("Store lesson"),
+			app.H3().Text("Add a new lesson"),
 			app.Textarea().ID("input_name").Cols(30).Rows(3).Placeholder("Name").
 				Required(true).OnInput(c.ValueTo(&c.inputName)).Text(c.inputName),
 			app.Br(),
 			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
-		),
+		).Hidden(!c.addLessonFormVisible),
 		app.Div().Body(
-			app.H2().Text("All lessons"),
+			app.H3().Text("Lessons"),
 			app.Table().Style("border", "1px solid black").Body(
 				&LessonHeader{},
 				app.Range(c.rows).Slice(func(i int) app.UI {
@@ -52,6 +56,11 @@ func (c *Lessons) Render() app.UI {
 			),
 		),
 	)
+}
+
+// handleAddLesson display add lesson form
+func (c *Lessons) handleAddLesson(ctx app.Context, e app.Event) {
+	c.addLessonFormVisible = true
 }
 
 // handleStore create new or update existing lesson
@@ -86,6 +95,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 func (c *Lessons) handleCancel(ctx app.Context, e app.Event) {
 	c.inputId = 0
 	c.inputName = ""
+	c.addLessonFormVisible = false
 }
 
 func (c *Lessons) displayAllLessons() {

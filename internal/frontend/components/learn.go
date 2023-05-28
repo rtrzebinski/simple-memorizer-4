@@ -6,6 +6,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -56,6 +57,9 @@ func (c *Learn) OnMount(ctx app.Context) {
 func (c *Learn) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.P().Body(
+			app.Button().Text("Show exercises").OnClick(c.handleShowExercises),
+		),
 		app.P().Body(
 			app.Text("Question: "),
 			app.If(c.question != "",
@@ -180,6 +184,18 @@ func (c *Learn) bindSwipes() {
 	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
 		c.handleViewAnswer()
 	})
+}
+
+// handleShowExercises start learning a current lesson
+func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
+	u, _ := url.Parse(pathExercises)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(c.lessonId))
+	u.RawQuery = params.Encode()
+
+	ctx.NavigateTo(u)
 }
 
 func (c *Learn) handleNextExercise() {
