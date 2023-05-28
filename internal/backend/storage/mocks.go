@@ -19,8 +19,8 @@ func (mock *ReaderMock) AllLessons() (models.Lessons, error) {
 	return mock.Called().Get(0).(models.Lessons), nil
 }
 
-func (mock *ReaderMock) RandomExercise() (models.Exercise, error) {
-	return mock.Called().Get(0).(models.Exercise), nil
+func (mock *ReaderMock) RandomExerciseOfLesson(lessonId int) (models.Exercise, error) {
+	return mock.Called(lessonId).Get(0).(models.Exercise), nil
 }
 
 type WriterMock struct{ mock.Mock }

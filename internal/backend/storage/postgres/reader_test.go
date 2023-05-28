@@ -94,7 +94,7 @@ func TestAllLessons(t *testing.T) {
 	assert.Equal(t, lesson.Name, res[0].Name)
 }
 
-func TestRandomExercise(t *testing.T) {
+func TestRandomExerciseOfLesson(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -127,7 +127,7 @@ func TestRandomExercise(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.RandomExercise()
+	res, err := r.RandomExerciseOfLesson(exercise.LessonId)
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercise{}, res)

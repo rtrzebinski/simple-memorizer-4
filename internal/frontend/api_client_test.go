@@ -210,7 +210,7 @@ func (suite *ApiClientSuite) TestFetchAllLessons() {
 	suite.Assert().Equal(lessons, result)
 }
 
-func (suite *ApiClientSuite) TestFetchNextExercise() {
+func (suite *ApiClientSuite) TestFetchNextExerciseOfLesson() {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -224,19 +224,25 @@ func (suite *ApiClientSuite) TestFetchNextExercise() {
 		suite.Error(err)
 	}
 
+	lessonId := 10
+
 	suite.httpClientMock.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
-		suite.Equal(backend.FetchNextExercise, req.URL.RequestURI())
+		suite.Equal(backend.FetchNextExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
+		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
+		suite.Equal(lessonId, lId)
+
 		return true
+
 	})).Return(&http.Response{
 		StatusCode: http.StatusOK,
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.apiClient.FetchNextExercise()
+	result, err := suite.apiClient.FetchNextExerciseOfLesson(lessonId)
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercise, result)

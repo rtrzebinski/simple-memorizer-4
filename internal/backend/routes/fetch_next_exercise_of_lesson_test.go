@@ -7,10 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strconv"
 	"testing"
 )
 
-func TestFetchNextExercise(t *testing.T) {
+func TestFetchNextExerciseOfLesson(t *testing.T) {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -19,13 +21,22 @@ func TestFetchNextExercise(t *testing.T) {
 		GoodAnswers: 3,
 	}
 
-	reader := storage.NewReaderMock()
-	reader.On("RandomExercise").Return(exercise)
+	lessonId := 10
 
-	route := NewFetchNextExercise(reader)
+	reader := storage.NewReaderMock()
+	reader.On("RandomExerciseOfLesson", lessonId).Return(exercise)
+
+	route := NewFetchNextExerciseOfLesson(reader)
+
+	u, _ := url.Parse("/")
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lessonId))
+	u.RawQuery = params.Encode()
+
+	req := &http.Request{}
+	req.URL = u
 
 	res := httptest.NewRecorder()
-	req := &http.Request{}
 
 	route.ServeHTTP(res, req)
 

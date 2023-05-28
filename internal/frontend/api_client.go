@@ -140,10 +140,17 @@ func (c *ApiClient) FetchAllLessons() (models.Lessons, error) {
 	return output, nil
 }
 
-func (c *ApiClient) FetchNextExercise() (models.Exercise, error) {
+func (c *ApiClient) FetchNextExerciseOfLesson(lessonId int) (models.Exercise, error) {
 	var output models.Exercise
 
-	resp, err := c.performRequestTo("GET", c.scheme+"://"+c.host+backend.FetchNextExercise, nil)
+	u, _ := url.Parse(c.scheme + "://" + c.host + backend.FetchNextExerciseOfLesson)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lessonId))
+	u.RawQuery = params.Encode()
+
+	resp, err := c.performRequestTo("GET", u.String(), nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
