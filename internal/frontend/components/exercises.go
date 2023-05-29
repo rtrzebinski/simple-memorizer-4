@@ -101,6 +101,8 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 		return
 	}
 
+	isCreatingNew := c.inputId == 0
+
 	c.storeButtonDisabled = true
 
 	err := c.api.StoreExercise(models.Exercise{
@@ -122,6 +124,12 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.displayExercisesOfLesson()
 
 	c.storeButtonDisabled = false
+
+	// hide the input form on row edit, but keep open on adding new
+	// because it is common to add a few exercises one after another
+	if isCreatingNew == false {
+		c.addExerciseFormVisible = false
+	}
 }
 
 // handleCancel cleanup input UI

@@ -89,6 +89,9 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	c.displayAllLessons()
 
 	c.storeButtonDisabled = false
+
+	// hide the inout form on success
+	c.addLessonFormVisible = false
 }
 
 // handleCancel cleanup input UI
