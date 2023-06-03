@@ -8,11 +8,9 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"sync"
 )
 
 var pathLearn = "/learn"
-var once sync.Once
 
 // A Learn component
 type Learn struct {
@@ -51,10 +49,8 @@ func (c *Learn) OnMount(ctx app.Context) {
 
 	c.api = frontend.NewApiClient(&http.Client{}, u.Host, u.Scheme)
 	c.handleNextExercise()
-	once.Do(func() {
-		c.bindKeys()
-		c.bindSwipes()
-	})
+	c.bindKeys()
+	c.bindSwipes()
 }
 
 // The Render method is where the component appearance is defined.
