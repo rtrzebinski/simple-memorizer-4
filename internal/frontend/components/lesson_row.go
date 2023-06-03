@@ -30,7 +30,9 @@ func (c *LessonRow) Render() app.UI {
 			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
 			app.Button().Text("Delete").OnClick(c.onDelete(c.lesson.Id), fmt.Sprintf("%p", c)),
 			app.Button().Text("Exercises").OnClick(c.onExercises(c.lesson.Id), fmt.Sprintf("%p", c)),
-			app.Button().Text("Learn").OnClick(c.onLearn(c.lesson.Id), fmt.Sprintf("%p", c)),
+			app.Button().Text("Learn").OnClick(c.onLearn(c.lesson.Id), fmt.Sprintf("%p", c)).
+				// Learning empty lessons not allowed
+				Disabled(c.lesson.ExerciseCount == 0),
 		),
 	)
 }
