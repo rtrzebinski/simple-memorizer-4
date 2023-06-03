@@ -34,6 +34,10 @@ type Learn struct {
 	nextGoodAnswers int
 	nextBadAnswers  int
 	nextExerciseId  int
+
+	// Window events unsubscribers, to be called on component dismount
+	// this is needed so Window events are not piled on each component mounting
+	unsubscribers []func()
 }
 
 // The OnMount method is run once component is mounted
@@ -51,6 +55,14 @@ func (c *Learn) OnMount(ctx app.Context) {
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()
+}
+
+// The OnDismount method is run once component is dismounted.
+func (c *Learn) OnDismount() {
+	// unsubscribe from registered Window events
+	for _, f := range c.unsubscribers {
+		f()
+	}
 }
 
 // The Render method is where the component appearance is defined.
@@ -129,7 +141,9 @@ func (c *Learn) Render() app.UI {
 }
 
 func (c *Learn) bindKeys() {
-	app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
+	var f func()
+
+	f = app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
 		// bind actions to keyboard shortcuts
 		switch e.Get("code").String() {
 		case "Space":
@@ -160,30 +174,41 @@ func (c *Learn) bindKeys() {
 			}
 		}
 	})
+
+	c.unsubscribers = append(c.unsubscribers, f)
 }
 
 func (c *Learn) bindSwipes() {
-	app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
+	var f func()
+
+	f = app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
 		if c.isNextPreloaded == true {
 			c.handleBadAnswer()
 		}
 	})
-	app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
+	c.unsubscribers = append(c.unsubscribers, f)
+
+	f = app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
 		if c.isNextPreloaded == true {
 			c.handleGoodAnswer()
 		}
 	})
-	app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
+	c.unsubscribers = append(c.unsubscribers, f)
+
+	f = app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
 		// only allow if next exercise was preloaded (to avoid double clicks)
 		if c.isNextPreloaded == true {
 			c.handleNextExercise()
 		}
 	})
-	app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
+	c.unsubscribers = append(c.unsubscribers, f)
+
+	f = app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
 		c.handleViewAnswer()
 	})
+	c.unsubscribers = append(c.unsubscribers, f)
 }
 
 // handleShowExercises start learning a current lesson
