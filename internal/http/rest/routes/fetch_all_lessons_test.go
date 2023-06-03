@@ -18,7 +18,7 @@ func TestFetchAllLessons(t *testing.T) {
 	lessons := models.Lessons{lesson}
 
 	reader := storage.NewReaderMock()
-	reader.On("AllLessons").Return(lessons)
+	reader.On("FetchAllLessons").Return(lessons)
 
 	route := NewFetchAllLessons(reader)
 

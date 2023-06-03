@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestExercisesOfLesson(t *testing.T) {
+func TestFetchExercisesOfLesson(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -40,7 +40,7 @@ func TestExercisesOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.ExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
+	res, err := r.FetchExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
@@ -52,7 +52,7 @@ func TestExercisesOfLesson(t *testing.T) {
 	assert.Equal(t, 0, res[0].GoodAnswers)
 }
 
-func TestAllLessons(t *testing.T) {
+func TestFetchAllLessons(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -85,7 +85,7 @@ func TestAllLessons(t *testing.T) {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	res, err := r.AllLessons()
+	res, err := r.FetchAllLessons()
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Lessons{}, res)
@@ -94,7 +94,7 @@ func TestAllLessons(t *testing.T) {
 	assert.Equal(t, lesson.Name, res[0].Name)
 }
 
-func TestRandomExerciseOfLesson(t *testing.T) {
+func TestFetchRandomExerciseOfLesson(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -127,7 +127,7 @@ func TestRandomExerciseOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.RandomExerciseOfLesson(models.Lesson{Id: exercise.LessonId})
+	res, err := r.FetchRandomExerciseOfLesson(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercise{}, res)

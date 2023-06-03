@@ -227,7 +227,7 @@ func (c *Learn) handleNextExercise() {
 	c.isAnswerVisible = false
 
 	if c.isNextPreloaded == false {
-		exercise := c.fetchNext()
+		exercise := c.FetchNextExercise()
 		c.exerciseId = exercise.Id
 		c.question = exercise.Question
 		c.answer = exercise.Answer
@@ -245,7 +245,7 @@ func (c *Learn) handleNextExercise() {
 	}
 
 	go func() {
-		exercise := c.fetchNext()
+		exercise := c.FetchNextExercise()
 		c.nextExerciseId = exercise.Id
 		c.nextQuestion = exercise.Question
 		c.nextAnswer = exercise.Answer
@@ -256,15 +256,15 @@ func (c *Learn) handleNextExercise() {
 	}()
 }
 
-func (c *Learn) fetchNext() models.Exercise {
-	exercise, err := c.api.FetchNextExerciseOfLesson(c.lesson)
+func (c *Learn) FetchNextExercise() models.Exercise {
+	exercise, err := c.api.FetchRandomExerciseOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}
 
 	// dummy way of avoiding duplicates todo move to the API
 	if exercise.Id == c.exerciseId {
-		return c.fetchNext()
+		return c.FetchNextExercise()
 	}
 
 	return exercise

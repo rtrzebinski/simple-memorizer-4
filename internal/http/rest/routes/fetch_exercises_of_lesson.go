@@ -27,7 +27,7 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 		return
 	}
 
-	exercises, err := h.r.ExercisesOfLesson(models.Lesson{Id: lessonId})
+	exercises, err := h.r.FetchExercisesOfLesson(models.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch all exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

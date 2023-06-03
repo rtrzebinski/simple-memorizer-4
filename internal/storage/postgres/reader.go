@@ -14,7 +14,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) ExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	const query = `
@@ -44,7 +44,7 @@ func (r *Reader) ExercisesOfLesson(lesson models.Lesson) (models.Exercises, erro
 	return exercises, nil
 }
 
-func (r *Reader) AllLessons() (models.Lessons, error) {
+func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
 	const query = `
@@ -72,7 +72,7 @@ func (r *Reader) AllLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
-func (r *Reader) RandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
+func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
 	var exercise models.Exercise
 
 	const query = `

@@ -140,10 +140,10 @@ func (c *Client) FetchAllLessons() (models.Lessons, error) {
 	return output, nil
 }
 
-func (c *Client) FetchNextExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
+func (c *Client) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
 	var output models.Exercise
 
-	u, _ := url.Parse(c.scheme + "://" + c.host + FetchNextExerciseOfLesson)
+	u, _ := url.Parse(c.scheme + "://" + c.host + FetchRandomExerciseOfLesson)
 
 	// set lesson_id in the url
 	params := u.Query()

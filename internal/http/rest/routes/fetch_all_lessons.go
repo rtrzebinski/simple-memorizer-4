@@ -17,7 +17,7 @@ func NewFetchAllLessons(r storage.Reader) *FetchAllLessons {
 }
 
 func (h *FetchAllLessons) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	lessons, err := h.r.AllLessons()
+	lessons, err := h.r.FetchAllLessons()
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch all lessons: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

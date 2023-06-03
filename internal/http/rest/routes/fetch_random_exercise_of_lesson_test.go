@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestFetchNextExerciseOfLesson(t *testing.T) {
+func TestFetchRandomExerciseOfLesson(t *testing.T) {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -24,9 +24,9 @@ func TestFetchNextExerciseOfLesson(t *testing.T) {
 	lessonId := 10
 
 	reader := storage.NewReaderMock()
-	reader.On("RandomExerciseOfLesson", models.Lesson{Id: lessonId}).Return(exercise)
+	reader.On("FetchRandomExerciseOfLesson", models.Lesson{Id: lessonId}).Return(exercise)
 
-	route := NewFetchNextExerciseOfLesson(reader)
+	route := NewFetchRandomExerciseOfLesson(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()

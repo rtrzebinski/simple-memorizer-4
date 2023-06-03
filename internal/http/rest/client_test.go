@@ -211,7 +211,7 @@ func (suite *ClientSuite) TestFetchAllLessons() {
 	suite.Assert().Equal(lessons, result)
 }
 
-func (suite *ClientSuite) TestFetchNextExerciseOfLesson() {
+func (suite *ClientSuite) TestRandomExerciseOfLesson() {
 	exercise := models.Exercise{
 		Id:          1,
 		Question:    "question",
@@ -229,7 +229,7 @@ func (suite *ClientSuite) TestFetchNextExerciseOfLesson() {
 
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
-		suite.Equal(FetchNextExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
+		suite.Equal(FetchRandomExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
@@ -243,7 +243,7 @@ func (suite *ClientSuite) TestFetchNextExerciseOfLesson() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.client.FetchNextExerciseOfLesson(models.Lesson{Id: lessonId})
+	result, err := suite.client.FetchRandomExerciseOfLesson(models.Lesson{Id: lessonId})
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercise, result)
