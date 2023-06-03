@@ -21,32 +21,13 @@ func NewWriter(http myhttp.Doer, host string, scheme string) *Writer {
 	return &Writer{http: http, host: host, scheme: scheme}
 }
 
-func (w *Writer) DeleteExercise(exercise models.Exercise) error {
-	body, err := json.Marshal(exercise)
+func (w *Writer) StoreLesson(lesson models.Lesson) error {
+	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	u := w.scheme + "://" + w.host + DeleteExercise
-	buffer := bytes.NewBuffer(body)
-
-	resp, err := w.performRequestTo("POST", u, buffer)
-	if err != nil {
-		return fmt.Errorf("failed to perform HTTP request: %w", err)
-	}
-
-	defer resp.Body.Close()
-
-	return nil
-}
-
-func (w *Writer) StoreExercise(exercise models.Exercise) error {
-	body, err := json.Marshal(exercise)
-	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
-	}
-
-	u := w.scheme + "://" + w.host + StoreExercise
+	u := w.scheme + "://" + w.host + StoreLesson
 	buffer := bytes.NewBuffer(body)
 
 	resp, err := w.performRequestTo("POST", u, buffer)
@@ -78,13 +59,32 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) StoreLesson(lesson models.Lesson) error {
-	body, err := json.Marshal(lesson)
+func (w *Writer) StoreExercise(exercise models.Exercise) error {
+	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode input: %w", err)
 	}
 
-	u := w.scheme + "://" + w.host + StoreLesson
+	u := w.scheme + "://" + w.host + StoreExercise
+	buffer := bytes.NewBuffer(body)
+
+	resp, err := w.performRequestTo("POST", u, buffer)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (w *Writer) DeleteExercise(exercise models.Exercise) error {
+	body, err := json.Marshal(exercise)
+	if err != nil {
+		return fmt.Errorf("failed to encode input: %w", err)
+	}
+
+	u := w.scheme + "://" + w.host + DeleteExercise
 	buffer := bytes.NewBuffer(body)
 
 	resp, err := w.performRequestTo("POST", u, buffer)

@@ -14,54 +14,34 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) DeleteExercise(exercise models.Exercise) error {
+func (w *Writer) StoreLesson(lesson models.Lesson) error {
 	var query string
 
-	// Get a Tx for making transaction requests.
-	tx, err := w.db.Begin()
+	if lesson.Id > 0 {
+		query = `UPDATE lesson set name = $1 where id = $2;`
+
+		_, err := w.db.Exec(query, lesson.Name, lesson.Id)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
+		}
+	} else {
+		query = `INSERT INTO lesson (name) VALUES ($1);`
+
+		_, err := w.db.Exec(query, lesson.Name)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (w *Writer) DeleteLesson(lesson models.Lesson) error {
+	query := `DELETE FROM lesson WHERE id = $1;`
+
+	_, err := w.db.Exec(query, lesson.Id)
 	if err != nil {
-		return fmt.Errorf("failed to begin DB transaction: %w", err)
-	}
-
-	// Defer a rollback in case anything fails.
-	defer tx.Rollback()
-
-	// Fetch the lesson of the exercise, so it can be used to update lesson.exercise_count.
-
-	query = `SELECT lesson_id FROM exercise WHERE id = $1;`
-
-	exercise.Lesson = &models.Lesson{}
-
-	if err := tx.QueryRow(query, exercise.Id).Scan(&exercise.Lesson.Id); err != nil {
-		return fmt.Errorf("failed to execute 'SELECT lesson_id FROM exercise' query: %w", err)
-	}
-
-	// Delete exercise.
-
-	query = `DELETE FROM exercise WHERE id = $1;`
-
-	_, err = tx.Exec(query, exercise.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute 'DELETE FROM exercise' query: %w", err)
-	}
-
-	// Update lesson.exercise_count.
-
-	query = `
-			UPDATE lesson
-			SET exercise_count=sq.exercise_count
-			FROM (SELECT count(*) as exercise_count FROM exercise WHERE lesson_id = $1) AS sq
-			WHERE lesson.id=$1;
-			`
-
-	_, err = tx.Exec(query, exercise.Lesson.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
-	}
-
-	// Commit the transaction.
-	if err = tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit DB transaction: %w", err)
+		return fmt.Errorf("failed to execute 'DELETE FROM lesson' query: %w", err)
 	}
 
 	return nil
@@ -119,34 +99,54 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (w *Writer) DeleteLesson(lesson models.Lesson) error {
-	query := `DELETE FROM lesson WHERE id = $1;`
-
-	_, err := w.db.Exec(query, lesson.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute 'DELETE FROM lesson' query: %w", err)
-	}
-
-	return nil
-}
-
-func (w *Writer) StoreLesson(lesson models.Lesson) error {
+func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	var query string
 
-	if lesson.Id > 0 {
-		query = `UPDATE lesson set name = $1 where id = $2;`
+	// Get a Tx for making transaction requests.
+	tx, err := w.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin DB transaction: %w", err)
+	}
 
-		_, err := w.db.Exec(query, lesson.Name, lesson.Id)
-		if err != nil {
-			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
-		}
-	} else {
-		query = `INSERT INTO lesson (name) VALUES ($1);`
+	// Defer a rollback in case anything fails.
+	defer tx.Rollback()
 
-		_, err := w.db.Exec(query, lesson.Name)
-		if err != nil {
-			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
-		}
+	// Fetch the lesson of the exercise, so it can be used to update lesson.exercise_count.
+
+	query = `SELECT lesson_id FROM exercise WHERE id = $1;`
+
+	exercise.Lesson = &models.Lesson{}
+
+	if err := tx.QueryRow(query, exercise.Id).Scan(&exercise.Lesson.Id); err != nil {
+		return fmt.Errorf("failed to execute 'SELECT lesson_id FROM exercise' query: %w", err)
+	}
+
+	// Delete exercise.
+
+	query = `DELETE FROM exercise WHERE id = $1;`
+
+	_, err = tx.Exec(query, exercise.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute 'DELETE FROM exercise' query: %w", err)
+	}
+
+	// Update lesson.exercise_count.
+
+	query = `
+			UPDATE lesson
+			SET exercise_count=sq.exercise_count
+			FROM (SELECT count(*) as exercise_count FROM exercise WHERE lesson_id = $1) AS sq
+			WHERE lesson.id=$1;
+			`
+
+	_, err = tx.Exec(query, exercise.Lesson.Id)
+	if err != nil {
+		return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
+	}
+
+	// Commit the transaction.
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit DB transaction: %w", err)
 	}
 
 	return nil

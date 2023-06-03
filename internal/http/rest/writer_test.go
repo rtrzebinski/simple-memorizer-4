@@ -36,22 +36,21 @@ func TestWriterSuite(t *testing.T) {
 	suite.Run(t, new(WriterSuite))
 }
 
-func (suite *WriterSuite) TestDeleteExercise() {
-	exercise := models.Exercise{
-		Id: 123,
+func (suite *WriterSuite) TestStoreLesson() {
+	lesson := models.Lesson{
+		Name: "name",
 	}
 
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
-		suite.Equal(DeleteExercise, req.URL.RequestURI())
+		suite.Equal(StoreLesson, req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
-		var input models.Exercise
+		var input models.Lesson
 		err := json.NewDecoder(req.Body).Decode(&input)
 		suite.NoError(err)
-		suite.Equal(exercise.Question, input.Question)
-		suite.Equal(exercise.Answer, input.Answer)
+		suite.Equal(lesson.Name, input.Name)
 
 		return true
 	})).Return(&http.Response{
@@ -59,7 +58,33 @@ func (suite *WriterSuite) TestDeleteExercise() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.writer.DeleteExercise(exercise)
+	err := suite.writer.StoreLesson(lesson)
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *WriterSuite) TestDeleteLesson() {
+	lesson := models.Lesson{
+		Id: 123,
+	}
+
+	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("POST", req.Method)
+		suite.Equal(DeleteLesson, req.URL.RequestURI())
+		suite.Equal(host, req.URL.Host)
+		suite.Equal(scheme, req.URL.Scheme)
+
+		var input models.Lesson
+		err := json.NewDecoder(req.Body).Decode(&input)
+		suite.NoError(err)
+		suite.Equal(lesson.Name, input.Name)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader([]byte{})),
+	}, nil)
+
+	err := suite.writer.DeleteLesson(lesson)
 	assert.NoError(suite.T(), err)
 }
 
@@ -91,21 +116,22 @@ func (suite *WriterSuite) TestStoreExercise() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *WriterSuite) TestDeleteLesson() {
-	lesson := models.Lesson{
+func (suite *WriterSuite) TestDeleteExercise() {
+	exercise := models.Exercise{
 		Id: 123,
 	}
 
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
-		suite.Equal(DeleteLesson, req.URL.RequestURI())
+		suite.Equal(DeleteExercise, req.URL.RequestURI())
 		suite.Equal(host, req.URL.Host)
 		suite.Equal(scheme, req.URL.Scheme)
 
-		var input models.Lesson
+		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
 		suite.NoError(err)
-		suite.Equal(lesson.Name, input.Name)
+		suite.Equal(exercise.Question, input.Question)
+		suite.Equal(exercise.Answer, input.Answer)
 
 		return true
 	})).Return(&http.Response{
@@ -113,33 +139,7 @@ func (suite *WriterSuite) TestDeleteLesson() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.writer.DeleteLesson(lesson)
-	assert.NoError(suite.T(), err)
-}
-
-func (suite *WriterSuite) TestStoreLesson() {
-	lesson := models.Lesson{
-		Name: "name",
-	}
-
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(StoreLesson, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
-
-		var input models.Lesson
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(lesson.Name, input.Name)
-
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.StoreLesson(lesson)
+	err := suite.writer.DeleteExercise(exercise)
 	assert.NoError(suite.T(), err)
 }
 
