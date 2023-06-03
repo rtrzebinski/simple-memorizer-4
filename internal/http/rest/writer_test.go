@@ -14,22 +14,20 @@ import (
 	"testing"
 )
 
-// todo move to suite
-//var (
-//	host   = "example.com"
-//	scheme = "http"
-//)
-
 type WriterSuite struct {
 	suite.Suite
 
 	http   *myhttp.DoerMock
+	host   string
+	scheme string
 	writer *Writer
 }
 
 func (suite *WriterSuite) SetupTest() {
 	suite.http = new(myhttp.DoerMock)
-	suite.writer = NewWriter(suite.http, host, scheme)
+	suite.host = "example.com"
+	suite.scheme = "http"
+	suite.writer = NewWriter(suite.http, suite.host, suite.scheme)
 }
 
 func TestWriterSuite(t *testing.T) {
@@ -44,8 +42,8 @@ func (suite *WriterSuite) TestStoreLesson() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(StoreLesson, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Lesson
 		err := json.NewDecoder(req.Body).Decode(&input)
@@ -70,8 +68,8 @@ func (suite *WriterSuite) TestDeleteLesson() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(DeleteLesson, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Lesson
 		err := json.NewDecoder(req.Body).Decode(&input)
@@ -97,8 +95,8 @@ func (suite *WriterSuite) TestStoreExercise() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(StoreExercise, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
@@ -124,8 +122,8 @@ func (suite *WriterSuite) TestDeleteExercise() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(DeleteExercise, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
@@ -149,8 +147,8 @@ func (suite *WriterSuite) TestIncrementBadAnswers() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(IncrementBadAnswers, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)
@@ -173,8 +171,8 @@ func (suite *WriterSuite) TestIncrementGoodAnswers() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("POST", req.Method)
 		suite.Equal(IncrementGoodAnswers, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		var input models.Exercise
 		err := json.NewDecoder(req.Body).Decode(&input)

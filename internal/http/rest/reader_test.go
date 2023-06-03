@@ -15,21 +15,20 @@ import (
 	"testing"
 )
 
-var (
-	host   = "example.com"
-	scheme = "http"
-)
-
 type ReaderSuite struct {
 	suite.Suite
 
 	http   *myhttp.DoerMock
+	host   string
+	scheme string
 	reader *Reader
 }
 
 func (suite *ReaderSuite) SetupTest() {
 	suite.http = new(myhttp.DoerMock)
-	suite.reader = NewReader(suite.http, host, scheme)
+	suite.host = "example.com"
+	suite.scheme = "http"
+	suite.reader = NewReader(suite.http, suite.host, suite.scheme)
 }
 
 func TestReaderSuite(t *testing.T) {
@@ -51,8 +50,8 @@ func (suite *ReaderSuite) TestFetchAllLessons() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
 		suite.Equal(FetchAllLessons, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		return true
 	})).Return(&http.Response{
@@ -86,8 +85,8 @@ func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
 		suite.Equal(FetchExercisesOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 		suite.Equal(lessonId, lId)
@@ -123,8 +122,8 @@ func (suite *ReaderSuite) TestRandomExerciseOfLesson() {
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
 		suite.Equal("GET", req.Method)
 		suite.Equal(FetchRandomExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
 
 		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 		suite.Equal(lessonId, lId)
