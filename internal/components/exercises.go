@@ -14,9 +14,9 @@ var pathExercises = "/exercises"
 
 type Exercises struct {
 	app.Compo
-	api      *rest.Client
-	lessonId int
-	rows     []*ExerciseRow
+	api    *rest.Client
+	lesson models.Lesson
+	rows   []*ExerciseRow
 
 	addExerciseFormVisible bool
 	inputId                int
@@ -34,7 +34,7 @@ func (c *Exercises) OnMount(ctx app.Context) {
 		app.Log("invalid lesson_id")
 		return
 	}
-	c.lessonId = lessonId
+	c.lesson = models.Lesson{Id: lessonId}
 
 	c.api = rest.NewClient(&http.Client{}, url.Host, url.Scheme)
 	c.displayExercisesOfLesson()
@@ -80,7 +80,7 @@ func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
 
 	// set lesson_id in the url
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(c.lessonId))
+	params.Add("lesson_id", strconv.Itoa(c.lesson.Id))
 	u.RawQuery = params.Encode()
 
 	ctx.NavigateTo(u)
@@ -110,7 +110,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 		Question: c.inputQuestion,
 		Answer:   c.inputAnswer,
 		Lesson: &models.Lesson{
-			Id: c.lessonId,
+			Id: c.lesson.Id,
 		},
 	})
 	if err != nil {
@@ -141,7 +141,7 @@ func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
 }
 
 func (c *Exercises) displayExercisesOfLesson() {
-	exercises, err := c.api.FetchExercisesOfLesson(c.lessonId)
+	exercises, err := c.api.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

@@ -15,8 +15,8 @@ var pathLearn = "/learn"
 // A Learn component
 type Learn struct {
 	app.Compo
-	api      *rest.Client
-	lessonId int
+	api    *rest.Client
+	lesson models.Lesson
 
 	isAnswerVisible bool
 	isNextPreloaded bool
@@ -49,7 +49,7 @@ func (c *Learn) OnMount(ctx app.Context) {
 		app.Log("invalid lesson_id")
 		return
 	}
-	c.lessonId = lessonId
+	c.lesson = models.Lesson{Id: lessonId}
 
 	c.api = rest.NewClient(&http.Client{}, u.Host, u.Scheme)
 	c.handleNextExercise()
@@ -217,7 +217,7 @@ func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
 
 	// set lesson_id in the url
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(c.lessonId))
+	params.Add("lesson_id", strconv.Itoa(c.lesson.Id))
 	u.RawQuery = params.Encode()
 
 	ctx.NavigateTo(u)
@@ -257,7 +257,7 @@ func (c *Learn) handleNextExercise() {
 }
 
 func (c *Learn) fetchNext() models.Exercise {
-	exercise, err := c.api.FetchNextExerciseOfLesson(c.lessonId)
+	exercise, err := c.api.FetchNextExerciseOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}

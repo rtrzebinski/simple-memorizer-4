@@ -123,7 +123,7 @@ func (suite *ClientSuite) TestFetchExercisesOfLesson() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.client.FetchExercisesOfLesson(lessonId)
+	result, err := suite.client.FetchExercisesOfLesson(models.Lesson{Id: lessonId})
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercises, result)
@@ -243,7 +243,7 @@ func (suite *ClientSuite) TestFetchNextExerciseOfLesson() {
 		Body:       io.NopCloser(bytes.NewReader(responseBody)),
 	}, nil)
 
-	result, err := suite.client.FetchNextExerciseOfLesson(lessonId)
+	result, err := suite.client.FetchNextExerciseOfLesson(models.Lesson{Id: lessonId})
 	assert.NoError(suite.T(), err)
 
 	suite.Assert().Equal(exercise, result)

@@ -61,14 +61,14 @@ func (c *Client) StoreExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (c *Client) FetchExercisesOfLesson(lessonId int) (models.Exercises, error) {
+func (c *Client) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var output models.Exercises
 
 	u, _ := url.Parse(c.scheme + "://" + c.host + FetchExercisesOfLesson)
 
 	// set lesson_id in the url
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lessonId))
+	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
 	resp, err := c.performRequestTo("GET", u.String(), nil)
@@ -140,14 +140,14 @@ func (c *Client) FetchAllLessons() (models.Lessons, error) {
 	return output, nil
 }
 
-func (c *Client) FetchNextExerciseOfLesson(lessonId int) (models.Exercise, error) {
+func (c *Client) FetchNextExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
 	var output models.Exercise
 
 	u, _ := url.Parse(c.scheme + "://" + c.host + FetchNextExerciseOfLesson)
 
 	// set lesson_id in the url
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lessonId))
+	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
 	resp, err := c.performRequestTo("GET", u.String(), nil)
