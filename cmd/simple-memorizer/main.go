@@ -7,11 +7,11 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/mysignal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"net/http"
 	"time"
@@ -119,7 +119,7 @@ func run(ctx context.Context) error {
 	// Start API server and send errors to the channel
 	go func() {
 		log.Printf("initializing API server on port: %s", cfg.Api.Port)
-		serverErrors <- backend.ListenAndServe(r, w, cfg.Api.Port)
+		serverErrors <- rest.ListenAndServe(r, w, cfg.Api.Port)
 	}()
 
 	// Signal notifier
