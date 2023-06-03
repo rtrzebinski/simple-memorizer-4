@@ -11,12 +11,12 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
-	return mock.Called(lesson).Get(0).(models.Exercises), nil
-}
-
 func (mock *ReaderMock) FetchAllLessons() (models.Lessons, error) {
 	return mock.Called().Get(0).(models.Lessons), nil
+}
+
+func (mock *ReaderMock) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+	return mock.Called(lesson).Get(0).(models.Exercises), nil
 }
 
 func (mock *ReaderMock) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {

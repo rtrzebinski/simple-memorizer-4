@@ -14,6 +14,34 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
+func (r *Reader) FetchAllLessons() (models.Lessons, error) {
+	var lessons models.Lessons
+
+	const query = `
+		SELECT l.id, l.name, l.exercise_count
+		FROM lesson l
+		ORDER BY l.id DESC
+		`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return lessons, err
+	}
+
+	for rows.Next() {
+		var lesson models.Lesson
+
+		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.ExerciseCount)
+		if err != nil {
+			return lessons, err
+		}
+
+		lessons = append(lessons, lesson)
+	}
+
+	return lessons, nil
+}
+
 func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
@@ -42,34 +70,6 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	}
 
 	return exercises, nil
-}
-
-func (r *Reader) FetchAllLessons() (models.Lessons, error) {
-	var lessons models.Lessons
-
-	const query = `
-		SELECT l.id, l.name, l.exercise_count
-		FROM lesson l
-		ORDER BY l.id DESC
-		`
-
-	rows, err := r.db.Query(query)
-	if err != nil {
-		return lessons, err
-	}
-
-	for rows.Next() {
-		var lesson models.Lesson
-
-		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.ExerciseCount)
-		if err != nil {
-			return lessons, err
-		}
-
-		lessons = append(lessons, lesson)
-	}
-
-	return lessons, nil
 }
 
 func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {

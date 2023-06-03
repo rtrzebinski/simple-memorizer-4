@@ -22,17 +22,10 @@ func NewReader(http myhttp.Doer, host string, scheme string) *Reader {
 	return &Reader{http: http, host: host, scheme: scheme}
 }
 
-func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
-	var output models.Exercises
+func (r *Reader) FetchAllLessons() (models.Lessons, error) {
+	var output models.Lessons
 
-	u, _ := url.Parse(r.scheme + "://" + r.host + FetchExercisesOfLesson)
-
-	// set lesson_id in the url
-	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
-	u.RawQuery = params.Encode()
-
-	resp, err := r.performRequestTo("GET", u.String(), nil)
+	resp, err := r.performRequestTo("GET", r.scheme+"://"+r.host+FetchAllLessons, nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -46,10 +39,17 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	return output, nil
 }
 
-func (r *Reader) FetchAllLessons() (models.Lessons, error) {
-	var output models.Lessons
+func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+	var output models.Exercises
 
-	resp, err := r.performRequestTo("GET", r.scheme+"://"+r.host+FetchAllLessons, nil)
+	u, _ := url.Parse(r.scheme + "://" + r.host + FetchExercisesOfLesson)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lesson.Id))
+	u.RawQuery = params.Encode()
+
+	resp, err := r.performRequestTo("GET", u.String(), nil)
 	if err != nil {
 		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

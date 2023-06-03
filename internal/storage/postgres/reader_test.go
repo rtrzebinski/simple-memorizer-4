@@ -7,6 +7,48 @@ import (
 	"testing"
 )
 
+func TestFetchAllLessons(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := NewReader(db)
+
+	lesson := &Lesson{}
+	createLesson(db, lesson)
+
+	res, err := r.FetchAllLessons()
+
+	assert.NoError(t, err)
+	assert.IsType(t, models.Lessons{}, res)
+	assert.Len(t, res, 1)
+	assert.Equal(t, lesson.Id, res[0].Id)
+	assert.Equal(t, lesson.Name, res[0].Name)
+}
+
 func TestFetchExercisesOfLesson(t *testing.T) {
 	t.Parallel()
 
@@ -50,48 +92,6 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	assert.Equal(t, exercise.Answer, res[0].Answer)
 	assert.Equal(t, 0, res[0].BadAnswers)
 	assert.Equal(t, 0, res[0].GoodAnswers)
-}
-
-func TestFetchAllLessons(t *testing.T) {
-	t.Parallel()
-
-	if testing.Short() {
-		t.Skip("Skipping integration test")
-	}
-
-	ctx := context.Background()
-
-	// container and database
-	container, db, err := createPostgresContainer(ctx, "testdb")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	defer container.Terminate(ctx)
-
-	// migration
-	mig, err := newMigrator(db)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = mig.Up()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	r := NewReader(db)
-
-	lesson := &Lesson{}
-	createLesson(db, lesson)
-
-	res, err := r.FetchAllLessons()
-
-	assert.NoError(t, err)
-	assert.IsType(t, models.Lessons{}, res)
-	assert.Len(t, res, 1)
-	assert.Equal(t, lesson.Id, res[0].Id)
-	assert.Equal(t, lesson.Name, res[0].Name)
 }
 
 func TestFetchRandomExerciseOfLesson(t *testing.T) {
