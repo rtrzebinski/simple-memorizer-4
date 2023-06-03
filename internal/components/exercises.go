@@ -14,7 +14,8 @@ var pathExercises = "/exercises"
 
 type Exercises struct {
 	app.Compo
-	api    *rest.Client
+	reader *rest.Reader
+	writer *rest.Writer
 	lesson models.Lesson
 	rows   []*ExerciseRow
 
@@ -36,7 +37,8 @@ func (c *Exercises) OnMount(ctx app.Context) {
 	}
 	c.lesson = models.Lesson{Id: lessonId}
 
-	c.api = rest.NewClient(&http.Client{}, url.Host, url.Scheme)
+	c.reader = rest.NewReader(&http.Client{}, url.Host, url.Scheme)
+	c.writer = rest.NewWriter(&http.Client{}, url.Host, url.Scheme)
 	c.displayExercisesOfLesson()
 }
 
@@ -105,7 +107,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 
 	c.storeButtonDisabled = true
 
-	err := c.api.StoreExercise(models.Exercise{
+	err := c.writer.StoreExercise(models.Exercise{
 		Id:       c.inputId,
 		Question: c.inputQuestion,
 		Answer:   c.inputAnswer,
@@ -141,7 +143,7 @@ func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
 }
 
 func (c *Exercises) displayExercisesOfLesson() {
-	exercises, err := c.api.FetchExercisesOfLesson(c.lesson)
+	exercises, err := c.reader.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

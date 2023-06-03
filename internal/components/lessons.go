@@ -12,8 +12,9 @@ var pathLessons = "/lessons"
 
 type Lessons struct {
 	app.Compo
-	api  *rest.Client
-	rows []*LessonRow
+	reader *rest.Reader
+	writer *rest.Writer
+	rows   []*LessonRow
 
 	addLessonFormVisible bool
 	inputId              int
@@ -24,7 +25,8 @@ type Lessons struct {
 // The OnMount method is run once component is mounted
 func (c *Lessons) OnMount(ctx app.Context) {
 	url := app.Window().URL()
-	c.api = rest.NewClient(&http.Client{}, url.Host, url.Scheme)
+	c.reader = rest.NewReader(&http.Client{}, url.Host, url.Scheme)
+	c.writer = rest.NewWriter(&http.Client{}, url.Host, url.Scheme)
 	c.displayAllLessons()
 }
 
@@ -75,7 +77,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 
 	c.storeButtonDisabled = true
 
-	err := c.api.StoreLesson(models.Lesson{
+	err := c.writer.StoreLesson(models.Lesson{
 		Id:   c.inputId,
 		Name: c.inputName,
 	})
@@ -102,7 +104,7 @@ func (c *Lessons) handleCancel(ctx app.Context, e app.Event) {
 }
 
 func (c *Lessons) displayAllLessons() {
-	lessons, err := c.api.FetchAllLessons()
+	lessons, err := c.reader.FetchAllLessons()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}

@@ -11,32 +11,32 @@ import (
 
 	"io"
 	"net/http"
-	"strconv"
 	"testing"
 )
 
-var (
-	host   = "example.com"
-	scheme = "http"
-)
+// todo move to suite
+//var (
+//	host   = "example.com"
+//	scheme = "http"
+//)
 
-type ClientSuite struct {
+type WriterSuite struct {
 	suite.Suite
 
 	http   *myhttp.DoerMock
-	client *Client
+	writer *Writer
 }
 
-func (suite *ClientSuite) SetupTest() {
+func (suite *WriterSuite) SetupTest() {
 	suite.http = new(myhttp.DoerMock)
-	suite.client = NewClient(suite.http, host, scheme)
+	suite.writer = NewWriter(suite.http, host, scheme)
 }
 
-func TestSuite(t *testing.T) {
-	suite.Run(t, new(ClientSuite))
+func TestWriterSuite(t *testing.T) {
+	suite.Run(t, new(WriterSuite))
 }
 
-func (suite *ClientSuite) TestDeleteExercise() {
+func (suite *WriterSuite) TestDeleteExercise() {
 	exercise := models.Exercise{
 		Id: 123,
 	}
@@ -59,11 +59,11 @@ func (suite *ClientSuite) TestDeleteExercise() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.DeleteExercise(exercise)
+	err := suite.writer.DeleteExercise(exercise)
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ClientSuite) TestStoreExercise() {
+func (suite *WriterSuite) TestStoreExercise() {
 	exercise := models.Exercise{
 		Question: "question",
 		Answer:   "answer",
@@ -87,49 +87,11 @@ func (suite *ClientSuite) TestStoreExercise() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.StoreExercise(exercise)
+	err := suite.writer.StoreExercise(exercise)
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ClientSuite) TestFetchExercisesOfLesson() {
-	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
-	}
-	exercises := models.Exercises{exercise}
-
-	lessonId := 10
-
-	responseBody, err := json.Marshal(exercises)
-	if err != nil {
-		suite.Error(err)
-	}
-
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchExercisesOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
-
-		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
-		suite.Equal(lessonId, lId)
-
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
-
-	result, err := suite.client.FetchExercisesOfLesson(models.Lesson{Id: lessonId})
-	assert.NoError(suite.T(), err)
-
-	suite.Assert().Equal(exercises, result)
-}
-
-func (suite *ClientSuite) TestDeleteLeson() {
+func (suite *WriterSuite) TestDeleteLesson() {
 	lesson := models.Lesson{
 		Id: 123,
 	}
@@ -151,11 +113,11 @@ func (suite *ClientSuite) TestDeleteLeson() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.DeleteLesson(lesson)
+	err := suite.writer.DeleteLesson(lesson)
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ClientSuite) TestStoreLesson() {
+func (suite *WriterSuite) TestStoreLesson() {
 	lesson := models.Lesson{
 		Name: "name",
 	}
@@ -177,79 +139,11 @@ func (suite *ClientSuite) TestStoreLesson() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.StoreLesson(lesson)
+	err := suite.writer.StoreLesson(lesson)
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ClientSuite) TestFetchAllLessons() {
-	lesson := models.Lesson{
-		Id:   1,
-		Name: "name",
-	}
-	lessons := models.Lessons{lesson}
-
-	responseBody, err := json.Marshal(lessons)
-	if err != nil {
-		suite.Error(err)
-	}
-
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchAllLessons, req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
-
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
-
-	result, err := suite.client.FetchAllLessons()
-	assert.NoError(suite.T(), err)
-
-	suite.Assert().Equal(lessons, result)
-}
-
-func (suite *ClientSuite) TestRandomExerciseOfLesson() {
-	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
-	}
-
-	responseBody, err := json.Marshal(exercise)
-	if err != nil {
-		suite.Error(err)
-	}
-
-	lessonId := 10
-
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchRandomExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(host, req.URL.Host)
-		suite.Equal(scheme, req.URL.Scheme)
-
-		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
-		suite.Equal(lessonId, lId)
-
-		return true
-
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
-
-	result, err := suite.client.FetchRandomExerciseOfLesson(models.Lesson{Id: lessonId})
-	assert.NoError(suite.T(), err)
-
-	suite.Assert().Equal(exercise, result)
-}
-
-func (suite *ClientSuite) TestIncrementBadAnswers() {
+func (suite *WriterSuite) TestIncrementBadAnswers() {
 	exercise := models.Exercise{Id: 123}
 
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
@@ -269,11 +163,11 @@ func (suite *ClientSuite) TestIncrementBadAnswers() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.IncrementBadAnswers(exercise)
+	err := suite.writer.IncrementBadAnswers(exercise)
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ClientSuite) TestIncrementGoodAnswers() {
+func (suite *WriterSuite) TestIncrementGoodAnswers() {
 	exercise := models.Exercise{Id: 123}
 
 	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
@@ -293,6 +187,6 @@ func (suite *ClientSuite) TestIncrementGoodAnswers() {
 		Body:       io.NopCloser(bytes.NewReader([]byte{})),
 	}, nil)
 
-	err := suite.client.IncrementGoodAnswers(exercise)
+	err := suite.writer.IncrementGoodAnswers(exercise)
 	assert.NoError(suite.T(), err)
 }

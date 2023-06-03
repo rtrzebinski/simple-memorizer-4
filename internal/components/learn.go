@@ -15,7 +15,8 @@ var pathLearn = "/learn"
 // A Learn component
 type Learn struct {
 	app.Compo
-	api    *rest.Client
+	reader *rest.Reader
+	writer *rest.Writer
 	lesson models.Lesson
 
 	isAnswerVisible bool
@@ -51,7 +52,8 @@ func (c *Learn) OnMount(ctx app.Context) {
 	}
 	c.lesson = models.Lesson{Id: lessonId}
 
-	c.api = rest.NewClient(&http.Client{}, u.Host, u.Scheme)
+	c.reader = rest.NewReader(&http.Client{}, u.Host, u.Scheme)
+	c.writer = rest.NewWriter(&http.Client{}, u.Host, u.Scheme)
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()
@@ -257,7 +259,7 @@ func (c *Learn) handleNextExercise() {
 }
 
 func (c *Learn) FetchNextExercise() models.Exercise {
-	exercise, err := c.api.FetchRandomExerciseOfLesson(c.lesson)
+	exercise, err := c.reader.FetchRandomExerciseOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch next exercise: %w", err))
 	}
@@ -278,7 +280,7 @@ func (c *Learn) handleGoodAnswer() {
 	exercise := models.Exercise{Id: c.exerciseId}
 	go func() {
 		// increment in the background
-		if err := c.api.IncrementGoodAnswers(exercise); err != nil {
+		if err := c.writer.IncrementGoodAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
@@ -289,7 +291,7 @@ func (c *Learn) handleBadAnswer() {
 	exercise := models.Exercise{Id: c.exerciseId}
 	go func() {
 		// increment in the background
-		if err := c.api.IncrementBadAnswers(exercise); err != nil {
+		if err := c.writer.IncrementBadAnswers(exercise); err != nil {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
