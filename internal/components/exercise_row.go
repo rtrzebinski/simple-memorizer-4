@@ -54,6 +54,7 @@ func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 		}
 		// replace parent rows slice with a new one - this will update the UI
 		c.parent.rows = rows
+		c.parent.hydrateLesson()
 	}
 }
 

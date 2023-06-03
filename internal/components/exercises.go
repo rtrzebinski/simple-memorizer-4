@@ -30,15 +30,18 @@ type Exercises struct {
 func (c *Exercises) OnMount(ctx app.Context) {
 	url := app.Window().URL()
 
-	lessonId, err := strconv.Atoi(url.Query().Get("lesson_id"))
-	if err != nil {
-		app.Log("invalid lesson_id")
-		return
-	}
-	c.lesson = models.Lesson{Id: lessonId}
-
 	c.reader = rest.NewReader(&http.Client{}, url.Host, url.Scheme)
 	c.writer = rest.NewWriter(&http.Client{}, url.Host, url.Scheme)
+
+	lessonId, err := strconv.Atoi(url.Query().Get("lesson_id"))
+	if err != nil {
+		app.Log(fmt.Errorf("failed to convert lesson_id: %w", err))
+		return
+	}
+
+	c.lesson = models.Lesson{Id: lessonId}
+
+	c.hydrateLesson()
 	c.displayExercisesOfLesson()
 }
 
@@ -47,8 +50,16 @@ func (c *Exercises) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.P().Body(
-			app.Button().Text("Start learning").OnClick(c.handleStartLearning),
+			app.Button().Text("Start learning").OnClick(c.handleStartLearning).Disabled(c.lesson.ExerciseCount < 2),
 			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.addExerciseFormVisible),
+		),
+		app.P().Body(
+			app.Text("Lesson: "),
+			app.Text(c.lesson.Name),
+		),
+		app.P().Body(
+			app.Text("Exercises: "),
+			app.Text(c.lesson.ExerciseCount),
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new exercise"),
@@ -124,6 +135,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.inputAnswer = ""
 
 	c.displayExercisesOfLesson()
+	c.hydrateLesson()
 
 	c.storeButtonDisabled = false
 
@@ -167,5 +179,13 @@ func (c *Exercises) displayExercisesOfLesson() {
 
 	for _, row := range exercises {
 		c.rows[row.Id] = &ExerciseRow{exercise: row, parent: c}
+	}
+}
+
+func (c *Exercises) hydrateLesson() {
+	err := c.reader.HydrateLesson(&c.lesson)
+	if err != nil {
+		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
+		return
 	}
 }

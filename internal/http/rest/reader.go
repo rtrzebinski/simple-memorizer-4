@@ -39,6 +39,28 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	return output, nil
 }
 
+func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
+	u, _ := url.Parse(r.scheme + "://" + r.host + HydrateLesson)
+
+	// set lesson_id in the url
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lesson.Id))
+	u.RawQuery = params.Encode()
+
+	resp, err := r.performRequestTo("GET", u.String(), nil)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(lesson); err != nil {
+		return fmt.Errorf("failed to decode output: %w", err)
+	}
+
+	return nil
+}
+
 func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var output models.Exercises
 

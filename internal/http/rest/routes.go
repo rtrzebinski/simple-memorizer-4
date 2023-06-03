@@ -10,6 +10,7 @@ const (
 	// read
 
 	FetchAllLessons             = "/fetch-all-lessons"
+	HydrateLesson               = "/hydrate-lesson"
 	FetchExercisesOfLesson      = "/fetch-exercises-of-lesson"
 	FetchRandomExerciseOfLesson = "/fetch-random-exercise-of-lesson"
 
@@ -27,6 +28,7 @@ func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	// read
 
 	http.Handle(FetchAllLessons, routes.NewFetchAllLessons(r))
+	http.Handle(HydrateLesson, routes.NewHydrateLesson(r))
 	http.Handle(FetchExercisesOfLesson, routes.NewFetchExercisesOfLesson(r))
 	http.Handle(FetchRandomExerciseOfLesson, routes.NewFetchRandomExerciseOfLesson(r))
 

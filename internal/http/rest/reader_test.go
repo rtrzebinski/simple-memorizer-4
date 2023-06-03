@@ -65,6 +65,37 @@ func (suite *ReaderSuite) TestFetchAllLessons() {
 	suite.Assert().Equal(lessons, result)
 }
 
+func (suite *ReaderSuite) TestHydrateLesson() {
+	lesson := &models.Lesson{
+		Id:            10,
+		Name:          "foo",
+		ExerciseCount: 2,
+	}
+
+	responseBody, err := json.Marshal(lesson)
+	if err != nil {
+		suite.Error(err)
+	}
+
+	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+		suite.Equal("GET", req.Method)
+		suite.Equal(HydrateLesson+"?lesson_id=10", req.URL.RequestURI())
+		suite.Equal(suite.host, req.URL.Host)
+		suite.Equal(suite.scheme, req.URL.Scheme)
+
+		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
+		suite.Equal(lesson.Id, lId)
+
+		return true
+	})).Return(&http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(bytes.NewReader(responseBody)),
+	}, nil)
+
+	err = suite.reader.HydrateLesson(lesson)
+	assert.NoError(suite.T(), err)
+}
+
 func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
 	exercise := models.Exercise{
 		Id:          1,

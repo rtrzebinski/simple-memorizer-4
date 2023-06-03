@@ -42,6 +42,16 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
+func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
+	query := `SELECT name, exercise_count FROM lesson WHERE id = $1;`
+
+	if err := r.db.QueryRow(query, lesson.Id).Scan(&lesson.Name, &lesson.ExerciseCount); err != nil {
+		return fmt.Errorf("failed to execute 'SELECT FROM lesson' query: %w", err)
+	}
+
+	return nil
+}
+
 func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 

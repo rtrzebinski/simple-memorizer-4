@@ -49,6 +49,53 @@ func TestFetchAllLessons(t *testing.T) {
 	assert.Equal(t, lesson.Name, res[0].Name)
 }
 
+func TestHydrateLesson(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := NewReader(db)
+
+	l := &Lesson{
+		Name:          "foo",
+		ExerciseCount: 10,
+	}
+	createLesson(db, l)
+
+	lesson := &models.Lesson{
+		Id: l.Id,
+	}
+
+	err = r.HydrateLesson(lesson)
+
+	assert.NoError(t, err)
+	assert.Equal(t, lesson.Name, l.Name)
+	assert.Equal(t, lesson.ExerciseCount, l.ExerciseCount)
+}
+
 func TestFetchExercisesOfLesson(t *testing.T) {
 	t.Parallel()
 
