@@ -7,9 +7,13 @@ import (
 )
 
 const (
+	// read
+
 	FetchAllLessons             = "/fetch-all-lessons"
 	FetchExercisesOfLesson      = "/fetch-exercises-of-lesson"
 	FetchRandomExerciseOfLesson = "/fetch-random-exercise-of-lesson"
+
+	// write
 
 	StoreLesson          = "/store-lesson"
 	DeleteLesson         = "/delete-lesson"
@@ -20,9 +24,13 @@ const (
 )
 
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
+	// read
+
 	http.Handle(FetchAllLessons, routes.NewFetchAllLessons(r))
 	http.Handle(FetchExercisesOfLesson, routes.NewFetchExercisesOfLesson(r))
 	http.Handle(FetchRandomExerciseOfLesson, routes.NewFetchRandomExerciseOfLesson(r))
+
+	// write
 
 	http.Handle(StoreLesson, routes.NewStoreLesson(w))
 	http.Handle(DeleteLesson, routes.NewDeleteLesson(w))
