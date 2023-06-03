@@ -11,14 +11,14 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) ExercisesOfLesson(lessonId int) (models.Exercises, error) {
-	return mock.Called(lessonId).Get(0).(models.Exercises), nil
+func (mock *ReaderMock) ExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+	return mock.Called(lesson).Get(0).(models.Exercises), nil
 }
 
 func (mock *ReaderMock) AllLessons() (models.Lessons, error) {
 	return mock.Called().Get(0).(models.Lessons), nil
 }
 
-func (mock *ReaderMock) RandomExerciseOfLesson(lessonId int) (models.Exercise, error) {
-	return mock.Called(lessonId).Get(0).(models.Exercise), nil
+func (mock *ReaderMock) RandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
+	return mock.Called(lesson).Get(0).(models.Exercise), nil
 }

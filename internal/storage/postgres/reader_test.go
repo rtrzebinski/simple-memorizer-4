@@ -40,7 +40,7 @@ func TestExercisesOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.ExercisesOfLesson(exercise.LessonId)
+	res, err := r.ExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
@@ -127,7 +127,7 @@ func TestRandomExerciseOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.RandomExerciseOfLesson(exercise.LessonId)
+	res, err := r.RandomExerciseOfLesson(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercise{}, res)

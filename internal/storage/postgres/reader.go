@@ -14,7 +14,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) ExercisesOfLesson(lessonId int) (models.Exercises, error) {
+func (r *Reader) ExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	const query = `
@@ -25,7 +25,7 @@ func (r *Reader) ExercisesOfLesson(lessonId int) (models.Exercises, error) {
 		ORDER BY e.id DESC
 		`
 
-	rows, err := r.db.Query(query, lessonId)
+	rows, err := r.db.Query(query, lesson.Id)
 	if err != nil {
 		return exercises, err
 	}
@@ -72,7 +72,7 @@ func (r *Reader) AllLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
-func (r *Reader) RandomExerciseOfLesson(lessonId int) (models.Exercise, error) {
+func (r *Reader) RandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
 	var exercise models.Exercise
 
 	const query = `
@@ -84,7 +84,7 @@ func (r *Reader) RandomExerciseOfLesson(lessonId int) (models.Exercise, error) {
 		ORDER BY random()
 		LIMIT 1`
 
-	if err := r.db.QueryRow(query, lessonId).Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.GoodAnswers); err != nil {
+	if err := r.db.QueryRow(query, lesson.Id).Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.GoodAnswers); err != nil {
 		return exercise, fmt.Errorf("failed to scan query results: %w", err)
 	}
 

@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"log"
 	"net/http"
@@ -26,7 +27,7 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 		return
 	}
 
-	exercises, err := h.r.ExercisesOfLesson(lessonId)
+	exercises, err := h.r.ExercisesOfLesson(models.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch all exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

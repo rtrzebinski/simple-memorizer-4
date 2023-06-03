@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"log"
 	"net/http"
@@ -26,7 +27,7 @@ func (h *FetchNextExerciseOfLesson) ServeHTTP(res http.ResponseWriter, req *http
 		return
 	}
 
-	exercise, err := h.r.RandomExerciseOfLesson(lessonId)
+	exercise, err := h.r.RandomExerciseOfLesson(models.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to find a random exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
