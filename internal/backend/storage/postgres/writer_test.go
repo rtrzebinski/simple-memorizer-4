@@ -37,7 +37,14 @@ func TestDeleteExercise(t *testing.T) {
 
 	w := NewWriter(db)
 
-	createExercise(db, &Exercise{})
+	lesson := &Lesson{
+		ExerciseCount: 1,
+	}
+	createLesson(db, lesson)
+
+	createExercise(db, &Exercise{
+		LessonId: lesson.Id,
+	})
 	stored := fetchLatestExercise(db)
 
 	createExercise(db, &Exercise{
@@ -50,6 +57,9 @@ func TestDeleteExercise(t *testing.T) {
 
 	assert.Nil(t, findExerciseById(db, stored.Id))
 	assert.Equal(t, "another", findExerciseById(db, another.Id).Question)
+
+	lesson = findLessonById(db, stored.LessonId)
+	assert.Equal(t, 0, lesson.ExerciseCount)
 }
 
 func TestStoreExercise_createNew(t *testing.T) {
@@ -82,8 +92,8 @@ func TestStoreExercise_createNew(t *testing.T) {
 
 	w := NewWriter(db)
 
-	lesson := Lesson{}
-	createLesson(db, &lesson)
+	lesson := &Lesson{}
+	createLesson(db, lesson)
 
 	exercise := models.Exercise{
 		Lesson: &models.Lesson{
@@ -101,6 +111,9 @@ func TestStoreExercise_createNew(t *testing.T) {
 	assert.Equal(t, exercise.Lesson.Id, stored.LessonId)
 	assert.Equal(t, exercise.Question, stored.Question)
 	assert.Equal(t, exercise.Answer, stored.Answer)
+
+	lesson = findLessonById(db, lesson.Id)
+	assert.Equal(t, 1, lesson.ExerciseCount)
 }
 
 func TestStoreExercise_updateExisting(t *testing.T) {

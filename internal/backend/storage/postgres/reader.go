@@ -48,7 +48,7 @@ func (r *Reader) AllLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
 	const query = `
-		SELECT l.id, l.name
+		SELECT l.id, l.name, l.exercise_count
 		FROM lesson l
 		ORDER BY l.id DESC
 		`
@@ -61,7 +61,7 @@ func (r *Reader) AllLessons() (models.Lessons, error) {
 	for rows.Next() {
 		var lesson models.Lesson
 
-		err = rows.Scan(&lesson.Id, &lesson.Name)
+		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.ExerciseCount)
 		if err != nil {
 			return lessons, err
 		}

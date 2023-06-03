@@ -17,8 +17,9 @@ import (
 
 type (
 	Lesson struct {
-		Id   int
-		Name string
+		Id            int
+		Name          string
+		ExerciseCount int
 	}
 
 	Exercise struct {
@@ -63,7 +64,7 @@ func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
 
 func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	const query = `
-		SELECT l.id, l.name
+		SELECT l.id, l.name, l.exercise_count
 		FROM lesson l
 		WHERE l.id = $1;`
 
@@ -75,7 +76,7 @@ func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	for rows.Next() {
 		var lesson Lesson
 
-		err = rows.Scan(&lesson.Id, &lesson.Name)
+		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.ExerciseCount)
 		if err != nil {
 			panic(err)
 		}
@@ -142,13 +143,13 @@ func createExercise(db *sql.DB, exercise *Exercise) {
 }
 
 func createLesson(db *sql.DB, lesson *Lesson) {
-	query := `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
+	query := `INSERT INTO lesson (name, exercise_count) VALUES ($1, $2) RETURNING id;`
 
 	if lesson.Name == "" {
 		lesson.Name = randomString()
 	}
 
-	err := db.QueryRow(query, &lesson.Name).Scan(&lesson.Id)
+	err := db.QueryRow(query, &lesson.Name, &lesson.ExerciseCount).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}

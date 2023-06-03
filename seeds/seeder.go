@@ -53,7 +53,7 @@ func (s Seeder) ExerciseSeed() {
 		"Germany":     "Berlin",
 		"France":      "Paris",
 		"Netherlands": "Amsterdam",
-		//"Spain":       "Madrid",
+		"Spain":       "Madrid",
 		//"Greece":      "Athens",
 		//"Slovakia":    "Bratislava",
 		//"Hungary":     "Budapest",
@@ -70,6 +70,20 @@ func (s Seeder) ExerciseSeed() {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	// Update lesson.exercise_count.
+
+	query := `
+			UPDATE lesson
+			SET exercise_count=sq.exercise_count
+			FROM (SELECT count(*) as exercise_count FROM exercise WHERE lesson_id = $1) AS sq
+			WHERE lesson.id=$1;
+			`
+
+	_, err = s.db.Exec(query, 1)
+	if err != nil {
+		panic(err)
 	}
 }
 

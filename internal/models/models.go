@@ -12,8 +12,9 @@ type Exercise struct {
 type Exercises []Exercise
 
 type Lesson struct {
-	Id   int
-	Name string
+	Id            int
+	Name          string
+	ExerciseCount int
 }
 
 type Lessons []Lesson

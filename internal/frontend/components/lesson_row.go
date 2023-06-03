@@ -24,6 +24,9 @@ func (c *LessonRow) Render() app.UI {
 			app.Text(c.lesson.Name),
 		),
 		app.Td().Style("border", "1px solid black").Body(
+			app.Text(c.lesson.ExerciseCount),
+		),
+		app.Td().Style("border", "1px solid black").Body(
 			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
 			app.Button().Text("Delete").OnClick(c.onDelete(c.lesson.Id), fmt.Sprintf("%p", c)),
 			app.Button().Text("Exercises").OnClick(c.onExercises(c.lesson.Id), fmt.Sprintf("%p", c)),
