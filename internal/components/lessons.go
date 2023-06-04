@@ -16,10 +16,12 @@ type Lessons struct {
 	writer *rest.Writer
 	rows   []*LessonRow
 
-	addLessonFormVisible bool
-	inputId              int
-	inputName            string
-	storeButtonDisabled  bool
+	// store lesson form
+	formVisible         bool
+	validationError     string
+	inputId             int
+	inputName           string
+	storeButtonDisabled bool
 }
 
 // The OnMount method is run once component is mounted
@@ -35,16 +37,17 @@ func (c *Lessons) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.P().Body(
-			app.Button().Text("Add a new lesson").OnClick(c.handleAddLesson).Hidden(c.addLessonFormVisible),
+			app.Button().Text("Add a new lesson").OnClick(c.handleAddLesson).Hidden(c.formVisible),
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new lesson"),
+			app.P().Text(c.validationError).Hidden(c.validationError == "").Style("color", "red"),
 			app.Textarea().ID("input_name").Cols(30).Rows(3).Placeholder("Name").
 				Required(true).OnInput(c.ValueTo(&c.inputName)).Text(c.inputName),
 			app.Br(),
 			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
-		).Hidden(!c.addLessonFormVisible),
+		).Hidden(!c.formVisible),
 		app.Div().Body(
 			app.H3().Text("Lessons"),
 			app.Table().Style("border", "1px solid black").Body(
@@ -62,21 +65,35 @@ func (c *Lessons) Render() app.UI {
 
 // handleAddLesson display add lesson form
 func (c *Lessons) handleAddLesson(ctx app.Context, e app.Event) {
-	c.addLessonFormVisible = true
+	c.formVisible = true
+	c.inputId = 0
 }
 
 // handleStore create new or update existing lesson
 func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	// todo implement input validation
+	// init empty validation errors
+	c.validationError = ""
+
+	// validate input - lesson name required
 	if c.inputName == "" {
-		app.Log("invalid input")
+		c.validationError = "Lesson name is required"
 		return
 	}
 
+	// validate input - lesson name unique
+	for i, row := range c.rows {
+		if row != nil && c.rows[i].lesson.Name == c.inputName && c.rows[i].lesson.Id != c.inputId {
+			c.validationError = "Lesson name must be unique"
+			return
+		}
+	}
+
+	// disable submit button to avoid duplicated requests
 	c.storeButtonDisabled = true
 
+	// store lesson
 	err := c.writer.StoreLesson(models.Lesson{
 		Id:   c.inputId,
 		Name: c.inputName,
@@ -85,22 +102,23 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 		app.Log(fmt.Errorf("failed to store lesson: %w", err))
 	}
 
-	c.inputId = 0
-	c.inputName = ""
+	// reset form
+	c.resetForm()
 
+	// refresh lessons list
 	c.displayAllLessons()
-
-	c.storeButtonDisabled = false
-
-	// hide the inout form on success
-	c.addLessonFormVisible = false
 }
 
-// handleCancel cleanup input UI
 func (c *Lessons) handleCancel(ctx app.Context, e app.Event) {
+	c.resetForm()
+}
+
+func (c *Lessons) resetForm() {
 	c.inputId = 0
 	c.inputName = ""
-	c.addLessonFormVisible = false
+	c.validationError = ""
+	c.storeButtonDisabled = false
+	c.formVisible = false
 }
 
 func (c *Lessons) displayAllLessons() {

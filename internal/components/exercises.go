@@ -19,11 +19,13 @@ type Exercises struct {
 	lesson models.Lesson
 	rows   []*ExerciseRow
 
-	addExerciseFormVisible bool
-	inputId                int
-	inputQuestion          string
-	inputAnswer            string
-	storeButtonDisabled    bool
+	// store exercise form
+	formVisible         bool
+	validationError     string
+	inputId             int
+	inputQuestion       string
+	inputAnswer         string
+	storeButtonDisabled bool
 }
 
 // The OnMount method is run once component is mounted
@@ -51,7 +53,7 @@ func (c *Exercises) Render() app.UI {
 		&Navigation{},
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(c.handleStartLearning).Disabled(c.lesson.ExerciseCount < 2),
-			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.addExerciseFormVisible),
+			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.formVisible),
 		),
 		app.P().Body(
 			app.Text("Lesson: "),
@@ -63,6 +65,7 @@ func (c *Exercises) Render() app.UI {
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new exercise"),
+			app.P().Text(c.validationError).Hidden(c.validationError == "").Style("color", "red"),
 			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
 				Required(true).OnInput(c.ValueTo(&c.inputQuestion)).Text(c.inputQuestion),
 			app.Br(),
@@ -71,7 +74,7 @@ func (c *Exercises) Render() app.UI {
 			app.Br(),
 			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
-		).Hidden(!c.addExerciseFormVisible),
+		).Hidden(!c.formVisible),
 		app.Div().Body(
 			app.H3().Text("Exercises"),
 			app.Table().Style("border", "1px solid black").Body(
@@ -101,23 +104,43 @@ func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
 
 // handleAddExercise display add exercise form
 func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
-	c.addExerciseFormVisible = true
+	c.formVisible = true
 }
 
 // handleStore create new or update existing exercise
 func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	// todo implement input validation
-	if c.inputQuestion == "" || c.inputAnswer == "" {
-		app.Log("invalid input")
+	// init empty validation errors
+	c.validationError = ""
+
+	// validate input - exercise question required
+	if c.inputQuestion == "" {
+		c.validationError = "Exercise question is required"
 		return
 	}
 
+	// validate input - exercise answer required
+	if c.inputAnswer == "" {
+		c.validationError = "Exercise answer is required"
+		return
+	}
+
+	// validate input - exercise question unique (for given lesson)
+	for i, row := range c.rows {
+		if row != nil && c.rows[i].exercise.Question == c.inputQuestion && c.rows[i].exercise.Id != c.inputId {
+			c.validationError = "Exercise question must be unique"
+			return
+		}
+	}
+
+	// check before resetting the form
 	isCreatingNew := c.inputId == 0
 
+	// disable submit button to avoid duplicated requests
 	c.storeButtonDisabled = true
 
+	// store exercise
 	err := c.writer.StoreExercise(models.Exercise{
 		Id:       c.inputId,
 		Question: c.inputQuestion,
@@ -130,28 +153,33 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
 
-	c.inputId = 0
-	c.inputQuestion = ""
-	c.inputAnswer = ""
-
-	c.displayExercisesOfLesson()
-	c.hydrateLesson()
-
-	c.storeButtonDisabled = false
+	// reset form
+	c.resetForm()
 
 	// hide the input form on row edit, but keep open on adding new
 	// because it is common to add a few exercises one after another
 	if isCreatingNew == false {
-		c.addExerciseFormVisible = false
+		c.formVisible = false
 	}
+
+	// refresh exercises list
+	c.displayExercisesOfLesson()
+
+	// refresh lesson details (exercises counter)
+	c.hydrateLesson()
 }
 
-// handleCancel cleanup input UI
 func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
+	c.resetForm()
+	c.formVisible = false
+}
+
+func (c *Exercises) resetForm() {
 	c.inputId = 0
 	c.inputQuestion = ""
 	c.inputAnswer = ""
-	c.addExerciseFormVisible = false
+	c.validationError = ""
+	c.storeButtonDisabled = false
 }
 
 func (c *Exercises) displayExercisesOfLesson() {

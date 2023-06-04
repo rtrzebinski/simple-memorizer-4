@@ -41,7 +41,8 @@ func (c *LessonRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		c.parent.inputId = c.lesson.Id
 		c.parent.inputName = c.lesson.Name
-		c.parent.addLessonFormVisible = true
+		c.parent.formVisible = true
+		c.parent.validationError = ""
 	}
 }
 

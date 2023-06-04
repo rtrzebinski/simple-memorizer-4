@@ -63,6 +63,7 @@ func (c *ExerciseRow) onEdit() app.EventHandler {
 		c.parent.inputId = c.exercise.Id
 		c.parent.inputQuestion = c.exercise.Question
 		c.parent.inputAnswer = c.exercise.Answer
-		c.parent.addExerciseFormVisible = true
+		c.parent.formVisible = true
+		c.parent.validationError = ""
 	}
 }
