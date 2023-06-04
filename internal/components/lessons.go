@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-var pathLessons = "/lessons"
+const PathLessons = "/lessons"
 
 type Lessons struct {
 	app.Compo

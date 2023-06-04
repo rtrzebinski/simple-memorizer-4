@@ -68,7 +68,7 @@ func (c *LessonRow) onDelete(id int) app.EventHandler {
 
 func (c *LessonRow) onExercises(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		u, _ := url.Parse(pathExercises)
+		u, _ := url.Parse(PathExercises)
 
 		// set lesson_id in the url
 		params := u.Query()
@@ -81,7 +81,7 @@ func (c *LessonRow) onExercises(id int) app.EventHandler {
 
 func (c *LessonRow) onLearn(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		u, _ := url.Parse(pathLearn)
+		u, _ := url.Parse(PathLearn)
 
 		// set lesson_id in the url
 		params := u.Query()

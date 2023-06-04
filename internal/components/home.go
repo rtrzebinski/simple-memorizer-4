@@ -4,7 +4,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
-var pathHome = "/"
+const PathHome = "/"
 
 // A Home component
 type Home struct {

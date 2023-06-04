@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var pathLearn = "/learn"
+const PathLearn = "/learn"
 
 // A Learn component
 type Learn struct {
@@ -215,7 +215,7 @@ func (c *Learn) bindSwipes() {
 
 // handleShowExercises start learning a current lesson
 func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
-	u, _ := url.Parse(pathExercises)
+	u, _ := url.Parse(PathExercises)
 
 	// set lesson_id in the url
 	params := u.Query()

@@ -50,12 +50,12 @@ func run(ctx context.Context) error {
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", &components.Home{})
+	app.Route(components.PathHome, &components.Home{})
 
 	// Associate other frontend routes
-	app.Route("/lessons", &components.Lessons{})
-	app.Route("/exercises", &components.Exercises{})
-	app.Route("/learn", &components.Learn{})
+	app.Route(components.PathLessons, &components.Lessons{})
+	app.Route(components.PathExercises, &components.Exercises{})
+	app.Route(components.PathLearn, &components.Learn{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.

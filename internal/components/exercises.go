@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var pathExercises = "/exercises"
+const PathExercises = "/exercises"
 
 type Exercises struct {
 	app.Compo
@@ -92,7 +92,7 @@ func (c *Exercises) Render() app.UI {
 
 // handleStartLearning start learning a current lesson
 func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
-	u, _ := url.Parse(pathLearn)
+	u, _ := url.Parse(PathLearn)
 
 	// set lesson_id in the url
 	params := u.Query()
