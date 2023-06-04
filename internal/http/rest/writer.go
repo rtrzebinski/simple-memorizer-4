@@ -28,14 +28,11 @@ func (w *Writer) StoreLesson(lesson models.Lesson) error {
 	}
 
 	u := w.scheme + "://" + w.host + StoreLesson
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -47,14 +44,11 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	}
 
 	u := w.scheme + "://" + w.host + DeleteLesson
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -66,14 +60,11 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 	}
 
 	u := w.scheme + "://" + w.host + StoreExercise
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -85,14 +76,11 @@ func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	}
 
 	u := w.scheme + "://" + w.host + DeleteExercise
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -104,14 +92,11 @@ func (w *Writer) IncrementBadAnswers(exercise models.Exercise) error {
 	}
 
 	u := w.scheme + "://" + w.host + IncrementBadAnswers
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
-
-	defer resp.Body.Close()
 
 	return nil
 }
@@ -123,36 +108,41 @@ func (w *Writer) IncrementGoodAnswers(exercise models.Exercise) error {
 	}
 
 	u := w.scheme + "://" + w.host + IncrementGoodAnswers
-	buffer := bytes.NewBuffer(body)
 
-	resp, err := w.performRequestTo("POST", u, buffer)
+	_, err = w.performRequestTo("POST", u, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	defer resp.Body.Close()
-
 	return nil
 }
 
-func (w *Writer) performRequestTo(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func (r *Writer) performRequestTo(method, url string, reqBody []byte) ([]byte, error) {
+	buffer := bytes.NewBuffer(reqBody)
+
+	req, err := http.NewRequest(method, url, buffer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
 	req.Header.Add("content-type", "application/json")
 
-	resp, err := w.http.Do(req)
+	resp, err := r.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call HTTP endpoint: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		payload, _ := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
 
-		return nil, fmt.Errorf("server returned with the status code '%d': %w", resp.StatusCode, errors.New(string(payload)))
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}
 
-	return resp, nil
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server returned with the status code '%d': %w",
+			resp.StatusCode, errors.New(string(respBody)))
+	}
+
+	return respBody, nil
 }

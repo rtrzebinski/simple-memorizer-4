@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,20 +24,18 @@ func NewReader(http myhttp.Doer, host string, scheme string) *Reader {
 }
 
 func (r *Reader) FetchAllLessons() (models.Lessons, error) {
-	var output models.Lessons
+	var lessons models.Lessons
 
-	resp, err := r.performRequestTo("GET", r.scheme+"://"+r.host+FetchAllLessons, nil)
+	respBody, err := r.performRequestTo("GET", r.scheme+"://"+r.host+FetchAllLessons, nil)
 	if err != nil {
-		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	defer resp.Body.Close()
-
-	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
-		return output, fmt.Errorf("failed to decode output: %w", err)
+	if err := json.Unmarshal(respBody, &lessons); err != nil {
+		return lessons, fmt.Errorf("failed to decode lessons: %w", err)
 	}
 
-	return output, nil
+	return lessons, nil
 }
 
 func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
@@ -47,22 +46,20 @@ func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
-	resp, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	defer resp.Body.Close()
-
-	if err := json.NewDecoder(resp.Body).Decode(lesson); err != nil {
-		return fmt.Errorf("failed to decode output: %w", err)
+	if err := json.Unmarshal(respBody, lesson); err != nil {
+		return fmt.Errorf("failed to decode lesson: %w", err)
 	}
 
 	return nil
 }
 
 func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
-	var output models.Exercises
+	var exercises models.Exercises
 
 	u, _ := url.Parse(r.scheme + "://" + r.host + FetchExercisesOfLesson)
 
@@ -71,22 +68,20 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
-	resp, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", u.String(), nil)
 	if err != nil {
-		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	defer resp.Body.Close()
-
-	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
-		return output, fmt.Errorf("failed to decode output: %w", err)
+	if err := json.Unmarshal(respBody, &exercises); err != nil {
+		return exercises, fmt.Errorf("failed to decode exercises: %w", err)
 	}
 
-	return output, nil
+	return exercises, nil
 }
 
 func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
-	var output models.Exercise
+	var exercise models.Exercise
 
 	u, _ := url.Parse(r.scheme + "://" + r.host + FetchRandomExerciseOfLesson)
 
@@ -95,22 +90,22 @@ func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exerc
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
-	resp, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", u.String(), nil)
 	if err != nil {
-		return output, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return exercise, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	defer resp.Body.Close()
-
-	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
-		return output, fmt.Errorf("failed to decode output: %w", err)
+	if err := json.Unmarshal(respBody, &exercise); err != nil {
+		return exercise, fmt.Errorf("failed to decode exercise: %w", err)
 	}
 
-	return output, nil
+	return exercise, nil
 }
 
-func (r *Reader) performRequestTo(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func (r *Reader) performRequestTo(method, url string, reqBody []byte) ([]byte, error) {
+	buffer := bytes.NewBuffer(reqBody)
+
+	req, err := http.NewRequest(method, url, buffer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -122,11 +117,17 @@ func (r *Reader) performRequestTo(method, url string, body io.Reader) (*http.Res
 		return nil, fmt.Errorf("failed to call HTTP endpoint: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		payload, _ := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
 
-		return nil, fmt.Errorf("server returned with the status code '%d': %w", resp.StatusCode, errors.New(string(payload)))
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}
 
-	return resp, nil
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server returned with the status code '%d': %w",
+			resp.StatusCode, errors.New(string(respBody)))
+	}
+
+	return respBody, nil
 }
