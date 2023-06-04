@@ -1,34 +1,23 @@
 package rest
 
 import (
-	"bytes"
 	"encoding/json"
 	myhttp "github.com/rtrzebinski/simple-memorizer-4/internal/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-
-	"io"
-	"net/http"
-	"strconv"
 	"testing"
 )
 
 type ReaderSuite struct {
 	suite.Suite
 
-	http   *myhttp.DoerMock
-	host   string
-	scheme string
+	client *myhttp.ClientMock
 	reader *Reader
 }
 
 func (suite *ReaderSuite) SetupTest() {
-	suite.http = new(myhttp.DoerMock)
-	suite.host = "example.com"
-	suite.scheme = "http"
-	suite.reader = NewReader(suite.http, suite.host, suite.scheme)
+	suite.client = myhttp.NewClientMock()
+	suite.reader = NewReader(suite.client)
 }
 
 func TestReaderSuite(t *testing.T) {
@@ -36,138 +25,76 @@ func TestReaderSuite(t *testing.T) {
 }
 
 func (suite *ReaderSuite) TestFetchAllLessons() {
-	lesson := models.Lesson{
-		Id:   1,
-		Name: "name",
-	}
-	lessons := models.Lessons{lesson}
+	lessons := models.Lessons{}
 
 	responseBody, err := json.Marshal(lessons)
-	if err != nil {
-		suite.Error(err)
-	}
+	suite.Assert().NoError(err)
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchAllLessons, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "GET"
+	route := FetchAllLessons
+	params := map[string]string(nil)
+	reqBody := []byte(nil)
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
+	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
 	result, err := suite.reader.FetchAllLessons()
-	assert.NoError(suite.T(), err)
-
+	suite.Assert().NoError(err)
 	suite.Assert().Equal(lessons, result)
 }
 
 func (suite *ReaderSuite) TestHydrateLesson() {
-	lesson := &models.Lesson{
-		Id:            10,
-		Name:          "foo",
-		ExerciseCount: 2,
-	}
+	lesson := &models.Lesson{Id: 10}
 
 	responseBody, err := json.Marshal(lesson)
-	if err != nil {
-		suite.Error(err)
-	}
+	suite.Assert().NoError(err)
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(HydrateLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "GET"
+	route := HydrateLesson
+	params := map[string]string{"lesson_id": "10"}
+	reqBody := []byte(nil)
 
-		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
-		suite.Equal(lesson.Id, lId)
-
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
+	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
 	err = suite.reader.HydrateLesson(lesson)
-	assert.NoError(suite.T(), err)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
-	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
-	}
-	exercises := models.Exercises{exercise}
-
+	exercises := models.Exercises{}
 	lessonId := 10
 
 	responseBody, err := json.Marshal(exercises)
-	if err != nil {
-		suite.Error(err)
-	}
+	suite.Assert().NoError(err)
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchExercisesOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "GET"
+	route := FetchExercisesOfLesson
+	params := map[string]string{"lesson_id": "10"}
+	reqBody := []byte(nil)
 
-		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
-		suite.Equal(lessonId, lId)
-
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
+	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
 	result, err := suite.reader.FetchExercisesOfLesson(models.Lesson{Id: lessonId})
-	assert.NoError(suite.T(), err)
 
+	suite.Assert().NoError(err)
 	suite.Assert().Equal(exercises, result)
 }
 
 func (suite *ReaderSuite) TestRandomExerciseOfLesson() {
-	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
-	}
-
-	responseBody, err := json.Marshal(exercise)
-	if err != nil {
-		suite.Error(err)
-	}
-
+	exercise := models.Exercise{}
 	lessonId := 10
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("GET", req.Method)
-		suite.Equal(FetchRandomExerciseOfLesson+"?lesson_id=10", req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	responseBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-		lId, _ := strconv.Atoi(req.URL.Query().Get("lesson_id"))
-		suite.Equal(lessonId, lId)
+	method := "GET"
+	route := FetchRandomExerciseOfLesson
+	params := map[string]string{"lesson_id": "10"}
+	reqBody := []byte(nil)
 
-		return true
-
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader(responseBody)),
-	}, nil)
+	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
 	result, err := suite.reader.FetchRandomExerciseOfLesson(models.Lesson{Id: lessonId})
-	assert.NoError(suite.T(), err)
 
+	suite.Assert().NoError(err)
 	suite.Assert().Equal(exercise, result)
 }

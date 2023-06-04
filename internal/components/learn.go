@@ -52,8 +52,8 @@ func (c *Learn) OnMount(ctx app.Context) {
 	}
 	c.lesson = models.Lesson{Id: lessonId}
 
-	c.reader = rest.NewReader(&http.Client{}, u.Host, u.Scheme)
-	c.writer = rest.NewWriter(&http.Client{}, u.Host, u.Scheme)
+	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()

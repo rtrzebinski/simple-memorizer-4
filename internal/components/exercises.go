@@ -28,12 +28,12 @@ type Exercises struct {
 
 // The OnMount method is run once component is mounted
 func (c *Exercises) OnMount(ctx app.Context) {
-	url := app.Window().URL()
+	u := app.Window().URL()
 
-	c.reader = rest.NewReader(&http.Client{}, url.Host, url.Scheme)
-	c.writer = rest.NewWriter(&http.Client{}, url.Host, url.Scheme)
+	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
 
-	lessonId, err := strconv.Atoi(url.Query().Get("lesson_id"))
+	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
 		app.Log(fmt.Errorf("failed to convert lesson_id: %w", err))
 		return

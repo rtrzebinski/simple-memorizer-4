@@ -1,33 +1,23 @@
 package rest
 
 import (
-	"bytes"
 	"encoding/json"
 	myhttp "github.com/rtrzebinski/simple-memorizer-4/internal/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-
-	"io"
-	"net/http"
 	"testing"
 )
 
 type WriterSuite struct {
 	suite.Suite
 
-	http   *myhttp.DoerMock
-	host   string
-	scheme string
+	client *myhttp.ClientMock
 	writer *Writer
 }
 
 func (suite *WriterSuite) SetupTest() {
-	suite.http = new(myhttp.DoerMock)
-	suite.host = "example.com"
-	suite.scheme = "http"
-	suite.writer = NewWriter(suite.http, suite.host, suite.scheme)
+	suite.client = myhttp.NewClientMock()
+	suite.writer = NewWriter(suite.client)
 }
 
 func TestWriterSuite(t *testing.T) {
@@ -35,156 +25,91 @@ func TestWriterSuite(t *testing.T) {
 }
 
 func (suite *WriterSuite) TestStoreLesson() {
-	lesson := models.Lesson{
-		Name: "name",
-	}
+	lesson := models.Lesson{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(StoreLesson, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := StoreLesson
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
 
-		var input models.Lesson
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(lesson.Name, input.Name)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.StoreLesson(lesson)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.StoreLesson(lesson)
+	suite.Assert().NoError(err)
 }
 
 func (suite *WriterSuite) TestDeleteLesson() {
-	lesson := models.Lesson{
-		Id: 123,
-	}
+	lesson := models.Lesson{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(DeleteLesson, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := DeleteLesson
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
 
-		var input models.Lesson
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(lesson.Name, input.Name)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.DeleteLesson(lesson)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.DeleteLesson(lesson)
+	suite.Assert().NoError(err)
 }
 
 func (suite *WriterSuite) TestStoreExercise() {
-	exercise := models.Exercise{
-		Question: "question",
-		Answer:   "answer",
-	}
+	exercise := models.Exercise{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(StoreExercise, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := StoreExercise
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-		var input models.Exercise
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(exercise.Question, input.Question)
-		suite.Equal(exercise.Answer, input.Answer)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.StoreExercise(exercise)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.StoreExercise(exercise)
+	suite.Assert().NoError(err)
 }
 
 func (suite *WriterSuite) TestDeleteExercise() {
-	exercise := models.Exercise{
-		Id: 123,
-	}
+	exercise := models.Exercise{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(DeleteExercise, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := DeleteExercise
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-		var input models.Exercise
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(exercise.Question, input.Question)
-		suite.Equal(exercise.Answer, input.Answer)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.DeleteExercise(exercise)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.DeleteExercise(exercise)
+	suite.Assert().NoError(err)
 }
 
 func (suite *WriterSuite) TestIncrementBadAnswers() {
-	exercise := models.Exercise{Id: 123}
+	exercise := models.Exercise{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(IncrementBadAnswers, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := IncrementBadAnswers
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-		var input models.Exercise
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(exercise.Id, input.Id)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.IncrementBadAnswers(exercise)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.IncrementBadAnswers(exercise)
+	suite.Assert().NoError(err)
 }
 
 func (suite *WriterSuite) TestIncrementGoodAnswers() {
-	exercise := models.Exercise{Id: 123}
+	exercise := models.Exercise{}
 
-	suite.http.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-		suite.Equal("POST", req.Method)
-		suite.Equal(IncrementGoodAnswers, req.URL.RequestURI())
-		suite.Equal(suite.host, req.URL.Host)
-		suite.Equal(suite.scheme, req.URL.Scheme)
+	method := "POST"
+	route := IncrementGoodAnswers
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-		var input models.Exercise
-		err := json.NewDecoder(req.Body).Decode(&input)
-		suite.NoError(err)
-		suite.Equal(exercise.Id, input.Id)
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-		return true
-	})).Return(&http.Response{
-		StatusCode: http.StatusOK,
-		Body:       io.NopCloser(bytes.NewReader([]byte{})),
-	}, nil)
-
-	err := suite.writer.IncrementGoodAnswers(exercise)
-	assert.NoError(suite.T(), err)
+	err = suite.writer.IncrementGoodAnswers(exercise)
+	suite.Assert().NoError(err)
 }

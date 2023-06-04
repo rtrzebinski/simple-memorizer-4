@@ -24,9 +24,9 @@ type Lessons struct {
 
 // The OnMount method is run once component is mounted
 func (c *Lessons) OnMount(ctx app.Context) {
-	url := app.Window().URL()
-	c.reader = rest.NewReader(&http.Client{}, url.Host, url.Scheme)
-	c.writer = rest.NewWriter(&http.Client{}, url.Host, url.Scheme)
+	u := app.Window().URL()
+	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
 	c.displayAllLessons()
 }
 
