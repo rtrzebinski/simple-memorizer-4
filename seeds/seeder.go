@@ -3,92 +3,26 @@ package main
 import (
 	"database/sql"
 	_ "github.com/lib/pq"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"os"
 	"reflect"
 )
 
-type Seeder struct {
-	db *sql.DB
-}
-
-func seed(s Seeder, seedMethodName string) {
-	// Get the reflection value of the method
-	m := reflect.ValueOf(s).MethodByName(seedMethodName)
-	// Exit if the method doesn't exist
-	if !m.IsValid() {
-		log.Fatal("No method called ", seedMethodName)
-	}
-	// Execute the method
-	m.Call(nil)
-}
-
-func (s Seeder) LessonSeed() {
-	//prepare the statement
-	stmt, err := s.db.Prepare(`INSERT INTO lesson(name) VALUES ($1)`)
+func main() {
+	// connect DB
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error opening DB: %v", err)
 	}
-
-	lessons := []string{"Capitals"}
-
-	for _, n := range lessons {
-		// execute query
-		_, err = stmt.Exec(n)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func (s Seeder) ExerciseSeed() {
-	//prepare the statement
-	stmt, err := s.db.Prepare(`INSERT INTO exercise(question, answer, lesson_id) VALUES ($1, $2, $3)`)
-	if err != nil {
-		panic(err)
-	}
-
-	capitals := map[string]string{
-		"Poland":      "Warsaw",
-		"Germany":     "Berlin",
-		"France":      "Paris",
-		"Netherlands": "Amsterdam",
-		"Spain":       "Madrid",
-		//"Greece":      "Athens",
-		//"Slovakia":    "Bratislava",
-		//"Hungary":     "Budapest",
-		//"Slovenia":    "Ljubljana",
-		//"Cyprus":      "Nicosia",
-		//"Iceland":     "Reykjavik",
-		//"Latvia":      "Riga",
-		//"Bulgaria":    "Sofia",
-	}
-
-	for q, a := range capitals {
-		// execute query
-		_, err = stmt.Exec(q, a, 1)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	// Update lesson.exercise_count.
-
-	query := `
-			UPDATE lesson
-			SET exercise_count=sq.exercise_count
-			FROM (SELECT count(*) as exercise_count FROM exercise WHERE lesson_id = $1) AS sq
-			WHERE lesson.id=$1;
-			`
-
-	_, err = s.db.Exec(query, 1)
-	if err != nil {
-		panic(err)
-	}
+	execute(db, "LessonSeed", "ExerciseSeed")
+	os.Exit(0)
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
-	s := Seeder{db}
+	s := Seeder{db, postgres.NewWriter(db)}
 
 	seedType := reflect.TypeOf(s)
 
@@ -110,12 +44,70 @@ func execute(db *sql.DB, seedMethodNames ...string) {
 	}
 }
 
-func main() {
-	// connect DB
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable")
-	if err != nil {
-		log.Fatalf("Error opening DB: %v", err)
+type Seeder struct {
+	db *sql.DB
+	w  storage.Writer
+}
+
+func seed(s Seeder, seedMethodName string) {
+	// Get the reflection value of the method
+	m := reflect.ValueOf(s).MethodByName(seedMethodName)
+	// Exit if the method doesn't exist
+	if !m.IsValid() {
+		log.Fatal("No method called ", seedMethodName)
 	}
-	execute(db, "LessonSeed", "ExerciseSeed")
-	os.Exit(0)
+	// Execute the method
+	m.Call(nil)
+}
+
+func (s Seeder) LessonSeed() {
+	lessons := models.Lessons{
+		models.Lesson{
+			Name: "Capitals",
+		},
+	}
+
+	for _, lesson := range lessons {
+		err := s.w.StoreLesson(lesson)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func (s Seeder) ExerciseSeed() {
+	capitals := models.Exercises{
+		models.Exercise{
+			Lesson:   &models.Lesson{Id: 1},
+			Question: "Poland",
+			Answer:   "Warsaw",
+		},
+		models.Exercise{
+			Lesson:   &models.Lesson{Id: 1},
+			Question: "Germany",
+			Answer:   "Berlin",
+		},
+		models.Exercise{
+			Lesson:   &models.Lesson{Id: 1},
+			Question: "France",
+			Answer:   "Paris",
+		},
+		models.Exercise{
+			Lesson:   &models.Lesson{Id: 1},
+			Question: "Netherlands",
+			Answer:   "Amsterdam",
+		},
+		models.Exercise{
+			Lesson:   &models.Lesson{Id: 1},
+			Question: "Spain",
+			Answer:   "Madrid",
+		},
+	}
+
+	for _, capital := range capitals {
+		err := s.w.StoreExercise(capital)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
