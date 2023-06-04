@@ -18,7 +18,7 @@ func NewWriter(c myhttp.Client) *Writer {
 func (w *Writer) StoreLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
 	_, err = w.c.Call("POST", StoreLesson, nil, body)
@@ -32,7 +32,7 @@ func (w *Writer) StoreLesson(lesson models.Lesson) error {
 func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
 	_, err = w.c.Call("POST", DeleteLesson, nil, body)
@@ -46,7 +46,7 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 func (w *Writer) StoreExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
 	_, err = w.c.Call("POST", StoreExercise, nil, body)
@@ -60,7 +60,7 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
 	_, err = w.c.Call("POST", DeleteExercise, nil, body)
@@ -74,7 +74,7 @@ func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 func (w *Writer) IncrementBadAnswers(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
 	_, err = w.c.Call("POST", IncrementBadAnswers, nil, body)
@@ -88,7 +88,7 @@ func (w *Writer) IncrementBadAnswers(exercise models.Exercise) error {
 func (w *Writer) IncrementGoodAnswers(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
-		return fmt.Errorf("failed to encode input: %w", err)
+		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
 	_, err = w.c.Call("POST", IncrementGoodAnswers, nil, body)
