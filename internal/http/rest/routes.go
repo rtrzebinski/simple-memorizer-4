@@ -1,7 +1,7 @@
 package rest
 
 import (
-	routes "github.com/rtrzebinski/simple-memorizer-4/internal/http/rest/routes"
+	handlers "github.com/rtrzebinski/simple-memorizer-4/internal/http/rest/handlers"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"net/http"
 )
@@ -27,19 +27,19 @@ const (
 func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	// read
 
-	http.Handle(FetchAllLessons, routes.NewFetchAllLessons(r))
-	http.Handle(HydrateLesson, routes.NewHydrateLesson(r))
-	http.Handle(FetchExercisesOfLesson, routes.NewFetchExercisesOfLesson(r))
-	http.Handle(FetchRandomExerciseOfLesson, routes.NewFetchRandomExerciseOfLesson(r))
+	http.Handle(FetchAllLessons, handlers.NewFetchAllLessons(r))
+	http.Handle(HydrateLesson, handlers.NewHydrateLesson(r))
+	http.Handle(FetchExercisesOfLesson, handlers.NewFetchExercisesOfLesson(r))
+	http.Handle(FetchRandomExerciseOfLesson, handlers.NewFetchRandomExerciseOfLesson(r))
 
 	// write
 
-	http.Handle(StoreLesson, routes.NewStoreLesson(w))
-	http.Handle(DeleteLesson, routes.NewDeleteLesson(w))
-	http.Handle(StoreExercise, routes.NewStoreExercise(w))
-	http.Handle(DeleteExercise, routes.NewDeleteExercise(w))
-	http.Handle(IncrementBadAnswers, routes.NewIncrementBadAnswers(w))
-	http.Handle(IncrementGoodAnswers, routes.NewIncrementGoodAnswers(w))
+	http.Handle(StoreLesson, handlers.NewStoreLesson(w))
+	http.Handle(DeleteLesson, handlers.NewDeleteLesson(w))
+	http.Handle(StoreExercise, handlers.NewStoreExercise(w))
+	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
+	http.Handle(IncrementBadAnswers, handlers.NewIncrementBadAnswers(w))
+	http.Handle(IncrementGoodAnswers, handlers.NewIncrementGoodAnswers(w))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
 		return err
