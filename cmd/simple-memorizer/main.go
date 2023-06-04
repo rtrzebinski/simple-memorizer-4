@@ -10,7 +10,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/components"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/http/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/mysignal"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"net/http"
@@ -123,7 +123,7 @@ func run(ctx context.Context) error {
 	}()
 
 	// Signal notifier
-	done := mysignal.NewNotifier(ctx)
+	done := signal.NewNotifier(ctx)
 
 	log.Println("application running")
 

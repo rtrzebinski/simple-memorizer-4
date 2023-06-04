@@ -1,4 +1,4 @@
-package mysignal
+package signal
 
 import (
 	"context"
