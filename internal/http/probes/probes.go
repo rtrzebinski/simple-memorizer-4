@@ -1,4 +1,4 @@
-package probes
+package http
 
 import (
 	"database/sql"
