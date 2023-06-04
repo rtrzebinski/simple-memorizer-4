@@ -26,7 +26,7 @@ func NewReader(http myhttp.Doer, host string, scheme string) *Reader {
 func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
-	respBody, err := r.performRequestTo("GET", r.scheme+"://"+r.host+FetchAllLessons, nil)
+	respBody, err := r.performRequestTo("GET", FetchAllLessons, nil, nil)
 	if err != nil {
 		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -39,14 +39,11 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 }
 
 func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
-	u, _ := url.Parse(r.scheme + "://" + r.host + HydrateLesson)
+	var params = map[string]string{
+		"lesson_id": strconv.Itoa(lesson.Id),
+	}
 
-	// set lesson_id in the url
-	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
-	u.RawQuery = params.Encode()
-
-	respBody, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", HydrateLesson, params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -61,14 +58,11 @@ func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
 func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
-	u, _ := url.Parse(r.scheme + "://" + r.host + FetchExercisesOfLesson)
+	var params = map[string]string{
+		"lesson_id": strconv.Itoa(lesson.Id),
+	}
 
-	// set lesson_id in the url
-	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
-	u.RawQuery = params.Encode()
-
-	respBody, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", FetchExercisesOfLesson, params, nil)
 	if err != nil {
 		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -83,14 +77,11 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
 	var exercise models.Exercise
 
-	u, _ := url.Parse(r.scheme + "://" + r.host + FetchRandomExerciseOfLesson)
+	var params = map[string]string{
+		"lesson_id": strconv.Itoa(lesson.Id),
+	}
 
-	// set lesson_id in the url
-	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
-	u.RawQuery = params.Encode()
-
-	respBody, err := r.performRequestTo("GET", u.String(), nil)
+	respBody, err := r.performRequestTo("GET", FetchRandomExerciseOfLesson, params, nil)
 	if err != nil {
 		return exercise, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -102,28 +93,47 @@ func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exerc
 	return exercise, nil
 }
 
-func (r *Reader) performRequestTo(method, url string, reqBody []byte) ([]byte, error) {
+func (r *Reader) performRequestTo(method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
+	// parse url
+	u, _ := url.Parse(r.scheme + "://" + r.host + route)
+
+	// encode query params
+	if params != nil {
+		p := u.Query()
+		for k, v := range params {
+			p.Add(k, v)
+		}
+		u.RawQuery = p.Encode()
+	}
+
+	// create request body buffer
 	buffer := bytes.NewBuffer(reqBody)
 
-	req, err := http.NewRequest(method, url, buffer)
+	// create a request
+	req, err := http.NewRequest(method, u.String(), buffer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
+	// add content-type header
 	req.Header.Add("content-type", "application/json")
 
+	// make a request
 	resp, err := r.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to call HTTP endpoint: %w", err)
 	}
 
+	// defer body closing
 	defer resp.Body.Close()
 
+	// read response body
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read HTTP response body: %w", err)
 	}
 
+	// check if status is OK
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("server returned with the status code '%d': %w",
 			resp.StatusCode, errors.New(string(respBody)))
