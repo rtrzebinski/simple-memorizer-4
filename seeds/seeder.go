@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error opening DB: %v", err)
 	}
-	execute(db, "LessonSeed", "ExerciseSeed")
+	execute(db, "CapitalsSeed")
 	os.Exit(0)
 }
 
@@ -60,23 +60,17 @@ func seed(s Seeder, seedMethodName string) {
 	m.Call(nil)
 }
 
-func (s Seeder) LessonSeed() {
-	lessons := models.Lessons{
-		models.Lesson{
-			Name: "Capitals",
-		},
+func (s Seeder) CapitalsSeed() {
+	lesson := models.Lesson{
+		Name: "Capitals",
 	}
 
-	for _, lesson := range lessons {
-		err := s.w.StoreLesson(lesson)
-		if err != nil {
-			panic(err)
-		}
+	err := s.w.StoreLesson(lesson)
+	if err != nil {
+		panic(err)
 	}
-}
 
-func (s Seeder) ExerciseSeed() {
-	capitals := models.Exercises{
+	exercises := models.Exercises{
 		models.Exercise{
 			Lesson:   &models.Lesson{Id: 1},
 			Question: "Poland",
@@ -104,8 +98,8 @@ func (s Seeder) ExerciseSeed() {
 		},
 	}
 
-	for _, capital := range capitals {
-		err := s.w.StoreExercise(capital)
+	for _, exercise := range exercises {
+		err := s.w.StoreExercise(exercise)
 		if err != nil {
 			panic(err)
 		}
