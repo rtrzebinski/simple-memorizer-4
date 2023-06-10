@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"log"
 	"net/http"
 )
@@ -22,6 +23,14 @@ func (h *StoreExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode StoreExercise HTTP request: %w", err))
+		res.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	err = validators.ValidateStoreExercise(h.exercise, nil)
+	if err != nil {
+		log.Print(fmt.Errorf("invalid input: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
