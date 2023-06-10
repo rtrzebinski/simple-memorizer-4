@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -55,4 +56,10 @@ func TestStoreExercise_invalidInput(t *testing.T) {
 	route.ServeHTTP(res, req)
 
 	assert.Equal(t, http.StatusBadRequest, res.Code)
+
+	var result string
+
+	err = json.Unmarshal(res.Body.Bytes(), &result)
+	assert.NoError(t, err)
+	assert.Equal(t, validators.ValidateStoreExercise(models.Exercise{}, nil).Error(), result)
 }

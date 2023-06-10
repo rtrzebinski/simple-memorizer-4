@@ -31,7 +31,24 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	err = validators.ValidateStoreLesson(h.lesson, nil)
 	if err != nil {
 		log.Print(fmt.Errorf("invalid input: %w", err))
+
 		res.WriteHeader(http.StatusBadRequest)
+
+		encoded, err := json.Marshal(err.Error())
+		if err != nil {
+			log.Print(fmt.Errorf("failed to encode StoreLesson HTTP response: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
+
+			return
+		}
+
+		_, err = res.Write(encoded)
+		if err != nil {
+			log.Print(fmt.Errorf("failed to write StoreLesson HTTP response: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
+
+			return
+		}
 
 		return
 	}
