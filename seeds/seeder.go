@@ -62,7 +62,8 @@ func seed(s Seeder, seedMethodName string) {
 
 func (s Seeder) CapitalsSeed() {
 	lesson := models.Lesson{
-		Name: "Capitals",
+		Name:        "Capitals",
+		Description: "What is the capital of given country?",
 	}
 
 	err := s.w.StoreLesson(&lesson)

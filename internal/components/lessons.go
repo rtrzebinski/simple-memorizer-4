@@ -21,6 +21,7 @@ type Lessons struct {
 	validationError     string
 	inputId             int
 	inputName           string
+	inputDescription    string
 	storeButtonDisabled bool
 }
 
@@ -42,8 +43,11 @@ func (c *Lessons) Render() app.UI {
 		app.Div().Body(
 			app.H3().Text("Add a new lesson"),
 			app.P().Text(c.validationError).Hidden(c.validationError == "").Style("color", "red"),
-			app.Textarea().ID("input_name").Cols(30).Rows(3).Placeholder("Name").
+			app.Textarea().Cols(30).Rows(3).Placeholder("Name").
 				Required(true).OnInput(c.ValueTo(&c.inputName)).Text(c.inputName),
+			app.Br(),
+			app.Textarea().Cols(30).Rows(3).Placeholder("Description").
+				Required(true).OnInput(c.ValueTo(&c.inputDescription)).Text(c.inputDescription),
 			app.Br(),
 			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
@@ -95,8 +99,9 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 
 	// store lesson
 	err := c.writer.StoreLesson(&models.Lesson{
-		Id:   c.inputId,
-		Name: c.inputName,
+		Id:          c.inputId,
+		Name:        c.inputName,
+		Description: c.inputDescription,
 	})
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store lesson: %w", err))
@@ -116,6 +121,7 @@ func (c *Lessons) handleCancel(ctx app.Context, e app.Event) {
 func (c *Lessons) resetForm() {
 	c.inputId = 0
 	c.inputName = ""
+	c.inputDescription = ""
 	c.validationError = ""
 	c.storeButtonDisabled = false
 	c.formVisible = false

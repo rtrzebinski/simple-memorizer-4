@@ -13,7 +13,8 @@ import (
 
 func TestStoreLesson(t *testing.T) {
 	input := models.Lesson{
-		Name: "name",
+		Name:        "name",
+		Description: "description",
 	}
 
 	body, err := json.Marshal(input)

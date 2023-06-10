@@ -38,7 +38,8 @@ func TestStoreLesson_createNew(t *testing.T) {
 	w := NewWriter(db)
 
 	lesson := models.Lesson{
-		Name: "name",
+		Name:        "name",
+		Description: "description",
 	}
 
 	err = w.StoreLesson(&lesson)
@@ -47,6 +48,7 @@ func TestStoreLesson_createNew(t *testing.T) {
 	stored := fetchLatestLesson(db)
 
 	assert.Equal(t, lesson.Name, stored.Name)
+	assert.Equal(t, lesson.Description, stored.Description)
 	assert.Equal(t, lesson.Id, stored.Id)
 }
 
@@ -84,14 +86,16 @@ func TestStoreLesson_updateExisting(t *testing.T) {
 	createLesson(db, lesson)
 
 	err = w.StoreLesson(&models.Lesson{
-		Id:   1,
-		Name: "newName",
+		Id:          1,
+		Name:        "newName",
+		Description: "newDescription",
 	})
 	assert.NoError(t, err)
 
 	stored := fetchLatestLesson(db)
 
 	assert.Equal(t, "newName", stored.Name)
+	assert.Equal(t, "newDescription", stored.Description)
 }
 
 func TestDeleteLesson(t *testing.T) {

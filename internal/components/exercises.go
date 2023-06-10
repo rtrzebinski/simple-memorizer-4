@@ -56,8 +56,12 @@ func (c *Exercises) Render() app.UI {
 			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.formVisible),
 		),
 		app.P().Body(
-			app.Text("Lesson: "),
+			app.Text("Lesson name: "),
 			app.Text(c.lesson.Name),
+		),
+		app.P().Body(
+			app.Text("Lesson description: "),
+			app.Text(c.lesson.Description),
 		),
 		app.P().Body(
 			app.Text("Exercises: "),

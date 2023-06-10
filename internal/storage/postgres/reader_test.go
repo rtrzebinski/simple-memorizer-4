@@ -47,6 +47,7 @@ func TestFetchAllLessons(t *testing.T) {
 	assert.Len(t, res, 1)
 	assert.Equal(t, lesson.Id, res[0].Id)
 	assert.Equal(t, lesson.Name, res[0].Name)
+	assert.Equal(t, lesson.Description, res[0].Description)
 }
 
 func TestHydrateLesson(t *testing.T) {
@@ -81,6 +82,7 @@ func TestHydrateLesson(t *testing.T) {
 
 	l := &Lesson{
 		Name:          "foo",
+		Description:   "bar",
 		ExerciseCount: 10,
 	}
 	createLesson(db, l)
@@ -93,6 +95,7 @@ func TestHydrateLesson(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, lesson.Name, l.Name)
+	assert.Equal(t, lesson.Description, l.Description)
 	assert.Equal(t, lesson.ExerciseCount, l.ExerciseCount)
 }
 

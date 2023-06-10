@@ -18,7 +18,7 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
 	const query = `
-		SELECT l.id, l.name, l.exercise_count
+		SELECT l.id, l.name, l.description, l.exercise_count
 		FROM lesson l
 		ORDER BY l.id DESC
 		`
@@ -31,7 +31,7 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 	for rows.Next() {
 		var lesson models.Lesson
 
-		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.ExerciseCount)
+		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.Description, &lesson.ExerciseCount)
 		if err != nil {
 			return lessons, err
 		}
@@ -43,9 +43,9 @@ func (r *Reader) FetchAllLessons() (models.Lessons, error) {
 }
 
 func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
-	query := `SELECT name, exercise_count FROM lesson WHERE id = $1;`
+	query := `SELECT name, description, exercise_count FROM lesson WHERE id = $1;`
 
-	if err := r.db.QueryRow(query, lesson.Id).Scan(&lesson.Name, &lesson.ExerciseCount); err != nil {
+	if err := r.db.QueryRow(query, lesson.Id).Scan(&lesson.Name, &lesson.Description, &lesson.ExerciseCount); err != nil {
 		return fmt.Errorf("failed to execute 'SELECT FROM lesson' query: %w", err)
 	}
 

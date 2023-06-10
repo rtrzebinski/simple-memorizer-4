@@ -24,6 +24,9 @@ func (c *LessonRow) Render() app.UI {
 			app.Text(c.lesson.Name),
 		),
 		app.Td().Style("border", "1px solid black").Body(
+			app.Text(c.lesson.Description),
+		),
+		app.Td().Style("border", "1px solid black").Body(
 			app.Text(c.lesson.ExerciseCount),
 		),
 		app.Td().Style("border", "1px solid black").Body(
@@ -41,6 +44,7 @@ func (c *LessonRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		c.parent.inputId = c.lesson.Id
 		c.parent.inputName = c.lesson.Name
+		c.parent.inputDescription = c.lesson.Description
 		c.parent.formVisible = true
 		c.parent.validationError = ""
 	}

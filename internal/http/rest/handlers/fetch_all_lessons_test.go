@@ -11,10 +11,7 @@ import (
 )
 
 func TestFetchAllLessons(t *testing.T) {
-	lesson := models.Lesson{
-		Id:   1,
-		Name: "name",
-	}
+	lesson := models.Lesson{}
 	lessons := models.Lessons{lesson}
 
 	reader := storage.NewReaderMock()

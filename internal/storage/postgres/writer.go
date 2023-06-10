@@ -18,16 +18,16 @@ func (w *Writer) StoreLesson(lesson *models.Lesson) error {
 	var query string
 
 	if lesson.Id > 0 {
-		query = `UPDATE lesson set name = $1 where id = $2;`
+		query = `UPDATE lesson set name = $1, description = $2 where id = $3;`
 
-		_, err := w.db.Exec(query, lesson.Name, lesson.Id)
+		_, err := w.db.Exec(query, lesson.Name, lesson.Description, lesson.Id)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
 		}
 	} else {
-		query = `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
+		query = `INSERT INTO lesson (name, description) VALUES ($1, $2) RETURNING id;`
 
-		rows, err := w.db.Query(query, lesson.Name)
+		rows, err := w.db.Query(query, lesson.Name, lesson.Description)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
 		}
