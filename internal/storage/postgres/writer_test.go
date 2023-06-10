@@ -41,12 +41,13 @@ func TestStoreLesson_createNew(t *testing.T) {
 		Name: "name",
 	}
 
-	err = w.StoreLesson(lesson)
+	err = w.StoreLesson(&lesson)
 	assert.NoError(t, err)
 
 	stored := fetchLatestLesson(db)
 
 	assert.Equal(t, lesson.Name, stored.Name)
+	assert.Equal(t, lesson.Id, stored.Id)
 }
 
 func TestStoreLesson_updateExisting(t *testing.T) {
@@ -82,7 +83,7 @@ func TestStoreLesson_updateExisting(t *testing.T) {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	err = w.StoreLesson(models.Lesson{
+	err = w.StoreLesson(&models.Lesson{
 		Id:   1,
 		Name: "newName",
 	})

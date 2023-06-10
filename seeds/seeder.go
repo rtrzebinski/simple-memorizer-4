@@ -65,7 +65,7 @@ func (s Seeder) CapitalsSeed() {
 		Name: "Capitals",
 	}
 
-	err := s.w.StoreLesson(lesson)
+	err := s.w.StoreLesson(&lesson)
 	if err != nil {
 		panic(err)
 	}

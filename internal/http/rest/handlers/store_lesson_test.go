@@ -22,7 +22,7 @@ func TestStoreLesson(t *testing.T) {
 	}
 
 	writer := storage.NewWriterMock()
-	writer.On("StoreLesson", input)
+	writer.On("StoreLesson", &input)
 
 	route := NewStoreLesson(writer)
 

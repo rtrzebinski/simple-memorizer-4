@@ -27,7 +27,7 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreLesson(h.lesson)
+	err = h.w.StoreLesson(&h.lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to store lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

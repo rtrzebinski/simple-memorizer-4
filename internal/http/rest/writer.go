@@ -15,7 +15,7 @@ func NewWriter(c myhttp.Client) *Writer {
 	return &Writer{c: c}
 }
 
-func (w *Writer) StoreLesson(lesson models.Lesson) error {
+func (w *Writer) StoreLesson(lesson *models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)

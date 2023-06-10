@@ -94,7 +94,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store lesson
-	err := c.writer.StoreLesson(models.Lesson{
+	err := c.writer.StoreLesson(&models.Lesson{
 		Id:   c.inputId,
 		Name: c.inputName,
 	})

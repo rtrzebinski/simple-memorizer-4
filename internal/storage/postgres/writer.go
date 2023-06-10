@@ -14,7 +14,7 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) StoreLesson(lesson models.Lesson) error {
+func (w *Writer) StoreLesson(lesson *models.Lesson) error {
 	var query string
 
 	if lesson.Id > 0 {
@@ -25,11 +25,18 @@ func (w *Writer) StoreLesson(lesson models.Lesson) error {
 			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
 		}
 	} else {
-		query = `INSERT INTO lesson (name) VALUES ($1);`
+		query = `INSERT INTO lesson (name) VALUES ($1) RETURNING id;`
 
-		_, err := w.db.Exec(query, lesson.Name)
+		rows, err := w.db.Query(query, lesson.Name)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&lesson.Id)
+			if err != nil {
+				return fmt.Errorf("failed to scan lesson insert id: %w", err)
+			}
 		}
 	}
 

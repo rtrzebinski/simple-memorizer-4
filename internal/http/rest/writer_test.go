@@ -35,7 +35,7 @@ func (suite *WriterSuite) TestStoreLesson() {
 
 	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.writer.StoreLesson(lesson)
+	err = suite.writer.StoreLesson(&lesson)
 	suite.Assert().NoError(err)
 }
 
