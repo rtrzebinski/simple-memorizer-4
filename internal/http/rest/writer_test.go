@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	myhttp "github.com/rtrzebinski/simple-memorizer-4/internal/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -25,7 +26,9 @@ func TestWriterSuite(t *testing.T) {
 }
 
 func (suite *WriterSuite) TestStoreLesson() {
-	lesson := models.Lesson{}
+	lesson := models.Lesson{
+		Name: "name",
+	}
 
 	method := "POST"
 	route := StoreLesson
@@ -37,6 +40,21 @@ func (suite *WriterSuite) TestStoreLesson() {
 
 	err = suite.writer.StoreLesson(&lesson)
 	suite.Assert().NoError(err)
+}
+
+func (suite *WriterSuite) TestStoreLesson_invalidInput() {
+	lesson := models.Lesson{}
+
+	method := "POST"
+	route := StoreLesson
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
+
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
+
+	err = suite.writer.StoreLesson(&lesson)
+	suite.Assert().True(validators.IsValidationErr(err))
 }
 
 func (suite *WriterSuite) TestDeleteLesson() {
@@ -55,7 +73,11 @@ func (suite *WriterSuite) TestDeleteLesson() {
 }
 
 func (suite *WriterSuite) TestStoreExercise() {
-	exercise := models.Exercise{}
+	exercise := models.Exercise{
+		Question: "question",
+		Answer:   "answer",
+		Lesson:   &models.Lesson{Id: 10},
+	}
 
 	method := "POST"
 	route := StoreExercise
@@ -67,6 +89,21 @@ func (suite *WriterSuite) TestStoreExercise() {
 
 	err = suite.writer.StoreExercise(&exercise)
 	suite.Assert().NoError(err)
+}
+
+func (suite *WriterSuite) TestStoreExercise_invalidInput() {
+	exercise := models.Exercise{}
+
+	method := "POST"
+	route := StoreExercise
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
+
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
+
+	err = suite.writer.StoreExercise(&exercise)
+	suite.Assert().True(validators.IsValidationErr(err))
 }
 
 func (suite *WriterSuite) TestDeleteExercise() {
