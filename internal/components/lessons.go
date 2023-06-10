@@ -5,6 +5,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"net/http"
 )
 
@@ -77,32 +78,36 @@ func (c *Lessons) handleAddLesson(ctx app.Context, e app.Event) {
 func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	// init empty validation errors
-	c.validationError = ""
+	var err error
 
-	// validate input - lesson name required
-	if c.inputName == "" {
-		c.validationError = "Lesson name is required"
-		return
+	// lesson to be stored
+	lesson := models.Lesson{
+		Id:          c.inputId,
+		Name:        c.inputName,
+		Description: c.inputDescription,
 	}
 
-	// validate input - lesson name unique
+	// extract other names to validate against
+	var names []string
 	for i, row := range c.rows {
-		if row != nil && c.rows[i].lesson.Name == c.inputName && c.rows[i].lesson.Id != c.inputId {
-			c.validationError = "Lesson name must be unique"
-			return
+		if row != nil && c.rows[i].lesson.Id != c.inputId {
+			names = append(names, c.rows[i].lesson.Name)
 		}
+	}
+
+	// validate input
+	err = validators.ValidateStoreLesson(lesson, names)
+	if err != nil {
+		c.validationError = err.Error()
+
+		return
 	}
 
 	// disable submit button to avoid duplicated requests
 	c.storeButtonDisabled = true
 
 	// store lesson
-	err := c.writer.StoreLesson(&models.Lesson{
-		Id:          c.inputId,
-		Name:        c.inputName,
-		Description: c.inputDescription,
-	})
+	err = c.writer.StoreLesson(&lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store lesson: %w", err))
 	}

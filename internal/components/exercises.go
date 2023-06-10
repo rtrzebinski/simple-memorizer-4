@@ -5,6 +5,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -115,56 +116,51 @@ func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
 func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	// init empty validation errors
-	c.validationError = ""
+	var err error
 
-	// validate input - exercise question required
-	if c.inputQuestion == "" {
-		c.validationError = "Exercise question is required"
-		return
-	}
-
-	// validate input - exercise answer required
-	if c.inputAnswer == "" {
-		c.validationError = "Exercise answer is required"
-		return
-	}
-
-	// validate input - exercise question unique (for given lesson)
-	for i, row := range c.rows {
-		if row != nil && c.rows[i].exercise.Question == c.inputQuestion && c.rows[i].exercise.Id != c.inputId {
-			c.validationError = "Exercise question must be unique"
-			return
-		}
-	}
-
-	// check before resetting the form
-	isCreatingNew := c.inputId == 0
-
-	// disable submit button to avoid duplicated requests
-	c.storeButtonDisabled = true
-
-	// store exercise
-	err := c.writer.StoreExercise(&models.Exercise{
+	// exercise to be stored
+	exercise := models.Exercise{
 		Id:       c.inputId,
 		Question: c.inputQuestion,
 		Answer:   c.inputAnswer,
 		Lesson: &models.Lesson{
 			Id: c.lesson.Id,
 		},
-	})
+	}
+
+	// extract other questions to validate against
+	var questions []string
+	for i, row := range c.rows {
+		if row != nil && c.rows[i].exercise.Id != c.inputId {
+			questions = append(questions, c.rows[i].exercise.Question)
+		}
+	}
+
+	// validate input
+	err = validators.ValidateStoreExercise(exercise, questions)
+	if err != nil {
+		c.validationError = err.Error()
+
+		return
+	}
+
+	// disable submit button to avoid duplicated requests
+	c.storeButtonDisabled = true
+
+	// store exercise
+	err = c.writer.StoreExercise(&exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
 
-	// reset form
-	c.resetForm()
-
 	// hide the input form on row edit, but keep open on adding new
 	// because it is common to add a few exercises one after another
-	if isCreatingNew == false {
+	if c.inputId != 0 {
 		c.formVisible = false
 	}
+
+	// reset form
+	c.resetForm()
 
 	// refresh exercises list
 	c.displayExercisesOfLesson()
