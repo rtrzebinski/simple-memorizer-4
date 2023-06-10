@@ -72,27 +72,27 @@ func (s Seeder) CapitalsSeed() {
 
 	exercises := models.Exercises{
 		models.Exercise{
-			Lesson:   &models.Lesson{Id: 1},
+			Lesson:   &models.Lesson{Id: lesson.Id},
 			Question: "Poland",
 			Answer:   "Warsaw",
 		},
 		models.Exercise{
-			Lesson:   &models.Lesson{Id: 1},
+			Lesson:   &models.Lesson{Id: lesson.Id},
 			Question: "Germany",
 			Answer:   "Berlin",
 		},
 		models.Exercise{
-			Lesson:   &models.Lesson{Id: 1},
+			Lesson:   &models.Lesson{Id: lesson.Id},
 			Question: "France",
 			Answer:   "Paris",
 		},
 		models.Exercise{
-			Lesson:   &models.Lesson{Id: 1},
+			Lesson:   &models.Lesson{Id: lesson.Id},
 			Question: "Netherlands",
 			Answer:   "Amsterdam",
 		},
 		models.Exercise{
-			Lesson:   &models.Lesson{Id: 1},
+			Lesson:   &models.Lesson{Id: lesson.Id},
 			Question: "Spain",
 			Answer:   "Madrid",
 		},
