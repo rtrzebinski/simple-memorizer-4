@@ -180,7 +180,7 @@ func TestStoreExercise_createNew(t *testing.T) {
 		Answer:   "answer",
 	}
 
-	err = w.StoreExercise(exercise)
+	err = w.StoreExercise(&exercise)
 	assert.NoError(t, err)
 
 	stored := fetchLatestExercise(db)
@@ -188,6 +188,7 @@ func TestStoreExercise_createNew(t *testing.T) {
 	assert.Equal(t, exercise.Lesson.Id, stored.LessonId)
 	assert.Equal(t, exercise.Question, stored.Question)
 	assert.Equal(t, exercise.Answer, stored.Answer)
+	assert.Equal(t, exercise.Id, stored.Id)
 
 	lesson = findLessonById(db, lesson.Id)
 	assert.Equal(t, 1, lesson.ExerciseCount)
@@ -229,7 +230,7 @@ func TestStoreExercise_updateExisting(t *testing.T) {
 	exercise := Exercise{LessonId: lesson.Id}
 	createExercise(db, &exercise)
 
-	err = w.StoreExercise(models.Exercise{
+	err = w.StoreExercise(&models.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",

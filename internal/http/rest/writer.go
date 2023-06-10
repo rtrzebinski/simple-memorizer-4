@@ -43,7 +43,7 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) StoreExercise(exercise models.Exercise) error {
+func (w *Writer) StoreExercise(exercise *models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)

@@ -27,7 +27,7 @@ func (h *StoreExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreExercise(h.exercise)
+	err = h.w.StoreExercise(&h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to store exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

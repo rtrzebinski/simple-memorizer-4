@@ -54,7 +54,7 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) StoreExercise(exercise models.Exercise) error {
+func (w *Writer) StoreExercise(exercise *models.Exercise) error {
 	var query string
 
 	if exercise.Id > 0 {
@@ -76,11 +76,18 @@ func (w *Writer) StoreExercise(exercise models.Exercise) error {
 
 		// Insert exercise.
 
-		query = `INSERT INTO exercise (lesson_id, question, answer) VALUES ($1, $2, $3);`
+		query = `INSERT INTO exercise (lesson_id, question, answer) VALUES ($1, $2, $3) RETURNING id;`
 
-		_, err = tx.Exec(query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
+		rows, err := w.db.Query(query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&exercise.Id)
+			if err != nil {
+				return fmt.Errorf("failed to scan exercise insert id: %w", err)
+			}
 		}
 
 		// Update lesson.exercise_count.

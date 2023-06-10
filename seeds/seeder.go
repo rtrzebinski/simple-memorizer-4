@@ -99,7 +99,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.w.StoreExercise(exercise)
+		err := s.w.StoreExercise(&exercise)
 		if err != nil {
 			panic(err)
 		}

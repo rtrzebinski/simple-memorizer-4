@@ -141,7 +141,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store exercise
-	err := c.writer.StoreExercise(models.Exercise{
+	err := c.writer.StoreExercise(&models.Exercise{
 		Id:       c.inputId,
 		Question: c.inputQuestion,
 		Answer:   c.inputAnswer,
