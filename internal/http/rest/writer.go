@@ -5,7 +5,6 @@ import (
 	"fmt"
 	myhttp "github.com/rtrzebinski/simple-memorizer-4/internal/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 )
 
 type Writer struct {
@@ -17,11 +16,6 @@ func NewWriter(c myhttp.Client) *Writer {
 }
 
 func (w *Writer) StoreLesson(lesson *models.Lesson) error {
-	err := validators.ValidateStoreLesson(*lesson, nil)
-	if err != nil {
-		return fmt.Errorf("invalid input: %w", err)
-	}
-
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -50,11 +44,6 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 }
 
 func (w *Writer) StoreExercise(exercise *models.Exercise) error {
-	err := validators.ValidateStoreExercise(*exercise, nil)
-	if err != nil {
-		return fmt.Errorf("invalid input: %w", err)
-	}
-
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
