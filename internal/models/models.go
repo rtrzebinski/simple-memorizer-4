@@ -1,21 +1,23 @@
 package models
 
-type Lesson struct {
-	Id            int
-	Name          string
-	Description   string
-	ExerciseCount int
-}
+type (
+	Lesson struct {
+		Id            int
+		Name          string
+		Description   string
+		ExerciseCount int
+	}
 
-type Lessons []Lesson
+	Lessons []Lesson
 
-type Exercise struct {
-	Id          int
-	Lesson      *Lesson
-	Question    string
-	Answer      string
-	BadAnswers  int
-	GoodAnswers int
-}
+	Exercise struct {
+		Id          int
+		Lesson      *Lesson
+		Question    string
+		Answer      string
+		BadAnswers  int
+		GoodAnswers int
+	}
 
-type Exercises []Exercise
+	Exercises []Exercise
+)
