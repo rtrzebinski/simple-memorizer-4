@@ -2,9 +2,7 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -98,17 +96,6 @@ func TestStoreLesson_updateExisting(t *testing.T) {
 
 	assert.Equal(t, "newName", stored.Name)
 	assert.Equal(t, "newDescription", stored.Description)
-}
-
-func TestStoreLesson_invalidInput(t *testing.T) {
-	t.Parallel()
-
-	w := NewWriter(&sql.DB{})
-
-	lesson := models.Lesson{}
-
-	err := w.StoreLesson(&lesson)
-	assert.True(t, validators.IsValidationErr(err))
 }
 
 func TestDeleteLesson(t *testing.T) {
@@ -258,17 +245,6 @@ func TestStoreExercise_updateExisting(t *testing.T) {
 
 	assert.Equal(t, "newQuestion", stored.Question)
 	assert.Equal(t, "newAnswer", stored.Answer)
-}
-
-func TestStoreExercise_invalidInput(t *testing.T) {
-	t.Parallel()
-
-	w := NewWriter(&sql.DB{})
-
-	exercise := models.Exercise{}
-
-	err := w.StoreExercise(&exercise)
-	assert.True(t, validators.IsValidationErr(err))
 }
 
 func TestDeleteExercise(t *testing.T) {
