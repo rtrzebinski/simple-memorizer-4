@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 )
 
 type Writer struct {
@@ -15,6 +16,11 @@ func NewWriter(db *sql.DB) *Writer {
 }
 
 func (w *Writer) StoreLesson(lesson *models.Lesson) error {
+	err := validators.ValidateStoreLesson(*lesson, nil)
+	if err != nil {
+		return fmt.Errorf("invalid input: %w", err)
+	}
+
 	var query string
 
 	if lesson.Id > 0 {
@@ -55,6 +61,11 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 }
 
 func (w *Writer) StoreExercise(exercise *models.Exercise) error {
+	err := validators.ValidateStoreExercise(*exercise, nil)
+	if err != nil {
+		return fmt.Errorf("invalid input: %w", err)
+	}
+
 	var query string
 
 	if exercise.Id > 0 {
