@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -46,4 +47,27 @@ func TestFetchRandomExerciseOfLesson(t *testing.T) {
 	json.Unmarshal(res.Body.Bytes(), &result)
 
 	assert.Equal(t, exercise, result)
+}
+
+func TestFetchRandomExerciseOfLesson_invalidInput(t *testing.T) {
+	reader := storage.NewReaderMock()
+
+	route := NewFetchRandomExerciseOfLesson(reader)
+
+	u, _ := url.Parse("/")
+
+	req := &http.Request{}
+	req.URL = u
+
+	res := httptest.NewRecorder()
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusBadRequest, res.Code)
+
+	var result string
+
+	err := json.Unmarshal(res.Body.Bytes(), &result)
+	assert.NoError(t, err)
+	assert.Equal(t, validators.ValidateLessonIdentified(models.Lesson{}).Error(), result)
 }

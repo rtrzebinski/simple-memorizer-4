@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
 	"log"
 	"net/http"
 )
@@ -23,6 +24,31 @@ func (h *IncrementBadAnswers) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode IncrementBadAnswers HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	err = validators.ValidateExerciseIdentified(h.exercise)
+	if err != nil {
+		log.Print(fmt.Errorf("invalid input: %w", err))
+
+		res.WriteHeader(http.StatusBadRequest)
+
+		encoded, err := json.Marshal(err.Error())
+		if err != nil {
+			log.Print(fmt.Errorf("failed to encode IncrementBadAnswers HTTP response: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
+
+			return
+		}
+
+		_, err = res.Write(encoded)
+		if err != nil {
+			log.Print(fmt.Errorf("failed to write IncrementBadAnswers HTTP response: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
+
+			return
+		}
 
 		return
 	}

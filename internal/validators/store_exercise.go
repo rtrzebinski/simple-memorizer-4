@@ -5,13 +5,6 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
-var (
-	ErrExerciseQuestionRequired = errors.New("exercise.question is required")
-	ErrExerciseQuestionUnique   = errors.New("exercise.question must be unique")
-	ErrExerciseAnswerRequired   = errors.New("exercise.answer is required")
-	ErrLessonIdRequired         = errors.New("lesson.id is required")
-)
-
 func ValidateStoreExercise(e models.Exercise, questions []string) error {
 	var err error
 

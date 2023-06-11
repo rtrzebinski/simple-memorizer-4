@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -30,4 +32,30 @@ func TestIncrementBadAnswers(t *testing.T) {
 	route.ServeHTTP(res, req)
 
 	writer.AssertExpectations(t)
+}
+
+func TestIncrementBadAnswers_invalidInput(t *testing.T) {
+	input := models.Exercise{}
+
+	body, err := json.Marshal(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	writer := storage.NewWriterMock()
+
+	route := NewIncrementBadAnswers(writer)
+
+	res := httptest.NewRecorder()
+	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusBadRequest, res.Code)
+
+	var result string
+
+	err = json.Unmarshal(res.Body.Bytes(), &result)
+	assert.NoError(t, err)
+	assert.Equal(t, validators.ValidateExerciseIdentified(models.Exercise{}).Error(), result)
 }
