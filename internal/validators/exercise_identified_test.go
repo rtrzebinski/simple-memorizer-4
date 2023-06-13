@@ -22,4 +22,5 @@ func TestValidateExerciseIdentified_invalid(t *testing.T) {
 	err := ValidateExerciseIdentified(exercise)
 
 	assert.True(t, IsValidationErr(err))
+	assert.Equal(t, "exercise.id is required", err.Error())
 }

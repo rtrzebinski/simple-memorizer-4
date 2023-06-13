@@ -19,14 +19,16 @@ func TestValidateStoreLesson_valid(t *testing.T) {
 
 func TestValidateStoreLesson_invalid(t *testing.T) {
 	var tests = []struct {
-		name   string
-		lesson models.Lesson
-		names  []string
+		name    string
+		lesson  models.Lesson
+		names   []string
+		message string
 	}{
 		{
 			"empty",
 			models.Lesson{},
 			nil,
+			"lesson.name is required",
 		},
 		{
 			"non unique name",
@@ -34,6 +36,7 @@ func TestValidateStoreLesson_invalid(t *testing.T) {
 				Name: "name",
 			},
 			[]string{"name"},
+			"lesson.name must be unique",
 		},
 	}
 
@@ -41,6 +44,7 @@ func TestValidateStoreLesson_invalid(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			err := ValidateStoreLesson(tt.lesson, tt.names)
 			assert.True(t, IsValidationErr(err))
+			assert.Equal(t, tt.message, err.Error())
 		})
 	}
 }

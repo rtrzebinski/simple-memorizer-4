@@ -37,11 +37,13 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 		name      string
 		exercise  models.Exercise
 		questions []string
+		message   string
 	}{
 		{
 			"empty",
 			models.Exercise{},
 			nil,
+			"exercise.question is required\nexercise.answer is required\nlesson.id is required",
 		},
 		{
 			"non unique question",
@@ -49,6 +51,7 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 				Question: "question",
 			},
 			[]string{"question"},
+			"exercise.question must be unique\nexercise.answer is required\nlesson.id is required",
 		},
 		{
 			"missing lesson id",
@@ -58,6 +61,7 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 				Lesson:   &models.Lesson{},
 			},
 			nil,
+			"lesson.id is required",
 		},
 	}
 
@@ -65,6 +69,7 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			err := ValidateStoreExercise(tt.exercise, tt.questions)
 			assert.True(t, IsValidationErr(err))
+			assert.Equal(t, tt.message, err.Error())
 		})
 	}
 }
