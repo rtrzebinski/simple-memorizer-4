@@ -1,21 +1,41 @@
 package validators
 
-import "errors"
+import (
+	"errors"
+)
 
 // ValidationErr error type for validation.
-type ValidationErr struct{ err error }
+type ValidationErr struct {
+	errors []error
+}
 
 // NewValidationErr creates a new validation error.
-func NewValidationErr(err error) error {
-	return ValidationErr{err: err}
+func NewValidationErr() *ValidationErr {
+	return &ValidationErr{}
+}
+
+// Add adds a new error.
+func (v *ValidationErr) Add(err error) {
+	v.errors = append(v.errors, err)
+}
+
+// All retrieves all errors.
+func (v *ValidationErr) All() []error {
+	return v.errors
+}
+
+// Empty checks if there are no errors.
+func (v *ValidationErr) Empty() bool {
+	return v.errors == nil
 }
 
 // Error implements the error interface function.
-func (v ValidationErr) Error() string { return v.err.Error() }
+func (v *ValidationErr) Error() string {
+	var out error
 
-// IsValidationErr checks if the provided error is from the type `ValidationErr`.
-func IsValidationErr(err error) bool {
-	var validationErr ValidationErr
+	for _, e := range v.errors {
+		out = errors.Join(out, e)
+	}
 
-	return errors.As(err, &validationErr)
+	return out.Error()
 }

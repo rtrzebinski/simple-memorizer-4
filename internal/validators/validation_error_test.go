@@ -7,8 +7,12 @@ import (
 )
 
 func TestValidationErr(t *testing.T) {
-	err := NewValidationErr(errors.New("foo"))
+	err := NewValidationErr()
 
-	assert.True(t, IsValidationErr(err))
-	assert.Equal(t, "foo", err.Error())
+	assert.True(t, err.Empty())
+
+	err.Add(errors.New("foo"))
+
+	assert.False(t, err.Empty())
+	assert.Equal(t, "foo", err.All()[0].Error())
 }

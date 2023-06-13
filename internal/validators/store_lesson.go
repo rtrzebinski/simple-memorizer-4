@@ -1,26 +1,25 @@
 package validators
 
 import (
-	"errors"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
 func ValidateStoreLesson(l models.Lesson, names []string) error {
-	var err error
+	err := NewValidationErr()
 
 	if l.Name == "" {
-		err = errors.Join(err, ErrLessonNameRequired)
+		err.Add(ErrLessonNameRequired)
 	} else if names != nil {
 		for _, n := range names {
 			if l.Name == n {
-				err = errors.Join(err, ErrLessonNameUnique)
+				err.Add(ErrLessonNameUnique)
 			}
 		}
 	}
 
-	if err == nil {
+	if err.Empty() {
 		return nil
 	}
 
-	return NewValidationErr(err)
+	return err
 }

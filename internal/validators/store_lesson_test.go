@@ -43,7 +43,6 @@ func TestValidateStoreLesson_invalid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			err := ValidateStoreLesson(tt.lesson, tt.names)
-			assert.True(t, IsValidationErr(err))
 			assert.Equal(t, tt.message, err.Error())
 		})
 	}

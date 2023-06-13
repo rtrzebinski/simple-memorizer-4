@@ -21,6 +21,5 @@ func TestValidateLessonIdentified_invalid(t *testing.T) {
 
 	err := ValidateLessonIdentified(lesson)
 
-	assert.True(t, IsValidationErr(err))
 	assert.Equal(t, "lesson.id is required", err.Error())
 }

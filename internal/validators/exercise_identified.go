@@ -1,20 +1,19 @@
 package validators
 
 import (
-	"errors"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
 func ValidateExerciseIdentified(e models.Exercise) error {
-	var err error
+	err := NewValidationErr()
 
 	if e.Id == 0 {
-		err = errors.Join(err, ErrExerciseIdRequired)
+		err.Add(ErrExerciseIdRequired)
 	}
 
-	if err == nil {
+	if err.Empty() {
 		return nil
 	}
 
-	return NewValidationErr(err)
+	return err
 }

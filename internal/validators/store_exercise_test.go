@@ -68,7 +68,6 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			err := ValidateStoreExercise(tt.exercise, tt.questions)
-			assert.True(t, IsValidationErr(err))
 			assert.Equal(t, tt.message, err.Error())
 		})
 	}
