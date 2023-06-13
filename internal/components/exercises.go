@@ -5,7 +5,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -22,7 +22,7 @@ type Exercises struct {
 
 	// store exercise form
 	formVisible         bool
-	validationError     string
+	validationErrors    []error
 	inputId             int
 	inputQuestion       string
 	inputAnswer         string
@@ -70,7 +70,14 @@ func (c *Exercises) Render() app.UI {
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new exercise"),
-			app.P().Text(c.validationError).Hidden(c.validationError == "").Style("color", "red"),
+			app.P().Body(
+				app.Range(c.validationErrors).Slice(func(i int) app.UI {
+					return app.Div().Body(
+						app.Text(c.validationErrors[i].Error()),
+						app.Br(),
+					).Style("color", "red")
+				}),
+			),
 			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
 				Required(true).OnInput(c.ValueTo(&c.inputQuestion)).Text(c.inputQuestion),
 			app.Br(),
@@ -116,8 +123,6 @@ func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
 func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	var err error
-
 	// exercise to be stored
 	exercise := models.Exercise{
 		Id:       c.inputId,
@@ -137,9 +142,9 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// validate input
-	err = validators.ValidateStoreExercise(exercise, questions)
-	if err != nil {
-		c.validationError = err.Error()
+	validator := validation.ValidateStoreExercise(exercise, questions)
+	if validator.Failed() {
+		c.validationErrors = validator.Errors()
 
 		return
 	}
@@ -148,7 +153,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store exercise
-	err = c.writer.StoreExercise(&exercise)
+	err := c.writer.StoreExercise(&exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
@@ -178,7 +183,7 @@ func (c *Exercises) resetForm() {
 	c.inputId = 0
 	c.inputQuestion = ""
 	c.inputAnswer = ""
-	c.validationError = ""
+	c.validationErrors = nil
 	c.storeButtonDisabled = false
 }
 

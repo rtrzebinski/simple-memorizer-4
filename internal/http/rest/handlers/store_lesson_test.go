@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -60,5 +60,5 @@ func TestStoreLesson_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validators.ValidateStoreLesson(models.Lesson{}, nil).Error(), result)
+	assert.Equal(t, validation.ValidateStoreLesson(models.Lesson{}, nil).Error(), result)
 }

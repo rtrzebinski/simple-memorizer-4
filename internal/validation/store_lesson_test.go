@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -12,9 +12,9 @@ func TestValidateStoreLesson_valid(t *testing.T) {
 		Description: "description",
 	}
 
-	err := ValidateStoreLesson(lesson, []string{"foo"})
+	validator := ValidateStoreLesson(lesson, []string{"foo"})
 
-	assert.NoError(t, err)
+	assert.False(t, validator.Failed())
 }
 
 func TestValidateStoreLesson_invalid(t *testing.T) {
@@ -41,9 +41,10 @@ func TestValidateStoreLesson_invalid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			err := ValidateStoreLesson(tt.lesson, tt.names)
-			assert.Equal(t, tt.message, err.Error())
+		t.Run(tt.name, func(t *testing.T) {
+			validator := ValidateStoreLesson(tt.lesson, tt.names)
+			assert.Equal(t, tt.message, validator.Error())
+			assert.True(t, validator.Failed())
 		})
 	}
 }

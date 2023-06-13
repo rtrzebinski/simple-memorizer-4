@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
 )
@@ -28,13 +28,13 @@ func (h *StoreExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = validators.ValidateStoreExercise(h.exercise, nil)
-	if err != nil {
-		log.Print(fmt.Errorf("invalid input: %w", err))
+	validator := validation.ValidateStoreExercise(h.exercise, nil)
+	if validator.Failed() {
+		log.Print(fmt.Errorf("invalid input: %w", validator))
 
 		res.WriteHeader(http.StatusBadRequest)
 
-		encoded, err := json.Marshal(err.Error())
+		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
 			log.Print(fmt.Errorf("failed to encode StoreExercise HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)

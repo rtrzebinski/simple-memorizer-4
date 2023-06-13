@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -11,15 +11,16 @@ func TestValidateLessonIdentified_valid(t *testing.T) {
 		Id: 10,
 	}
 
-	err := ValidateLessonIdentified(lesson)
+	validator := ValidateLessonIdentified(lesson)
 
-	assert.NoError(t, err)
+	assert.False(t, validator.Failed())
 }
 
 func TestValidateLessonIdentified_invalid(t *testing.T) {
 	lesson := models.Lesson{}
 
-	err := ValidateLessonIdentified(lesson)
+	validator := ValidateLessonIdentified(lesson)
 
-	assert.Equal(t, "lesson.id is required", err.Error())
+	assert.Equal(t, "lesson.id is required", validator.Error())
+	assert.True(t, validator.Failed())
 }

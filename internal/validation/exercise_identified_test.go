@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -11,15 +11,16 @@ func TestValidateExerciseIdentified_valid(t *testing.T) {
 		Id: 10,
 	}
 
-	err := ValidateExerciseIdentified(exercise)
+	validator := ValidateExerciseIdentified(exercise)
 
-	assert.NoError(t, err)
+	assert.False(t, validator.Failed())
 }
 
 func TestValidateExerciseIdentified_invalid(t *testing.T) {
 	exercise := models.Exercise{}
 
-	err := ValidateExerciseIdentified(exercise)
+	validator := ValidateExerciseIdentified(exercise)
 
-	assert.Equal(t, "exercise.id is required", err.Error())
+	assert.Equal(t, "exercise.id is required", validator.Error())
+	assert.True(t, validator.Failed())
 }

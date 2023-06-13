@@ -5,7 +5,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"net/http"
 )
 
@@ -19,7 +19,7 @@ type Lessons struct {
 
 	// store lesson form
 	formVisible         bool
-	validationError     string
+	validationErrors    []error
 	inputId             int
 	inputName           string
 	inputDescription    string
@@ -43,7 +43,14 @@ func (c *Lessons) Render() app.UI {
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new lesson"),
-			app.P().Text(c.validationError).Hidden(c.validationError == "").Style("color", "red"),
+			app.P().Body(
+				app.Range(c.validationErrors).Slice(func(i int) app.UI {
+					return app.Div().Body(
+						app.Text(c.validationErrors[i].Error()),
+						app.Br(),
+					).Style("color", "red")
+				}),
+			),
 			app.Textarea().Cols(30).Rows(3).Placeholder("Name").
 				Required(true).OnInput(c.ValueTo(&c.inputName)).Text(c.inputName),
 			app.Br(),
@@ -96,9 +103,9 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// validate input
-	err = validators.ValidateStoreLesson(lesson, names)
-	if err != nil {
-		c.validationError = err.Error()
+	validator := validation.ValidateStoreLesson(lesson, names)
+	if validator.Failed() {
+		c.validationErrors = validator.Errors()
 
 		return
 	}
@@ -127,7 +134,7 @@ func (c *Lessons) resetForm() {
 	c.inputId = 0
 	c.inputName = ""
 	c.inputDescription = ""
-	c.validationError = ""
+	c.validationErrors = nil
 	c.storeButtonDisabled = false
 	c.formVisible = false
 }

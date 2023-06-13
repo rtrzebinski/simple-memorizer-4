@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/validators"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,13 +25,13 @@ func (h *FetchRandomExerciseOfLesson) ServeHTTP(res http.ResponseWriter, req *ht
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
 
 		// validate empty lesson if lesson_id is not present, this is for error messages consistency
-		err = validators.ValidateLessonIdentified(models.Lesson{})
-		if err != nil {
-			log.Print(fmt.Errorf("invalid input: %w", err))
+		validator := validation.ValidateLessonIdentified(models.Lesson{})
+		if validator.Failed() {
+			log.Print(fmt.Errorf("invalid input: %w", validator))
 
 			res.WriteHeader(http.StatusBadRequest)
 
-			encoded, err := json.Marshal(err.Error())
+			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
 				log.Print(fmt.Errorf("failed to encode FetchRandomExerciseOfLesson HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)

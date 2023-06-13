@@ -46,7 +46,7 @@ func (c *LessonRow) onEdit() app.EventHandler {
 		c.parent.inputName = c.lesson.Name
 		c.parent.inputDescription = c.lesson.Description
 		c.parent.formVisible = true
-		c.parent.validationError = ""
+		c.parent.validationErrors = nil
 	}
 }
 

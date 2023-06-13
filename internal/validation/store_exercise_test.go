@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -15,9 +15,9 @@ func TestValidateStoreExercise_validInsert(t *testing.T) {
 		Answer:   "answer",
 	}
 
-	err := ValidateStoreExercise(exercise, []string{"bar"})
+	validation := ValidateStoreExercise(exercise, []string{"bar"})
 
-	assert.NoError(t, err)
+	assert.False(t, validation.Failed())
 }
 
 func TestValidateStoreExercise_validUpdate(t *testing.T) {
@@ -27,9 +27,9 @@ func TestValidateStoreExercise_validUpdate(t *testing.T) {
 		Answer:   "answer",
 	}
 
-	err := ValidateStoreExercise(exercise, []string{"bar"})
+	validator := ValidateStoreExercise(exercise, []string{"bar"})
 
-	assert.NoError(t, err)
+	assert.False(t, validator.Failed())
 }
 
 func TestValidateStoreExercise_invalid(t *testing.T) {
@@ -66,9 +66,10 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			err := ValidateStoreExercise(tt.exercise, tt.questions)
-			assert.Equal(t, tt.message, err.Error())
+		t.Run(tt.name, func(t *testing.T) {
+			validator := ValidateStoreExercise(tt.exercise, tt.questions)
+			assert.Equal(t, tt.message, validator.Error())
+			assert.True(t, validator.Failed())
 		})
 	}
 }
