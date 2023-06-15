@@ -52,11 +52,17 @@ func (c *Learn) OnMount(ctx app.Context) {
 		return
 	}
 
-	exercises, err := c.reader.FetchExercisesOfLesson(c.lesson)
+	exercisesOfLesson, err := c.reader.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 
 		return
+	}
+
+	// convert into map that is needed for a memorizer service
+	var exercises = make(map[int]models.Exercise)
+	for _, e := range exercisesOfLesson {
+		exercises[e.Id] = e
 	}
 
 	c.memorizer.Init(exercises)
@@ -103,6 +109,14 @@ func (c *Learn) Render() app.UI {
 				app.Text(""),
 			),
 		).Hidden(!c.isAnswerVisible),
+		app.P().Body(
+			app.Text("Good answers: "),
+			app.Text(c.exercise.GoodAnswers),
+		),
+		app.P().Body(
+			app.Text("Bad answers: "),
+			app.Text(c.exercise.BadAnswers),
+		),
 		app.P().Body(
 			app.Button().
 				Text("⇧ View answer").
@@ -216,6 +230,7 @@ func (c *Learn) handleGoodAnswer() {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
+	c.exercise.GoodAnswers++
 	c.handleNextExercise()
 }
 
@@ -226,5 +241,6 @@ func (c *Learn) handleBadAnswer() {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
+	c.exercise.BadAnswers++
 	c.handleNextExercise()
 }
