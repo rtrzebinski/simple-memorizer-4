@@ -54,6 +54,10 @@ func (c *Learn) OnMount(ctx app.Context) {
 
 	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
 	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	err = c.reader.HydrateLesson(&c.lesson)
+	if err != nil {
+		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
+	}
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()
@@ -73,6 +77,12 @@ func (c *Learn) Render() app.UI {
 		&Navigation{},
 		app.P().Body(
 			app.Button().Text("Show exercises").OnClick(c.handleShowExercises),
+		),
+		app.P().Body(
+			app.Text("Lesson name: "+c.lesson.Name),
+		),
+		app.P().Body(
+			app.Text("Lesson description: "+c.lesson.Description),
 		),
 		app.P().Body(
 			app.Text("Question: "),
