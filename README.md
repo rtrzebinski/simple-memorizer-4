@@ -1,29 +1,6 @@
-### simple-memorizer-4
+The Simple Memorizer is an educational tool that utilizes the spaced repetition technique commonly employed with flashcards. It presents newly introduced and challenging exercises more often, while reducing the frequency of older and easier ones, taking advantage of the psychological spacing effect. Extensive research has confirmed that the implementation of spaced repetition significantly enhances the speed of learning.
 
-Work in progress - a proof of concept for simple-memorizer web app built with go-app.
-
-```
-simple-memorizer-4 $ make
-target                         help
-------                         ----
-help                           Show this help
-start                          Start containers (docker compose up)
-stop                           Stop containers (docker compose down)
-ps                             Show running containers
-restart                        Stop and start containers
-destroy                        Stop containers and remove volumes
-migrate                        Run db migrations (migrate up)
-migrate-down                   Revert db migrations (migrate down)
-migrate-drop                   Drop db without confirmation (migrate drop)
-seed                           Seed the database with some example data
-reseed                         Destroy, recreate and seed the database (no confirmation)
-db                             Db CLI client connection
-build                          Build client and server
-run                            Build and run locally
-test                           Test all
-test-short                     Test short (unit)
-dev                            Prepare dev environment (stop + start + migrate + seed)
-```
+This marks the fourth iteration of the project, incorporating the Go programming language for both the UI and backend components. It functions as a creative space for experimentation and a platform to showcase coding skills.
 
 ### Documentation
 
