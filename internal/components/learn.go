@@ -224,23 +224,29 @@ func (c *Learn) handleViewAnswer() {
 }
 
 func (c *Learn) handleGoodAnswer() {
+	// copy so go routine will not rely on dynamic c.exercise
+	exCopy := c.exercise
 	go func() {
 		// increment in the background
-		if err := c.writer.IncrementGoodAnswers(c.exercise); err != nil {
+		if err := c.writer.IncrementGoodAnswers(exCopy); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
+	// exercise will be passed back to memorizer, it needs the correct answers count
 	c.exercise.GoodAnswers++
 	c.handleNextExercise()
 }
 
 func (c *Learn) handleBadAnswer() {
+	// copy so go routine will not rely on dynamic c.exercise
+	exCopy := c.exercise
 	go func() {
 		// increment in the background
-		if err := c.writer.IncrementBadAnswers(c.exercise); err != nil {
+		if err := c.writer.IncrementBadAnswers(exCopy); err != nil {
 			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
 		}
 	}()
+	// exercise will be passed back to memorizer, it needs the correct answers count
 	c.exercise.BadAnswers++
 	c.handleNextExercise()
 }
