@@ -110,12 +110,16 @@ func (c *Learn) Render() app.UI {
 			),
 		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
+			app.Text("Bad answers: "),
+			app.Text(c.exercise.BadAnswers),
+		),
+		app.P().Body(
 			app.Text("Good answers: "),
 			app.Text(c.exercise.GoodAnswers),
 		),
 		app.P().Body(
-			app.Text("Bad answers: "),
-			app.Text(c.exercise.BadAnswers),
+			app.Text("Good answers %: "),
+			app.Text(c.exercise.GoodAnswersPercent()),
 		),
 		app.P().Body(
 			app.Button().

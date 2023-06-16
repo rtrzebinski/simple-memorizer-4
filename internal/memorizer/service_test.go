@@ -40,3 +40,61 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 	assert.Equal(t, e2.Question, res.Question)
 	assert.Equal(t, e2.GoodAnswers, res.GoodAnswers)
 }
+
+func TestMemorizer_points(t *testing.T) {
+	var tests = []struct {
+		percent int
+		points  int
+	}{
+		{0, 10},
+		{5, 10},
+		{10, 10},
+		{15, 9},
+		{20, 9},
+		{25, 8},
+		{30, 8},
+		{35, 7},
+		{40, 7},
+		{45, 6},
+		{50, 6},
+		{55, 5},
+		{60, 5},
+		{65, 4},
+		{70, 4},
+		{75, 3},
+		{80, 3},
+		{85, 2},
+		{90, 2},
+		{95, 1},
+		{100, 1},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, tt.points, points(tt.percent))
+		})
+	}
+}
+
+/*
+	[0, 10],
+	[5, 10],
+	[15, 9],
+	[20, 9],
+	[25, 8],
+	[30, 8],
+	[35, 7],
+	[40, 7],
+	[45, 6],
+	[50, 6],
+	[55, 5],
+	[60, 5],
+	[65, 4],
+	[70, 4],
+	[75, 3],
+	[80, 3],
+	[85, 2],
+	[90, 2],
+	[95, 1],
+	[100, 1]
+*/

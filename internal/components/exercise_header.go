@@ -27,6 +27,9 @@ func (c *ExerciseHeader) Render() app.UI {
 			app.Text("Good answers"),
 		),
 		app.Th().Style("border", "1px solid black").Body(
+			app.Text("Good answers %"),
+		),
+		app.Th().Style("border", "1px solid black").Body(
 			app.Text("Actions"),
 		),
 	)
