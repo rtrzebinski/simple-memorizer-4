@@ -4,6 +4,6 @@ This marks the fourth iteration of the project, incorporating the Go programming
 
 ### Documentation
 
-https://go-app.dev/getting-started
+[Go-app](https://go-app.dev)
 
 [Dev documentation - local environment](https://github.com/rtrzebinski/simple-memorizer-4/wiki/Dev-documentation---local-environment) 
