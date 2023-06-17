@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -11,27 +11,27 @@ import (
 	"net/url"
 	"strconv"
 	"testing"
+	"time"
 )
 
-func TestFetchRandomExerciseOfLesson(t *testing.T) {
-	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
+func TestFetchAnswersOfExercise(t *testing.T) {
+	answer := models.Answer{
+		Id:        10,
+		Type:      models.Good,
+		CreatedAt: time.Time{},
 	}
+	answers := models.Answers{answer}
 
-	lessonId := 10
+	exerciseId := 10
 
-	reader := storage.NewReaderMock()
-	reader.On("FetchRandomExerciseOfLesson", models.Lesson{Id: lessonId}).Return(exercise)
+	reader := internal.NewReaderMock()
+	reader.On("FetchAnswersOfExercise", models.Exercise{Id: exerciseId}).Return(answers)
 
-	route := NewFetchRandomExerciseOfLesson(reader)
+	route := NewFetchAnswersOfExercise(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lessonId))
+	params.Add("exercise_id", strconv.Itoa(exerciseId))
 	u.RawQuery = params.Encode()
 
 	req := &http.Request{}
@@ -43,16 +43,16 @@ func TestFetchRandomExerciseOfLesson(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.Code)
 
-	var result models.Exercise
+	var result models.Answers
 	json.Unmarshal(res.Body.Bytes(), &result)
 
-	assert.Equal(t, exercise, result)
+	assert.Equal(t, answers, result)
 }
 
-func TestFetchRandomExerciseOfLesson_invalidInput(t *testing.T) {
-	reader := storage.NewReaderMock()
+func TestFetchAnswersOfExercise_invalidInput(t *testing.T) {
+	reader := internal.NewReaderMock()
 
-	route := NewFetchRandomExerciseOfLesson(reader)
+	route := NewFetchAnswersOfExercise(reader)
 
 	u, _ := url.Parse("/")
 
@@ -69,5 +69,5 @@ func TestFetchRandomExerciseOfLesson_invalidInput(t *testing.T) {
 
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateLessonIdentified(models.Lesson{}).Error(), result)
+	assert.Equal(t, validation.ValidateExerciseIdentified(models.Exercise{}).Error(), result)
 }

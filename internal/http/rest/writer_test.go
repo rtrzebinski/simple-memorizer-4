@@ -84,32 +84,17 @@ func (suite *WriterSuite) TestDeleteExercise() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *WriterSuite) TestIncrementBadAnswers() {
-	exercise := models.Exercise{}
+func (suite *WriterSuite) TestStoreAnswer() {
+	answer := models.Answer{}
 
 	method := "POST"
-	route := IncrementBadAnswers
+	route := StoreAnswer
 	params := map[string]string(nil)
-	reqBody, err := json.Marshal(exercise)
+	reqBody, err := json.Marshal(answer)
 	suite.Assert().NoError(err)
 
 	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.writer.IncrementBadAnswers(exercise)
-	suite.Assert().NoError(err)
-}
-
-func (suite *WriterSuite) TestIncrementGoodAnswers() {
-	exercise := models.Exercise{}
-
-	method := "POST"
-	route := IncrementGoodAnswers
-	params := map[string]string(nil)
-	reqBody, err := json.Marshal(exercise)
-	suite.Assert().NoError(err)
-
-	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
-
-	err = suite.writer.IncrementGoodAnswers(exercise)
+	err = suite.writer.StoreAnswer(&answer)
 	suite.Assert().NoError(err)
 }

@@ -9,6 +9,7 @@ import (
 	migrate_postgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"log"
@@ -36,31 +37,30 @@ type (
 		BadAnswers  int
 		GoodAnswers int
 	}
+
+	Answer struct {
+		Id         int
+		ExerciseId int
+		Type       models.AnswerType
+		CreatedAt  time.Time
+	}
 )
 
-func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
-	const query = `
-		SELECT e.id, e.question, e.answer
-		FROM exercise e
-		WHERE e.id = $1;`
+func createLesson(db *sql.DB, lesson *Lesson) {
+	query := `INSERT INTO lesson (name, description, exercise_count) VALUES ($1, $2, $3) RETURNING id;`
 
-	rows, err := db.Query(query, exerciseId)
+	if lesson.Name == "" {
+		lesson.Name = randomString()
+	}
+
+	if lesson.Description == "" {
+		lesson.Description = randomString()
+	}
+
+	err := db.QueryRow(query, &lesson.Name, &lesson.Description, &lesson.ExerciseCount).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}
-
-	for rows.Next() {
-		var exercise Exercise
-
-		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
-		if err != nil {
-			panic(err)
-		}
-
-		return &exercise
-	}
-
-	return nil
 }
 
 func findLessonById(db *sql.DB, lessonId int) *Lesson {
@@ -86,22 +86,6 @@ func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	}
 
 	return nil
-}
-
-func fetchLatestExercise(db *sql.DB) Exercise {
-	var exercise Exercise
-
-	const query = `
-		SELECT e.id, e.lesson_id, e.question, e.answer
-		FROM exercise e
-		ORDER BY id DESC
-		LIMIT 1;`
-
-	if err := db.QueryRow(query).Scan(&exercise.Id, &exercise.LessonId, &exercise.Question, &exercise.Answer); err != nil {
-		panic(err)
-	}
-
-	return exercise
 }
 
 func fetchLatestLesson(db *sql.DB) Lesson {
@@ -143,40 +127,84 @@ func createExercise(db *sql.DB, exercise *Exercise) {
 	}
 }
 
-func createLesson(db *sql.DB, lesson *Lesson) {
-	query := `INSERT INTO lesson (name, description, exercise_count) VALUES ($1, $2, $3) RETURNING id;`
+func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
+	const query = `
+		SELECT e.id, e.question, e.answer
+		FROM exercise e
+		WHERE e.id = $1;`
 
-	if lesson.Name == "" {
-		lesson.Name = randomString()
+	rows, err := db.Query(query, exerciseId)
+	if err != nil {
+		panic(err)
 	}
 
-	if lesson.Description == "" {
-		lesson.Description = randomString()
+	for rows.Next() {
+		var exercise Exercise
+
+		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
+		if err != nil {
+			panic(err)
+		}
+
+		return &exercise
 	}
 
-	err := db.QueryRow(query, &lesson.Name, &lesson.Description, &lesson.ExerciseCount).Scan(&lesson.Id)
+	return nil
+}
+
+func fetchLatestExercise(db *sql.DB) Exercise {
+	var exercise Exercise
+
+	const query = `
+		SELECT e.id, e.lesson_id, e.question, e.answer
+		FROM exercise e
+		ORDER BY id DESC
+		LIMIT 1;`
+
+	if err := db.QueryRow(query).Scan(&exercise.Id, &exercise.LessonId, &exercise.Question, &exercise.Answer); err != nil {
+		panic(err)
+	}
+
+	return exercise
+}
+
+func createAnswer(db *sql.DB, answer *Answer) {
+	query := `INSERT INTO answer (exercise_id, type) VALUES ($1, $2) RETURNING id;`
+
+	if answer.ExerciseId == 0 {
+		exercise := &Exercise{}
+		createExercise(db, exercise)
+		answer.ExerciseId = exercise.Id
+	}
+
+	if answer.Type == "" {
+		answer.Type = models.Good
+	}
+
+	err := db.QueryRow(query, &answer.ExerciseId, &answer.Type).Scan(&answer.Id)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func randomString() string {
-	return uuid.NewString()
-}
-
-func findExerciseResultByExerciseId(db *sql.DB, exerciseId int) ExerciseResult {
-	var exerciseResult ExerciseResult
+func fetchLatestAnswer(db *sql.DB) Answer {
+	var answer Answer
 
 	const query = `
-		SELECT er.id, er.exercise_id, er.bad_answers, er.good_answers
-		FROM exercise_result er
-		WHERE er.exercise_id = $1;`
+		SELECT a.id, a.type, a.exercise_id, a.created_at
+		FROM answer a
+		ORDER BY id DESC
+		LIMIT 1;`
 
-	if err := db.QueryRow(query, exerciseId).Scan(&exerciseResult.Id, &exerciseResult.ExerciseId, &exerciseResult.BadAnswers, &exerciseResult.GoodAnswers); err != nil {
+	if err := db.QueryRow(query).Scan(&answer.Id, &answer.Type, &answer.ExerciseId, &answer.CreatedAt); err != nil {
 		panic(err)
 	}
 
-	return exerciseResult
+	return answer
+}
+
+func randomString() string {
+	return uuid.NewString()
 }
 
 func createPostgresContainer(ctx context.Context, dbname string) (testcontainers.Container, *sql.DB, error) {

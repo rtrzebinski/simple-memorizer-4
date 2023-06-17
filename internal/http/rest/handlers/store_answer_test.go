@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -13,18 +13,23 @@ import (
 	"testing"
 )
 
-func TestIncrementBadAnswers(t *testing.T) {
-	input := models.Exercise{Id: 123}
+func TestStoreAnswer(t *testing.T) {
+	input := models.Answer{
+		Exercise: &models.Exercise{
+			Id: 10,
+		},
+		Type: models.Good,
+	}
 
 	body, err := json.Marshal(input)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	writer := storage.NewWriterMock()
-	writer.On("IncrementBadAnswers", models.Exercise{Id: 123})
+	writer := internal.NewWriterMock()
+	writer.On("StoreAnswer", &input)
 
-	route := NewIncrementBadAnswers(writer)
+	route := NewStoreAnswer(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -34,17 +39,17 @@ func TestIncrementBadAnswers(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestIncrementBadAnswers_invalidInput(t *testing.T) {
-	input := models.Exercise{}
+func TestStoreAnswer_invalidInput(t *testing.T) {
+	input := models.Answer{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	writer := storage.NewWriterMock()
+	writer := internal.NewWriterMock()
 
-	route := NewIncrementBadAnswers(writer)
+	route := NewStoreAnswer(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -57,5 +62,5 @@ func TestIncrementBadAnswers_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateExerciseIdentified(models.Exercise{}).Error(), result)
+	assert.Equal(t, validation.ValidateStoreAnswer(models.Answer{}).Error(), result)
 }

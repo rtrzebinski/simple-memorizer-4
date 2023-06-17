@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/docker/go-connections v0.4.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/google/uuid v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.7
 	github.com/maxence-charriere/go-app/v9 v9.6.7
@@ -24,7 +25,6 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

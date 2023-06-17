@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -23,7 +23,7 @@ func TestDeleteExercise(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := storage.NewWriterMock()
+	writer := internal.NewWriterMock()
 	writer.On("DeleteExercise", input)
 
 	route := NewDeleteExercise(writer)
@@ -44,7 +44,7 @@ func TestDeleteExercise_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := storage.NewWriterMock()
+	writer := internal.NewWriterMock()
 
 	route := NewDeleteExercise(writer)
 

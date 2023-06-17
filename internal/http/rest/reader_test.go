@@ -25,7 +25,7 @@ func TestReaderSuite(t *testing.T) {
 }
 
 func (suite *ReaderSuite) TestFetchAllLessons() {
-	lessons := models.Lessons{}
+	lessons := models.Lessons{models.Lesson{Name: "name"}}
 
 	responseBody, err := json.Marshal(lessons)
 	suite.Assert().NoError(err)
@@ -60,7 +60,7 @@ func (suite *ReaderSuite) TestHydrateLesson() {
 }
 
 func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
-	exercises := models.Exercises{}
+	exercises := models.Exercises{models.Exercise{Question: "question"}}
 	lessonId := 10
 
 	responseBody, err := json.Marshal(exercises)
@@ -79,22 +79,22 @@ func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
 	suite.Assert().Equal(exercises, result)
 }
 
-func (suite *ReaderSuite) TestRandomExerciseOfLesson() {
-	exercise := models.Exercise{}
-	lessonId := 10
+func (suite *ReaderSuite) TestFetchAnswersOfExercise() {
+	answers := models.Answers{models.Answer{Type: models.Good}}
+	exerciseId := 10
 
-	responseBody, err := json.Marshal(exercise)
+	responseBody, err := json.Marshal(answers)
 	suite.Assert().NoError(err)
 
 	method := "GET"
-	route := FetchRandomExerciseOfLesson
-	params := map[string]string{"lesson_id": "10"}
+	route := FetchAnswersOfExercise
+	params := map[string]string{"exercise_id": "10"}
 	reqBody := []byte(nil)
 
 	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.reader.FetchRandomExerciseOfLesson(models.Lesson{Id: lessonId})
+	result, err := suite.reader.FetchAnswersOfExercise(models.Exercise{Id: exerciseId})
 
 	suite.Assert().NoError(err)
-	suite.Assert().Equal(exercise, result)
+	suite.Assert().Equal(answers, result)
 }

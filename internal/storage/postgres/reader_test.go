@@ -140,11 +140,9 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	assert.Equal(t, exercise.Id, res[0].Id)
 	assert.Equal(t, exercise.Question, res[0].Question)
 	assert.Equal(t, exercise.Answer, res[0].Answer)
-	assert.Equal(t, 0, res[0].BadAnswers)
-	assert.Equal(t, 0, res[0].GoodAnswers)
 }
 
-func TestFetchRandomExerciseOfLesson(t *testing.T) {
+func TestFetchAnswersOfExercise(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -177,13 +175,18 @@ func TestFetchRandomExerciseOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	res, err := r.FetchRandomExerciseOfLesson(models.Lesson{Id: exercise.LessonId})
+	// store good answer related to the exercise
+	answer := &Answer{
+		ExerciseId: exercise.Id,
+	}
+	createAnswer(db, answer)
+
+	// store bad answer related to another exercise
+	createAnswer(db, &Answer{})
+
+	answers, err := r.FetchAnswersOfExercise(models.Exercise{Id: exercise.Id})
 
 	assert.NoError(t, err)
-	assert.IsType(t, models.Exercise{}, res)
-	assert.Equal(t, exercise.Id, res.Id)
-	assert.Equal(t, exercise.Question, res.Question)
-	assert.Equal(t, exercise.Answer, res.Answer)
-	assert.Equal(t, 0, res.BadAnswers)
-	assert.Equal(t, 0, res.GoodAnswers)
+	assert.Len(t, answers, 1)
+	assert.Equal(t, answer.Id, answers[0].Id)
 }

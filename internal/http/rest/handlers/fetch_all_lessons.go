@@ -3,16 +3,16 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"log"
 	"net/http"
 )
 
 type FetchAllLessons struct {
-	r storage.Reader
+	r internal.Reader
 }
 
-func NewFetchAllLessons(r storage.Reader) *FetchAllLessons {
+func NewFetchAllLessons(r internal.Reader) *FetchAllLessons {
 	return &FetchAllLessons{r: r}
 }
 

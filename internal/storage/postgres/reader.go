@@ -56,9 +56,8 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	var exercises models.Exercises
 
 	const query = `
-		SELECT e.id, e.question, e.answer, COALESCE(er.bad_answers, 0), COALESCE(er.good_answers, 0) 
+		SELECT e.id, e.question, e.answer
 		FROM exercise e
-		LEFT JOIN exercise_result er on e.id = er.exercise_id
 		WHERE lesson_id = $1
 		ORDER BY e.id DESC
 		`
@@ -71,7 +70,7 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	for rows.Next() {
 		var exercise models.Exercise
 
-		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.GoodAnswers)
+		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
 		if err != nil {
 			return exercises, err
 		}
@@ -82,21 +81,30 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	return exercises, nil
 }
 
-func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
-	var exercise models.Exercise
+func (r *Reader) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
+	answers := models.Answers{}
 
 	const query = `
-		SELECT e.id, e.question, e.answer, COALESCE(er.bad_answers, 0), COALESCE(er.good_answers, 0) 
-		FROM exercise e
-		JOIN lesson l on l.id = e.lesson_id
-		LEFT JOIN exercise_result er on e.id = er.exercise_id
-		WHERE l.id = $1
-		ORDER BY random()
-		LIMIT 1`
+		SELECT a.id, a.type, a.created_at
+		FROM answer a
+		WHERE a.exercise_id = $1
+		`
 
-	if err := r.db.QueryRow(query, lesson.Id).Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.GoodAnswers); err != nil {
-		return exercise, fmt.Errorf("failed to scan query results: %w", err)
+	rows, err := r.db.Query(query, exercise.Id)
+	if err != nil {
+		return answers, err
 	}
 
-	return exercise, nil
+	for rows.Next() {
+		var answer models.Answer
+
+		err = rows.Scan(&answer.Id, &answer.Type, &answer.CreatedAt)
+		if err != nil {
+			return answers, err
+		}
+
+		answers = append(answers, answer)
+	}
+
+	return answers, nil
 }

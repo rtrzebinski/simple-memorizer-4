@@ -1,4 +1,4 @@
-package storage
+package internal
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -25,6 +25,6 @@ func (mock *ReaderMock) FetchExercisesOfLesson(lesson models.Lesson) (models.Exe
 	return mock.Called(lesson).Get(0).(models.Exercises), nil
 }
 
-func (mock *ReaderMock) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
-	return mock.Called(lesson).Get(0).(models.Exercise), nil
+func (mock *ReaderMock) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
+	return mock.Called(exercise).Get(0).(models.Answers), nil
 }

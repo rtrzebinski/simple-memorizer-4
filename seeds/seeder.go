@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"os"
@@ -46,7 +45,7 @@ func execute(db *sql.DB, seedMethodNames ...string) {
 
 type Seeder struct {
 	db *sql.DB
-	w  storage.Writer
+	w  *postgres.Writer
 }
 
 func seed(s Seeder, seedMethodName string) {

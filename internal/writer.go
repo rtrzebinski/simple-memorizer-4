@@ -1,4 +1,4 @@
-package storage
+package internal
 
 import "github.com/rtrzebinski/simple-memorizer-4/internal/models"
 
@@ -7,6 +7,5 @@ type Writer interface {
 	DeleteLesson(models.Lesson) error
 	StoreExercise(*models.Exercise) error
 	DeleteExercise(models.Exercise) error
-	IncrementBadAnswers(models.Exercise) error
-	IncrementGoodAnswers(models.Exercise) error
+	StoreAnswer(*models.Answer) error
 }

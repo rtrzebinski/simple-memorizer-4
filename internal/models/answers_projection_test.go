@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestExercise_GoodAnswersPercent(t *testing.T) {
+func Test_goodAnswersPercent(t *testing.T) {
 	var tests = []struct {
 		good    int
 		bad     int
@@ -22,12 +22,8 @@ func TestExercise_GoodAnswersPercent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			exercise := Exercise{
-				GoodAnswers: tt.good,
-				BadAnswers:  tt.bad,
-			}
-
-			assert.Equal(t, tt.percent, exercise.GoodAnswersPercent())
+			projection := AnswersProjection{BadAnswers: tt.bad, GoodAnswers: tt.good}
+			assert.Equal(t, tt.percent, projection.GoodAnswersPercent())
 		})
 	}
 }

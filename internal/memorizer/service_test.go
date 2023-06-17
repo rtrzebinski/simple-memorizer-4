@@ -24,7 +24,12 @@ func TestMemorizer_simpleRandomization(t *testing.T) {
 
 func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 	e1 := models.Exercise{Id: 1}
-	e2 := models.Exercise{Id: 2, GoodAnswers: 10}
+	e2 := models.Exercise{
+		Id: 2,
+		AnswersProjection: models.AnswersProjection{
+			GoodAnswers: 10,
+		},
+	}
 
 	var exercises = make(map[int]models.Exercise)
 	exercises[e1.Id] = e1
@@ -38,7 +43,7 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 
 	res = s.Next(e1)
 	assert.Equal(t, e2.Question, res.Question)
-	assert.Equal(t, e2.GoodAnswers, res.GoodAnswers)
+	assert.Equal(t, e2.AnswersProjection.GoodAnswers, res.AnswersProjection.GoodAnswers)
 }
 
 func TestMemorizer_points(t *testing.T) {

@@ -3,32 +3,32 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
 )
 
-type StoreLesson struct {
+type StoreAnswer struct {
 	w      internal.Writer
-	lesson models.Lesson
+	answer models.Answer
 }
 
-func NewStoreLesson(w internal.Writer) *StoreLesson {
-	return &StoreLesson{w: w}
+func NewStoreAnswer(w internal.Writer) *StoreAnswer {
+	return &StoreAnswer{w: w}
 }
 
-func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.lesson)
+func (h *StoreAnswer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.answer)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreLesson HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode StoreAnswer HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateStoreLesson(h.lesson, nil)
+	validator := validation.ValidateStoreAnswer(h.answer)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -36,7 +36,7 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode StoreAnswer HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -44,7 +44,7 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write StoreAnswer HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -53,9 +53,9 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreLesson(&h.lesson)
+	err = h.w.StoreAnswer(&h.answer)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store lesson: %w", err))
+		log.Print(fmt.Errorf("failed to store answer: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

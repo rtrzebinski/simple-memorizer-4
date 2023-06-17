@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
@@ -15,8 +16,9 @@ const PathExercises = "/exercises"
 
 type Exercises struct {
 	app.Compo
-	reader *rest.Reader
-	writer *rest.Writer
+	s *internal.Service
+
+	// component vars
 	lesson models.Lesson
 	rows   []*ExerciseRow
 
@@ -33,8 +35,10 @@ type Exercises struct {
 func (c *Exercises) OnMount(ctx app.Context) {
 	u := app.Window().URL()
 
-	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	// create a service, because if go-app lib limitations it can not be injected from main
+	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.s = internal.NewService(r, w)
 
 	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
@@ -153,7 +157,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store exercise
-	err := c.writer.StoreExercise(&exercise)
+	err := c.s.StoreExercise(&exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
@@ -188,7 +192,7 @@ func (c *Exercises) resetForm() {
 }
 
 func (c *Exercises) displayExercisesOfLesson() {
-	exercises, err := c.reader.FetchExercisesOfLesson(c.lesson)
+	exercises, err := c.s.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}
@@ -216,7 +220,7 @@ func (c *Exercises) displayExercisesOfLesson() {
 }
 
 func (c *Exercises) hydrateLesson() {
-	err := c.reader.HydrateLesson(&c.lesson)
+	err := c.s.HydrateLesson(&c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		return

@@ -25,13 +25,13 @@ func (c *ExerciseRow) Render() app.UI {
 			app.Text(c.exercise.Answer),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.BadAnswers),
+			app.Text(c.exercise.AnswersProjection.BadAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.GoodAnswers),
+			app.Text(c.exercise.AnswersProjection.GoodAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.GoodAnswersPercent()),
+			app.Text(c.exercise.AnswersProjection.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
 			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
@@ -42,8 +42,8 @@ func (c *ExerciseRow) Render() app.UI {
 
 func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		// delete exercise via API
-		err := c.parent.writer.DeleteExercise(models.Exercise{Id: id})
+		// delete exercise
+		err := c.parent.s.DeleteExercise(models.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}

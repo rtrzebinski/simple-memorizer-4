@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/memorizer"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -16,12 +17,12 @@ const PathLearn = "/learn"
 // A Learn component
 type Learn struct {
 	app.Compo
-	reader    *rest.Reader
-	writer    *rest.Writer
+	s         *internal.Service
 	memorizer memorizer.Service
-	lesson    models.Lesson
-	exercise  models.Exercise
 
+	// component vars
+	lesson          models.Lesson
+	exercise        models.Exercise
 	isAnswerVisible bool
 
 	// Window events unsubscribers, to be called on component dismount
@@ -33,8 +34,10 @@ type Learn struct {
 func (c *Learn) OnMount(ctx app.Context) {
 	u := app.Window().URL()
 
-	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	// create a service, because if go-app lib limitations it can not be injected from main
+	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.s = internal.NewService(r, w)
 
 	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
@@ -45,14 +48,14 @@ func (c *Learn) OnMount(ctx app.Context) {
 
 	c.lesson = models.Lesson{Id: lessonId}
 
-	err = c.reader.HydrateLesson(&c.lesson)
+	err = c.s.HydrateLesson(&c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 
 		return
 	}
 
-	exercisesOfLesson, err := c.reader.FetchExercisesOfLesson(c.lesson)
+	exercisesOfLesson, err := c.s.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 
@@ -111,15 +114,15 @@ func (c *Learn) Render() app.UI {
 		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
 			app.Text("Bad answers: "),
-			app.Text(c.exercise.BadAnswers),
+			app.Text(c.exercise.AnswersProjection.BadAnswers),
 		),
 		app.P().Body(
 			app.Text("Good answers: "),
-			app.Text(c.exercise.GoodAnswers),
+			app.Text(c.exercise.AnswersProjection.GoodAnswers),
 		),
 		app.P().Body(
 			app.Text("Good answers %: "),
-			app.Text(c.exercise.GoodAnswersPercent()),
+			app.Text(c.exercise.AnswersProjection.GoodAnswersPercent()),
 		),
 		app.P().Body(
 			app.Button().
@@ -230,27 +233,33 @@ func (c *Learn) handleViewAnswer() {
 func (c *Learn) handleGoodAnswer() {
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
+	// store answer in the background
 	go func() {
-		// increment in the background
-		if err := c.writer.IncrementGoodAnswers(exCopy); err != nil {
+		if err := c.s.StoreAnswer(&models.Answer{
+			Exercise: &exCopy,
+			Type:     models.Good,
+		}); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.GoodAnswers++
+	c.exercise.AnswersProjection.GoodAnswers++
 	c.handleNextExercise()
 }
 
 func (c *Learn) handleBadAnswer() {
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
+	// store answer in the background
 	go func() {
-		// increment in the background
-		if err := c.writer.IncrementBadAnswers(exCopy); err != nil {
-			app.Log(fmt.Errorf("failed to increment bad answers: %w", err))
+		if err := c.s.StoreAnswer(&models.Answer{
+			Exercise: &exCopy,
+			Type:     models.Bad,
+		}); err != nil {
+			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.BadAnswers++
+	c.exercise.AnswersProjection.BadAnswers++
 	c.handleNextExercise()
 }

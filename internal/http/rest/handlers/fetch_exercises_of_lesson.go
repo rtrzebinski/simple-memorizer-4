@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
@@ -12,10 +12,10 @@ import (
 )
 
 type FetchExercisesOfLesson struct {
-	r storage.Reader
+	r internal.Reader
 }
 
-func NewFetchExercisesOfLesson(r storage.Reader) *FetchExercisesOfLesson {
+func NewFetchExercisesOfLesson(r internal.Reader) *FetchExercisesOfLesson {
 	return &FetchExercisesOfLesson{r: r}
 }
 

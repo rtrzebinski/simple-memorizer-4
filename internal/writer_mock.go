@@ -1,4 +1,4 @@
-package storage
+package internal
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
@@ -35,14 +35,8 @@ func (mock *WriterMock) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (mock *WriterMock) IncrementBadAnswers(exercise models.Exercise) error {
-	mock.Called(exercise)
-
-	return nil
-}
-
-func (mock *WriterMock) IncrementGoodAnswers(exercise models.Exercise) error {
-	mock.Called(exercise)
+func (mock *WriterMock) StoreAnswer(answer *models.Answer) error {
+	mock.Called(answer)
 
 	return nil
 }

@@ -34,7 +34,7 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 		}
 		// populate candidates with multiplied exercise.id depending on points number
 		// an exercise with 5 points has 5 times more chances to win than an exercise with 1 point etc.
-		for i := 1; i <= points(e.GoodAnswersPercent()); i++ {
+		for i := 1; i <= points(e.AnswersProjection.GoodAnswersPercent()); i++ {
 			candidates = append(candidates, e.Id)
 		}
 	}

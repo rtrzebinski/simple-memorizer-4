@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
@@ -13,9 +14,10 @@ const PathLessons = "/lessons"
 
 type Lessons struct {
 	app.Compo
-	reader *rest.Reader
-	writer *rest.Writer
-	rows   []*LessonRow
+	s *internal.Service
+
+	// component vars
+	rows []*LessonRow
 
 	// store lesson form
 	formVisible         bool
@@ -29,8 +31,12 @@ type Lessons struct {
 // The OnMount method is run once component is mounted
 func (c *Lessons) OnMount(ctx app.Context) {
 	u := app.Window().URL()
-	c.reader = rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.writer = rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+
+	// create a service, because if go-app lib limitations it can not be injected from main
+	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	c.s = internal.NewService(r, w)
+
 	c.displayAllLessons()
 }
 
@@ -114,7 +120,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store lesson
-	err = c.writer.StoreLesson(&lesson)
+	err = c.s.StoreLesson(&lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store lesson: %w", err))
 	}
@@ -140,7 +146,7 @@ func (c *Lessons) resetForm() {
 }
 
 func (c *Lessons) displayAllLessons() {
-	lessons, err := c.reader.FetchAllLessons()
+	lessons, err := c.s.FetchAllLessons()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}

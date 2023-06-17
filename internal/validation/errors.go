@@ -10,4 +10,5 @@ var (
 	ErrExerciseQuestionRequired = errors.New("exercise.question is required")
 	ErrExerciseQuestionUnique   = errors.New("exercise.question must be unique")
 	ErrExerciseAnswerRequired   = errors.New("exercise.answer is required")
+	ErrAnswerTypeRequired       = errors.New("answer.type is required")
 )

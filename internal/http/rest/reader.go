@@ -67,21 +67,21 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	return exercises, nil
 }
 
-func (r *Reader) FetchRandomExerciseOfLesson(lesson models.Lesson) (models.Exercise, error) {
-	var exercise models.Exercise
+func (r *Reader) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
+	var answers models.Answers
 
 	var params = map[string]string{
-		"lesson_id": strconv.Itoa(lesson.Id),
+		"exercise_id": strconv.Itoa(exercise.Id),
 	}
 
-	respBody, err := r.c.Call("GET", FetchRandomExerciseOfLesson, params, nil)
+	respBody, err := r.c.Call("GET", FetchAnswersOfExercise, params, nil)
 	if err != nil {
-		return exercise, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return answers, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	if err := json.Unmarshal(respBody, &exercise); err != nil {
-		return exercise, fmt.Errorf("failed to decode exercise: %w", err)
+	if err := json.Unmarshal(respBody, &answers); err != nil {
+		return answers, fmt.Errorf("failed to decode answers: %w", err)
 	}
 
-	return exercise, nil
+	return answers, nil
 }

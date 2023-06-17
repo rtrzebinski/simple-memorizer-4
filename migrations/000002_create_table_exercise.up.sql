@@ -6,3 +6,5 @@ CREATE TABLE exercise
     answer    VARCHAR NOT NULL,
     CONSTRAINT exercise_question_unique_per_lesson UNIQUE (lesson_id, question)
 );
+
+CREATE INDEX idx_exercise_lesson_id ON exercise (lesson_id);

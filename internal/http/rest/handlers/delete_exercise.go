@@ -3,19 +3,19 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
 )
 
 type DeleteExercise struct {
-	w        storage.Writer
+	w        internal.Writer
 	exercise models.Exercise
 }
 
-func NewDeleteExercise(w storage.Writer) *DeleteExercise {
+func NewDeleteExercise(w internal.Writer) *DeleteExercise {
 	return &DeleteExercise{w: w}
 }
 

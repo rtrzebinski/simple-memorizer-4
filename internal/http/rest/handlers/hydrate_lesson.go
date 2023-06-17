@@ -3,8 +3,8 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"log"
 	"net/http"
@@ -12,10 +12,10 @@ import (
 )
 
 type HydrateLesson struct {
-	r storage.Reader
+	r internal.Reader
 }
 
-func NewHydrateLesson(r storage.Reader) *HydrateLesson {
+func NewHydrateLesson(r internal.Reader) *HydrateLesson {
 	return &HydrateLesson{r: r}
 }
 

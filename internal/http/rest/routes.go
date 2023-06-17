@@ -1,36 +1,35 @@
 package rest
 
 import (
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	handlers "github.com/rtrzebinski/simple-memorizer-4/internal/http/rest/handlers"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"net/http"
 )
 
 const (
 	// read
 
-	FetchAllLessons             = "/fetch-all-lessons"
-	HydrateLesson               = "/hydrate-lesson"
-	FetchExercisesOfLesson      = "/fetch-exercises-of-lesson"
-	FetchRandomExerciseOfLesson = "/fetch-random-exercise-of-lesson"
+	FetchAllLessons        = "/fetch-all-lessons"
+	HydrateLesson          = "/hydrate-lesson"
+	FetchExercisesOfLesson = "/fetch-exercises-of-lesson"
+	FetchAnswersOfExercise = "/fetch-answers-of-exercise"
 
 	// write
 
-	StoreLesson          = "/store-lesson"
-	DeleteLesson         = "/delete-lesson"
-	StoreExercise        = "/store-exercise"
-	DeleteExercise       = "/delete-exercise"
-	IncrementBadAnswers  = "/increment-bad-answers"
-	IncrementGoodAnswers = "/increment-good-answers"
+	StoreLesson    = "/store-lesson"
+	DeleteLesson   = "/delete-lesson"
+	StoreExercise  = "/store-exercise"
+	DeleteExercise = "/delete-exercise"
+	StoreAnswer    = "/store-answer"
 )
 
-func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
+func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	// read
 
 	http.Handle(FetchAllLessons, handlers.NewFetchAllLessons(r))
 	http.Handle(HydrateLesson, handlers.NewHydrateLesson(r))
 	http.Handle(FetchExercisesOfLesson, handlers.NewFetchExercisesOfLesson(r))
-	http.Handle(FetchRandomExerciseOfLesson, handlers.NewFetchRandomExerciseOfLesson(r))
+	http.Handle(FetchAnswersOfExercise, handlers.NewFetchAnswersOfExercise(r))
 
 	// write
 
@@ -38,8 +37,7 @@ func ListenAndServe(r storage.Reader, w storage.Writer, port string) error {
 	http.Handle(DeleteLesson, handlers.NewDeleteLesson(w))
 	http.Handle(StoreExercise, handlers.NewStoreExercise(w))
 	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
-	http.Handle(IncrementBadAnswers, handlers.NewIncrementBadAnswers(w))
-	http.Handle(IncrementGoodAnswers, handlers.NewIncrementGoodAnswers(w))
+	http.Handle(StoreAnswer, handlers.NewStoreAnswer(w))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
 		return err

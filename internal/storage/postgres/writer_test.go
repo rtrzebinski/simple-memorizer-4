@@ -302,7 +302,7 @@ func TestDeleteExercise(t *testing.T) {
 	assert.Equal(t, 0, lesson.ExerciseCount)
 }
 
-func TestIncrementBadAnswers(t *testing.T) {
+func TestStoreAnswer(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -335,81 +335,18 @@ func TestIncrementBadAnswers(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	t.Run(
-		"not existing exercise result", func(t *testing.T) {
-			err := w.IncrementBadAnswers(models.Exercise{Id: exercise.Id})
-			assert.NoError(t, err)
-
-			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
-
-			assert.Equal(t, 1, exerciseResult.BadAnswers)
-			assert.Equal(t, 0, exerciseResult.GoodAnswers)
-		})
-
-	t.Run(
-		"existing exercise result", func(t *testing.T) {
-			err := w.IncrementBadAnswers(models.Exercise{Id: exercise.Id})
-			assert.NoError(t, err)
-
-			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
-
-			assert.Equal(t, 2, exerciseResult.BadAnswers)
-			assert.Equal(t, 0, exerciseResult.GoodAnswers)
-		})
-}
-
-func TestIncrementGoodAnswers(t *testing.T) {
-	t.Parallel()
-
-	if testing.Short() {
-		t.Skip("Skipping integration test")
+	answer := models.Answer{
+		Type: models.Good,
+		Exercise: &models.Exercise{
+			Id: exercise.Id,
+		},
 	}
 
-	ctx := context.Background()
+	err = w.StoreAnswer(&answer)
+	assert.NoError(t, err)
 
-	// container and database
-	container, db, err := createPostgresContainer(ctx, "testdb")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	defer container.Terminate(ctx)
+	stored := fetchLatestAnswer(db)
 
-	// migration
-	mig, err := newMigrator(db)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = mig.Up()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	w := NewWriter(db)
-
-	exercise := &Exercise{}
-	createExercise(db, exercise)
-
-	t.Run(
-		"not existing exercise result", func(t *testing.T) {
-			err := w.IncrementGoodAnswers(models.Exercise{Id: exercise.Id})
-			assert.NoError(t, err)
-
-			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
-
-			assert.Equal(t, 1, exerciseResult.GoodAnswers)
-			assert.Equal(t, 0, exerciseResult.BadAnswers)
-		})
-
-	t.Run(
-		"existing exercise result", func(t *testing.T) {
-			err := w.IncrementGoodAnswers(models.Exercise{Id: exercise.Id})
-			assert.NoError(t, err)
-
-			exerciseResult := findExerciseResultByExerciseId(db, exercise.Id)
-
-			assert.Equal(t, 2, exerciseResult.GoodAnswers)
-			assert.Equal(t, 0, exerciseResult.BadAnswers)
-		})
+	assert.Equal(t, answer.Type, stored.Type)
+	assert.Equal(t, answer.Exercise.Id, stored.ExerciseId)
 }

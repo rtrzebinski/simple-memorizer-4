@@ -2,8 +2,8 @@ package rest
 
 import (
 	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +14,7 @@ func TestFetchAllLessons(t *testing.T) {
 	lesson := models.Lesson{}
 	lessons := models.Lessons{lesson}
 
-	reader := storage.NewReaderMock()
+	reader := internal.NewReaderMock()
 	reader.On("FetchAllLessons").Return(lessons)
 
 	route := NewFetchAllLessons(reader)

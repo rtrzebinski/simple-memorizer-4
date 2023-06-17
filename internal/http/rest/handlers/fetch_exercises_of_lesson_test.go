@@ -2,8 +2,8 @@ package rest
 
 import (
 	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -15,17 +15,15 @@ import (
 
 func TestFetchExercisesOfLesson(t *testing.T) {
 	exercise := models.Exercise{
-		Id:          1,
-		Question:    "question",
-		Answer:      "answer",
-		BadAnswers:  2,
-		GoodAnswers: 3,
+		Id:       1,
+		Question: "question",
+		Answer:   "answer",
 	}
 	exercises := models.Exercises{exercise}
 
 	lessonId := 10
 
-	reader := storage.NewReaderMock()
+	reader := internal.NewReaderMock()
 	reader.On("FetchExercisesOfLesson", models.Lesson{Id: lessonId}).Return(exercises)
 
 	route := NewFetchExercisesOfLesson(reader)
@@ -51,7 +49,7 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 }
 
 func TestFetchExercisesOfLesson_invalidInput(t *testing.T) {
-	reader := storage.NewReaderMock()
+	reader := internal.NewReaderMock()
 
 	route := NewFetchExercisesOfLesson(reader)
 
