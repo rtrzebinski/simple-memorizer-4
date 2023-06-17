@@ -1,3 +1,3 @@
-DROP INDEX idx_address_phone;
-DROP TYPE answer_type;
+DROP INDEX idx_answer_exercise_id;
 DROP TABLE answer;
+DROP TYPE answer_type;
