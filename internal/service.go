@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/projections"
+	"sync"
 )
 
 type Service struct {
@@ -28,14 +30,26 @@ func (s *Service) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises
 		return exercises, err
 	}
 
-	for i := range exercises {
-		answers, err := s.r.FetchAnswersOfExercise(exercises[i])
-		if err != nil {
-			return exercises, err
-		}
+	wg := sync.WaitGroup{}
 
-		exercises[i].AnswersProjection = projections.BuildAnswersProjection(answers)
+	for i := range exercises {
+		wg.Add(1)
+
+		i := i
+
+		go func() {
+			answers, err := s.r.FetchAnswersOfExercise(exercises[i])
+			if err != nil {
+				app.Log(err)
+			}
+
+			exercises[i].AnswersProjection = projections.BuildAnswersProjection(answers)
+
+			wg.Done()
+		}()
 	}
+
+	wg.Wait()
 
 	return exercises, nil
 }
