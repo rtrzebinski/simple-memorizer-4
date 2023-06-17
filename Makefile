@@ -59,7 +59,7 @@ seed: ## Seed the database with some example data
 	@go run seeds/seeder.go
 
 reseed: ## Destroy, recreate and seed the database (no confirmation)
-	@make migrate-drop
+	@make migrate-down
 	@make migrate
 	@make seed
 
