@@ -47,13 +47,7 @@ func (c *Learn) OnMount(ctx app.Context) {
 	}
 
 	c.lesson = models.Lesson{Id: lessonId}
-
-	err = c.s.HydrateLesson(&c.lesson)
-	if err != nil {
-		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
-
-		return
-	}
+	c.hydrateLesson()
 
 	exercisesOfLesson, err := c.s.FetchExercisesOfLesson(c.lesson)
 	if err != nil {
@@ -73,6 +67,16 @@ func (c *Learn) OnMount(ctx app.Context) {
 	c.handleNextExercise()
 	c.bindKeys()
 	c.bindSwipes()
+}
+
+// HydrateLesson in go routine
+func (c *Learn) hydrateLesson() {
+	go func() {
+		err := c.s.HydrateLesson(&c.lesson)
+		if err != nil {
+			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
+		}
+	}()
 }
 
 // The OnDismount method is run once component is dismounted.

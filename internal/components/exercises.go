@@ -52,6 +52,16 @@ func (c *Exercises) OnMount(ctx app.Context) {
 	c.displayExercisesOfLesson()
 }
 
+// HydrateLesson in go routine
+func (c *Exercises) hydrateLesson() {
+	go func() {
+		err := c.s.HydrateLesson(&c.lesson)
+		if err != nil {
+			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
+		}
+	}()
+}
+
 // The Render method is where the component appearance is defined.
 func (c *Exercises) Render() app.UI {
 	return app.Div().Body(
@@ -216,13 +226,5 @@ func (c *Exercises) displayExercisesOfLesson() {
 
 	for _, row := range exercises {
 		c.rows[row.Id] = &ExerciseRow{exercise: row, parent: c}
-	}
-}
-
-func (c *Exercises) hydrateLesson() {
-	err := c.s.HydrateLesson(&c.lesson)
-	if err != nil {
-		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
-		return
 	}
 }
