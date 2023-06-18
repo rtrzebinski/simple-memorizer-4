@@ -132,14 +132,31 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
+	// to check of exercise without answers will also be fetched
+	exercise2 := &Exercise{LessonId: exercise.LessonId}
+	createExercise(db, exercise2)
+
+	// belongs to exercise, to be included
+	answer1 := &Answer{ExerciseId: exercise.Id}
+	createAnswer(db, answer1)
+
+	// does not belong to exercise, to be excluded
+	answer2 := &Answer{}
+	createAnswer(db, answer2)
+
 	res, err := r.FetchExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)
-	assert.Len(t, res, 1)
-	assert.Equal(t, exercise.Id, res[0].Id)
-	assert.Equal(t, exercise.Question, res[0].Question)
-	assert.Equal(t, exercise.Answer, res[0].Answer)
+	assert.Len(t, res, 2)
+	assert.Equal(t, exercise.Id, res[1].Id)
+	assert.Equal(t, exercise.Question, res[1].Question)
+	assert.Equal(t, exercise.Answer, res[1].Answer)
+	assert.Len(t, res[1].Answers, 1)
+	assert.Empty(t, res[0].Answers)
+	assert.Equal(t, answer1.Id, res[1].Answers[0].Id)
+	assert.Equal(t, answer1.Type, res[1].Answers[0].Type)
+	assert.Equal(t, answer1.CreatedAt, res[1].Answers[0].CreatedAt)
 }
 
 func TestFetchAnswersOfExercise(t *testing.T) {

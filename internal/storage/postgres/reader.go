@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
+	"strconv"
 )
 
 type Reader struct {
@@ -56,8 +57,9 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	var exercises models.Exercises
 
 	const query = `
-		SELECT e.id, e.question, e.answer
+		SELECT e.id, e.question, e.answer, a.id, a.type, a.created_at 
 		FROM exercise e
+		LEFT JOIN answer a ON a.exercise_id = e.id 
 		WHERE lesson_id = $1
 		ORDER BY e.id DESC
 		`
@@ -68,14 +70,55 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	}
 
 	for rows.Next() {
-		var exercise models.Exercise
+		var exerciseId int
+		var exerciseQuestion string
+		var exerciseAnswer string
+		var answerId sql.NullInt64
+		var answerType sql.NullString
+		var answerCreatedAt sql.NullTime
 
-		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
+		err = rows.Scan(&exerciseId, &exerciseQuestion, &exerciseAnswer, &answerId, &answerType, &answerCreatedAt)
 		if err != nil {
 			return exercises, err
 		}
 
-		exercises = append(exercises, exercise)
+		answer := models.Answer{}
+
+		if answerId.Valid == true {
+			numInt, err := strconv.Atoi(strconv.FormatInt(answerId.Int64, 10))
+			if err != nil {
+				return exercises, err
+			}
+			answer.Id = numInt
+		}
+		if answerType.Valid == true {
+			var ans = models.AnswerType(answerType.String)
+			answer.Type = ans
+		}
+		if answerCreatedAt.Valid == true {
+			answer.CreatedAt = answerCreatedAt.Time
+		}
+
+		lastIndex := len(exercises) - 1
+
+		if lastIndex >= 0 && exercises[lastIndex].Id == exerciseId {
+			// existing exercise (if exists it will always have answer at this point)
+			exercises[lastIndex].Answers = append(exercises[lastIndex].Answers, answer)
+		} else {
+			// new exercise
+			exercise := models.Exercise{
+				Id:       exerciseId,
+				Question: exerciseQuestion,
+				Answer:   exerciseAnswer,
+			}
+
+			// add answer if exists (mind LEFT JOIN, it might be empty)
+			if answer.Id > 0 {
+				exercise.Answers = models.Answers{answer}
+			}
+
+			exercises = append(exercises, exercise)
+		}
 	}
 
 	return exercises, nil

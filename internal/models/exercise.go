@@ -5,5 +5,6 @@ type Exercise struct {
 	Lesson            *Lesson
 	Question          string
 	Answer            string
+	Answers           Answers
 	AnswersProjection AnswersProjection
 }

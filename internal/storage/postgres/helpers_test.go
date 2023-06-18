@@ -31,13 +31,6 @@ type (
 		Answer   string
 	}
 
-	ExerciseResult struct {
-		Id          int
-		ExerciseId  int
-		BadAnswers  int
-		GoodAnswers int
-	}
-
 	Answer struct {
 		Id         int
 		ExerciseId int
@@ -169,7 +162,7 @@ func fetchLatestExercise(db *sql.DB) Exercise {
 }
 
 func createAnswer(db *sql.DB, answer *Answer) {
-	query := `INSERT INTO answer (exercise_id, type) VALUES ($1, $2) RETURNING id;`
+	query := `INSERT INTO answer (exercise_id, type) VALUES ($1, $2) RETURNING id, created_at;`
 
 	if answer.ExerciseId == 0 {
 		exercise := &Exercise{}
@@ -181,7 +174,7 @@ func createAnswer(db *sql.DB, answer *Answer) {
 		answer.Type = models.Good
 	}
 
-	err := db.QueryRow(query, &answer.ExerciseId, &answer.Type).Scan(&answer.Id)
+	err := db.QueryRow(query, &answer.ExerciseId, &answer.Type).Scan(&answer.Id, &answer.CreatedAt)
 	if err != nil {
 		panic(err)
 	}
