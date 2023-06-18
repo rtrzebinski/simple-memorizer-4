@@ -19,13 +19,13 @@ type Lessons struct {
 	// component vars
 	rows []*LessonRow
 
-	// store lesson form
-	formVisible         bool
-	validationErrors    []error
-	inputId             int
-	inputName           string
-	inputDescription    string
-	storeButtonDisabled bool
+	// save lesson form
+	formVisible        bool
+	validationErrors   []error
+	inputId            int
+	inputName          string
+	inputDescription   string
+	saveButtonDisabled bool
 }
 
 // The OnMount method is run once component is mounted
@@ -63,7 +63,7 @@ func (c *Lessons) Render() app.UI {
 			app.Textarea().Cols(30).Rows(3).Placeholder("Description").
 				Required(true).OnInput(c.ValueTo(&c.inputDescription)).Text(c.inputDescription),
 			app.Br(),
-			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
+			app.Button().Text("Save").OnClick(c.handleSave).Disabled(c.saveButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
 		).Hidden(!c.formVisible),
 		app.Div().Body(
@@ -87,13 +87,13 @@ func (c *Lessons) handleAddLesson(ctx app.Context, e app.Event) {
 	c.inputId = 0
 }
 
-// handleStore create new or update existing lesson
-func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
+// handleSave create new or update existing lesson
+func (c *Lessons) handleSave(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
 	var err error
 
-	// lesson to be stored
+	// lesson to be saved
 	lesson := models.Lesson{
 		Id:          c.inputId,
 		Name:        c.inputName,
@@ -117,12 +117,12 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// disable submit button to avoid duplicated requests
-	c.storeButtonDisabled = true
+	c.saveButtonDisabled = true
 
-	// store lesson
+	// save lesson
 	err = c.s.UpsertLesson(&lesson)
 	if err != nil {
-		app.Log(fmt.Errorf("failed to store lesson: %w", err))
+		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}
 
 	// reset form
@@ -141,7 +141,7 @@ func (c *Lessons) resetForm() {
 	c.inputName = ""
 	c.inputDescription = ""
 	c.validationErrors = nil
-	c.storeButtonDisabled = false
+	c.saveButtonDisabled = false
 	c.formVisible = false
 }
 

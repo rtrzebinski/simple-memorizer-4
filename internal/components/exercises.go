@@ -23,12 +23,12 @@ type Exercises struct {
 	rows   []*ExerciseRow
 
 	// upsert exercise form
-	formVisible         bool
-	validationErrors    []error
-	inputId             int
-	inputQuestion       string
-	inputAnswer         string
-	storeButtonDisabled bool
+	formVisible        bool
+	validationErrors   []error
+	inputId            int
+	inputQuestion      string
+	inputAnswer        string
+	saveButtonDisabled bool
 }
 
 // The OnMount method is run once component is mounted
@@ -100,7 +100,7 @@ func (c *Exercises) Render() app.UI {
 			app.Textarea().ID("input_answer").Cols(30).Rows(3).Placeholder("Answer").
 				Required(true).OnInput(c.ValueTo(&c.inputAnswer)).Text(c.inputAnswer),
 			app.Br(),
-			app.Button().Text("Store").OnClick(c.handleStore).Disabled(c.storeButtonDisabled),
+			app.Button().Text("Save").OnClick(c.handleSave).Disabled(c.saveButtonDisabled),
 			app.Button().Text("Cancel").OnClick(c.handleCancel),
 		).Hidden(!c.formVisible),
 		app.Div().Body(
@@ -135,11 +135,11 @@ func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
 	c.formVisible = true
 }
 
-// handleStore create new or update existing exercise
-func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
+// handleSave create new or update existing exercise
+func (c *Exercises) handleSave(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
-	// exercise to be stored
+	// exercise to be saved
 	exercise := models.Exercise{
 		Id:       c.inputId,
 		Question: c.inputQuestion,
@@ -166,12 +166,12 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// disable submit button to avoid duplicated requests
-	c.storeButtonDisabled = true
+	c.saveButtonDisabled = true
 
-	// store exercise
+	// save exercise
 	err := c.s.UpsertExercise(&exercise)
 	if err != nil {
-		app.Log(fmt.Errorf("failed to store exercise: %w", err))
+		app.Log(fmt.Errorf("failed to save exercise: %w", err))
 	}
 
 	// hide the input form on row edit, but keep open on adding new
@@ -200,7 +200,7 @@ func (c *Exercises) resetForm() {
 	c.inputQuestion = ""
 	c.inputAnswer = ""
 	c.validationErrors = nil
-	c.storeButtonDisabled = false
+	c.saveButtonDisabled = false
 }
 
 func (c *Exercises) displayExercisesOfLesson() {

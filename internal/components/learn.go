@@ -239,7 +239,7 @@ func (c *Learn) handleViewAnswer() {
 func (c *Learn) handleGoodAnswer() {
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
-	// store answer in the background
+	// save answer in the background
 	go func() {
 		if err := c.s.StoreResult(&models.Result{
 			Exercise: &exCopy,
@@ -256,7 +256,7 @@ func (c *Learn) handleGoodAnswer() {
 func (c *Learn) handleBadAnswer() {
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
-	// store answer in the background
+	// save answer in the background
 	go func() {
 		if err := c.s.StoreResult(&models.Result{
 			Exercise: &exCopy,
