@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 const PathLearn = "/learn"
@@ -119,16 +120,38 @@ func (c *Learn) Render() app.UI {
 			),
 		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
-			app.Text("Bad answers: "),
 			app.Text(c.exercise.ResultsProjection.BadAnswers),
+			app.Text(" bad answers"),
+			app.If(c.exercise.ResultsProjection.BadAnswers > 0,
+				app.If(c.exercise.ResultsProjection.BadAnswersToday > 0,
+					app.Text(" (today: "),
+					app.Text(c.exercise.ResultsProjection.BadAnswersToday),
+					app.Text(")"),
+				).Else(
+					app.Text(" (latest: "),
+					app.Text(c.exercise.ResultsProjection.LatestBadAnswer.Format("2 Jan 2006 15:04")),
+					app.Text(")"),
+				),
+			),
 		),
 		app.P().Body(
-			app.Text("Good answers: "),
 			app.Text(c.exercise.ResultsProjection.GoodAnswers),
+			app.Text(" good answers"),
+			app.If(c.exercise.ResultsProjection.GoodAnswers > 0,
+				app.If(c.exercise.ResultsProjection.GoodAnswersToday > 0,
+					app.Text(" (today: "),
+					app.Text(c.exercise.ResultsProjection.GoodAnswersToday),
+					app.Text(")"),
+				).Else(
+					app.Text(" (latest: "),
+					app.Text(c.exercise.ResultsProjection.LatestGoodAnswer.Format("2 Jan 2006 15:04")),
+					app.Text(")"),
+				),
+			),
 		),
 		app.P().Body(
-			app.Text("Good answers %: "),
 			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
+			app.Text("% of good answers"),
 		),
 		app.P().Body(
 			app.Button().
@@ -250,6 +273,7 @@ func (c *Learn) handleGoodAnswer() {
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
 	c.exercise.ResultsProjection.GoodAnswers++
+	c.exercise.ResultsProjection.GoodAnswersToday++
 	c.handleNextExercise()
 }
 
@@ -267,5 +291,7 @@ func (c *Learn) handleBadAnswer() {
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
 	c.exercise.ResultsProjection.BadAnswers++
+	c.exercise.ResultsProjection.BadAnswersToday++
+	c.exercise.ResultsProjection.LatestBadAnswer = time.Now()
 	c.handleNextExercise()
 }

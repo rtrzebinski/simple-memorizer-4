@@ -50,10 +50,10 @@ func TestBuildResultsProjection(t *testing.T) {
 
 	projection := BuildResultsProjection(results)
 
-	assert.Equal(t, now, projection.LatestBadAnswer)
 	assert.Equal(t, 4, projection.BadAnswers)
 	assert.Equal(t, 1, projection.BadAnswersToday)
-	assert.Equal(t, now, projection.LatestGoodAnswer)
+	assert.Equal(t, now, projection.LatestBadAnswer)
 	assert.Equal(t, 3, projection.GoodAnswers)
 	assert.Equal(t, 2, projection.GoodAnswersToday)
+	assert.Equal(t, now, projection.LatestGoodAnswer)
 }

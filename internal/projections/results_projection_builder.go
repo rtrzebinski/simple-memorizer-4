@@ -12,19 +12,19 @@ func BuildResultsProjection(results models.Results) models.ResultsProjection {
 		switch a.Type {
 		case models.Good:
 			projection.GoodAnswers++
-			if a.CreatedAt.After(projection.LatestGoodAnswer) {
-				projection.LatestGoodAnswer = a.CreatedAt
-			}
 			if isToday(a.CreatedAt) {
 				projection.GoodAnswersToday++
 			}
+			if a.CreatedAt.After(projection.LatestGoodAnswer) {
+				projection.LatestGoodAnswer = a.CreatedAt
+			}
 		case models.Bad:
 			projection.BadAnswers++
-			if a.CreatedAt.After(projection.LatestBadAnswer) {
-				projection.LatestBadAnswer = a.CreatedAt
-			}
 			if isToday(a.CreatedAt) {
 				projection.BadAnswersToday++
+			}
+			if a.CreatedAt.After(projection.LatestBadAnswer) {
+				projection.LatestBadAnswer = a.CreatedAt
 			}
 		}
 	}

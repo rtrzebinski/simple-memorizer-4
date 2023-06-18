@@ -3,12 +3,12 @@ package models
 import "time"
 
 type ResultsProjection struct {
-	LatestBadAnswer  time.Time
 	BadAnswers       int
 	BadAnswersToday  int
-	LatestGoodAnswer time.Time
+	LatestBadAnswer  time.Time
 	GoodAnswers      int
 	GoodAnswersToday int
+	LatestGoodAnswer time.Time
 }
 
 func (p ResultsProjection) GoodAnswersPercent() int {
