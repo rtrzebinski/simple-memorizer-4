@@ -76,6 +76,8 @@ func (c *Learn) hydrateLesson() {
 		if err != nil {
 			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		}
+		// needs to be run manually so UI reflects the change
+		c.Update()
 	}()
 }
 
