@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("Error opening DB: %v", err)
 	}
 	execute(db, "CapitalsSeed")
-	execute(db, "LargeLessonSeed")
+	//execute(db, "LargeLessonSeed")
 	os.Exit(0)
 }
 
