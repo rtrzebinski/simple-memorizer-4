@@ -25,11 +25,11 @@ func TestServiceSuite(t *testing.T) {
 	suite.Run(t, new(ServiceSuite))
 }
 
-func (suite *ServiceSuite) TestFetchAllLessons() {
+func (suite *ServiceSuite) TestFetchLessons() {
 	expectedLessons := models.Lessons{{Id: 1, Name: "Lesson 1"}, {Id: 2, Name: "Lesson 2"}}
-	suite.reader.On("FetchAllLessons").Return(expectedLessons, nil)
+	suite.reader.On("FetchLessons").Return(expectedLessons, nil)
 
-	lessons, err := suite.service.FetchAllLessons()
+	lessons, err := suite.service.FetchLessons()
 
 	suite.reader.AssertExpectations(suite.T())
 	assert.NoError(suite.T(), err)
@@ -46,7 +46,7 @@ func (suite *ServiceSuite) TestHydrateLesson() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
+func (suite *ServiceSuite) TestFetchExercises() {
 	lesson := models.Lesson{Id: 1}
 	exercises := models.Exercises{
 		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}}},
@@ -60,9 +60,9 @@ func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
 			ResultsProjection: projections.BuildResultsProjection(exercises[1].Results)},
 	}
 
-	suite.reader.On("FetchExercisesOfLesson", lesson).Return(exercises, nil)
+	suite.reader.On("FetchExercises", lesson).Return(exercises, nil)
 
-	result, err := suite.service.FetchExercisesOfLesson(lesson)
+	result, err := suite.service.FetchExercises(lesson)
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises, result)
@@ -71,12 +71,12 @@ func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
 	suite.reader.AssertExpectations(suite.T())
 }
 
-func (suite *ServiceSuite) TestStoreLesson() {
+func (suite *ServiceSuite) TestUpsertLesson() {
 	lesson := &models.Lesson{Id: 1, Name: "Lesson 1"}
 
-	suite.writer.On("StoreLesson", lesson).Return(nil)
+	suite.writer.On("UpsertLesson", lesson).Return(nil)
 
-	err := suite.service.StoreLesson(lesson)
+	err := suite.service.UpsertLesson(lesson)
 
 	suite.writer.AssertExpectations(suite.T())
 	assert.NoError(suite.T(), err)
@@ -93,12 +93,12 @@ func (suite *ServiceSuite) TestDeleteLesson() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ServiceSuite) TestStoreExercise() {
+func (suite *ServiceSuite) TestUpsertExercise() {
 	exercise := &models.Exercise{Id: 1, Question: "Exercise 1"}
 
-	suite.writer.On("StoreExercise", exercise).Return(nil)
+	suite.writer.On("UpsertExercise", exercise).Return(nil)
 
-	err := suite.service.StoreExercise(exercise)
+	err := suite.service.UpsertExercise(exercise)
 
 	suite.writer.AssertExpectations(suite.T())
 	assert.NoError(suite.T(), err)

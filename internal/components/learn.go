@@ -49,7 +49,7 @@ func (c *Learn) OnMount(ctx app.Context) {
 	c.lesson = models.Lesson{Id: lessonId}
 	c.hydrateLesson()
 
-	exercisesOfLesson, err := c.s.FetchExercisesOfLesson(c.lesson)
+	exercisesOfLesson, err := c.s.FetchExercises(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 

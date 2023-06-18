@@ -14,7 +14,7 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) StoreLesson(lesson *models.Lesson) error {
+func (w *Writer) UpsertLesson(lesson *models.Lesson) error {
 	var query string
 
 	if lesson.Id > 0 {
@@ -54,7 +54,7 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) StoreExercise(exercise *models.Exercise) error {
+func (w *Writer) UpsertExercise(exercise *models.Exercise) error {
 	var query string
 
 	if exercise.Id > 0 {

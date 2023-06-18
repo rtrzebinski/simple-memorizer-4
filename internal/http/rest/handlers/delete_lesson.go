@@ -22,7 +22,7 @@ func NewDeleteLesson(w internal.Writer) *DeleteLesson {
 func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreLesson HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode DeleteLesson HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -55,7 +55,7 @@ func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	err = h.w.DeleteLesson(h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store lesson: %w", err))
+		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

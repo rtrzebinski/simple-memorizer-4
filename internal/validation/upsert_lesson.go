@@ -4,7 +4,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
-func ValidateStoreLesson(l models.Lesson, names []string) *Validator {
+func ValidateUpsertLesson(l models.Lesson, names []string) *Validator {
 	validator := NewValidator()
 
 	if l.Name == "" {

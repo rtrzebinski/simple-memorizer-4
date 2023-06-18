@@ -6,18 +6,18 @@ import (
 	"testing"
 )
 
-func TestValidateStoreLesson_valid(t *testing.T) {
+func TestValidateUpsertLesson_valid(t *testing.T) {
 	lesson := models.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
 
-	validator := ValidateStoreLesson(lesson, []string{"foo"})
+	validator := ValidateUpsertLesson(lesson, []string{"foo"})
 
 	assert.False(t, validator.Failed())
 }
 
-func TestValidateStoreLesson_invalid(t *testing.T) {
+func TestValidateUpsertLesson_invalid(t *testing.T) {
 	var tests = []struct {
 		name    string
 		lesson  models.Lesson
@@ -42,7 +42,7 @@ func TestValidateStoreLesson_invalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validator := ValidateStoreLesson(tt.lesson, tt.names)
+			validator := ValidateUpsertLesson(tt.lesson, tt.names)
 			assert.Equal(t, tt.message, validator.Error())
 			assert.True(t, validator.Failed())
 		})

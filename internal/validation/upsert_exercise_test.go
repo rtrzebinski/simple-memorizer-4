@@ -15,24 +15,24 @@ func TestValidateStoreExercise_validInsert(t *testing.T) {
 		Answer:   "answer",
 	}
 
-	validation := ValidateStoreExercise(exercise, []string{"bar"})
+	validation := ValidateUpsertExercise(exercise, []string{"bar"})
 
 	assert.False(t, validation.Failed())
 }
 
-func TestValidateStoreExercise_validUpdate(t *testing.T) {
+func TestValidateUpsertExercise_validUpdate(t *testing.T) {
 	exercise := models.Exercise{
 		Id:       10,
 		Question: "question",
 		Answer:   "answer",
 	}
 
-	validator := ValidateStoreExercise(exercise, []string{"bar"})
+	validator := ValidateUpsertExercise(exercise, []string{"bar"})
 
 	assert.False(t, validator.Failed())
 }
 
-func TestValidateStoreExercise_invalid(t *testing.T) {
+func TestValidateUpsertExercise_invalid(t *testing.T) {
 	var tests = []struct {
 		name      string
 		exercise  models.Exercise
@@ -67,7 +67,7 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validator := ValidateStoreExercise(tt.exercise, tt.questions)
+			validator := ValidateUpsertExercise(tt.exercise, tt.questions)
 			assert.Equal(t, tt.message, validator.Error())
 			assert.True(t, validator.Failed())
 		})

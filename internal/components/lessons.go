@@ -109,7 +109,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// validate input
-	validator := validation.ValidateStoreLesson(lesson, names)
+	validator := validation.ValidateUpsertLesson(lesson, names)
 	if validator.Failed() {
 		c.validationErrors = validator.Errors()
 
@@ -120,7 +120,7 @@ func (c *Lessons) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store lesson
-	err = c.s.StoreLesson(&lesson)
+	err = c.s.UpsertLesson(&lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store lesson: %w", err))
 	}
@@ -146,7 +146,7 @@ func (c *Lessons) resetForm() {
 }
 
 func (c *Lessons) displayAllLessons() {
-	lessons, err := c.s.FetchAllLessons()
+	lessons, err := c.s.FetchLessons()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}

@@ -4,7 +4,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
-func ValidateStoreExercise(e models.Exercise, questions []string) *Validator {
+func ValidateUpsertExercise(e models.Exercise, questions []string) *Validator {
 	validator := NewValidator()
 
 	if e.Question == "" {

@@ -22,7 +22,7 @@ func NewDeleteExercise(w internal.Writer) *DeleteExercise {
 func (h *DeleteExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreExercise HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode DeleteExercise HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -55,7 +55,7 @@ func (h *DeleteExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	err = h.w.DeleteExercise(h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store exercise: %w", err))
+		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

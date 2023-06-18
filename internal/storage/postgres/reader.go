@@ -15,7 +15,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) FetchAllLessons() (models.Lessons, error) {
+func (r *Reader) FetchLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
 	const query = `
@@ -61,7 +61,7 @@ func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	const query = `

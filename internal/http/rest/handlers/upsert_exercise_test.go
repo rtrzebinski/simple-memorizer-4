@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestStoreExercise(t *testing.T) {
+func TestUpsertExercise(t *testing.T) {
 	input := models.Exercise{
 		Question: "question",
 		Answer:   "answer",
@@ -26,9 +26,9 @@ func TestStoreExercise(t *testing.T) {
 	}
 
 	writer := internal.NewWriterMock()
-	writer.On("StoreExercise", &input)
+	writer.On("UpsertExercise", &input)
 
-	route := NewStoreExercise(writer)
+	route := NewUpsertExercise(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -38,7 +38,7 @@ func TestStoreExercise(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestStoreExercise_invalidInput(t *testing.T) {
+func TestUpsertExercise_invalidInput(t *testing.T) {
 	input := models.Exercise{}
 
 	body, err := json.Marshal(input)
@@ -48,7 +48,7 @@ func TestStoreExercise_invalidInput(t *testing.T) {
 
 	writer := internal.NewWriterMock()
 
-	route := NewStoreExercise(writer)
+	route := NewUpsertExercise(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -61,5 +61,5 @@ func TestStoreExercise_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateStoreExercise(models.Exercise{}, nil).Error(), result)
+	assert.Equal(t, validation.ValidateUpsertExercise(models.Exercise{}, nil).Error(), result)
 }

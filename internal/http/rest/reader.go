@@ -16,10 +16,10 @@ func NewReader(c myhttp.Client) *Reader {
 	return &Reader{c: c}
 }
 
-func (r *Reader) FetchAllLessons() (models.Lessons, error) {
+func (r *Reader) FetchLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
-	respBody, err := r.c.Call("GET", FetchAllLessons, nil, nil)
+	respBody, err := r.c.Call("GET", FetchLessons, nil, nil)
 	if err != nil {
 		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -48,14 +48,14 @@ func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
+func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := r.c.Call("GET", FetchExercisesOfLesson, params, nil)
+	respBody, err := r.c.Call("GET", FetchExercises, params, nil)
 	if err != nil {
 		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

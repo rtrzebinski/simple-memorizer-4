@@ -24,18 +24,18 @@ func TestWriterSuite(t *testing.T) {
 	suite.Run(t, new(WriterSuite))
 }
 
-func (suite *WriterSuite) TestStoreLesson() {
+func (suite *WriterSuite) TestUpsertLesson() {
 	lesson := models.Lesson{}
 
 	method := "POST"
-	route := StoreLesson
+	route := UpsertLesson
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
 
 	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.writer.StoreLesson(&lesson)
+	err = suite.writer.UpsertLesson(&lesson)
 	suite.Assert().NoError(err)
 }
 
@@ -54,18 +54,18 @@ func (suite *WriterSuite) TestDeleteLesson() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *WriterSuite) TestStoreExercise() {
+func (suite *WriterSuite) TestUpsertExercise() {
 	exercise := models.Exercise{}
 
 	method := "POST"
-	route := StoreExercise
+	route := UpsertExercise
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
 
 	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.writer.StoreExercise(&exercise)
+	err = suite.writer.UpsertExercise(&exercise)
 	suite.Assert().NoError(err)
 }
 

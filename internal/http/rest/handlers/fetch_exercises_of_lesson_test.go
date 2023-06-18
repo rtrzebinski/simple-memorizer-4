@@ -24,7 +24,7 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	lessonId := 10
 
 	reader := internal.NewReaderMock()
-	reader.On("FetchExercisesOfLesson", models.Lesson{Id: lessonId}).Return(exercises)
+	reader.On("FetchExercises", models.Lesson{Id: lessonId}).Return(exercises)
 
 	route := NewFetchExercisesOfLesson(reader)
 

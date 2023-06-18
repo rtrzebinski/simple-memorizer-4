@@ -9,15 +9,15 @@ import (
 const (
 	// read
 
-	FetchAllLessons        = "/fetch-all-lessons"
-	HydrateLesson          = "/hydrate-lesson"
-	FetchExercisesOfLesson = "/fetch-exercises-of-lesson"
+	FetchLessons   = "/fetch-lessons"
+	HydrateLesson  = "/hydrate-lesson"
+	FetchExercises = "/fetch-exercises"
 
 	// write
 
-	StoreLesson    = "/store-lesson"
+	UpsertLesson   = "/upsert-lesson"
 	DeleteLesson   = "/delete-lesson"
-	StoreExercise  = "/store-exercise"
+	UpsertExercise = "/upsert-exercise"
 	DeleteExercise = "/delete-exercise"
 	StoreResult    = "/store-result"
 )
@@ -25,15 +25,15 @@ const (
 func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	// read
 
-	http.Handle(FetchAllLessons, handlers.NewFetchAllLessons(r))
+	http.Handle(FetchLessons, handlers.NewFetchLessons(r))
 	http.Handle(HydrateLesson, handlers.NewHydrateLesson(r))
-	http.Handle(FetchExercisesOfLesson, handlers.NewFetchExercisesOfLesson(r))
+	http.Handle(FetchExercises, handlers.NewFetchExercisesOfLesson(r))
 
 	// write
 
-	http.Handle(StoreLesson, handlers.NewStoreLesson(w))
+	http.Handle(UpsertLesson, handlers.NewUpsertLesson(w))
 	http.Handle(DeleteLesson, handlers.NewDeleteLesson(w))
-	http.Handle(StoreExercise, handlers.NewStoreExercise(w))
+	http.Handle(UpsertExercise, handlers.NewUpsertExercise(w))
 	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
 	http.Handle(StoreResult, handlers.NewStoreResult(w))
 

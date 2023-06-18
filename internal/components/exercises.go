@@ -22,7 +22,7 @@ type Exercises struct {
 	lesson models.Lesson
 	rows   []*ExerciseRow
 
-	// store exercise form
+	// upsert exercise form
 	formVisible         bool
 	validationErrors    []error
 	inputId             int
@@ -158,7 +158,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	}
 
 	// validate input
-	validator := validation.ValidateStoreExercise(exercise, questions)
+	validator := validation.ValidateUpsertExercise(exercise, questions)
 	if validator.Failed() {
 		c.validationErrors = validator.Errors()
 
@@ -169,7 +169,7 @@ func (c *Exercises) handleStore(ctx app.Context, e app.Event) {
 	c.storeButtonDisabled = true
 
 	// store exercise
-	err := c.s.StoreExercise(&exercise)
+	err := c.s.UpsertExercise(&exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to store exercise: %w", err))
 	}
@@ -204,7 +204,7 @@ func (c *Exercises) resetForm() {
 }
 
 func (c *Exercises) displayExercisesOfLesson() {
-	exercises, err := c.s.FetchExercisesOfLesson(c.lesson)
+	exercises, err := c.s.FetchExercises(c.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

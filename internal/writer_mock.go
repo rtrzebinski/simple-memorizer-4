@@ -11,7 +11,7 @@ func NewWriterMock() *WriterMock {
 	return &WriterMock{}
 }
 
-func (mock *WriterMock) StoreLesson(lesson *models.Lesson) error {
+func (mock *WriterMock) UpsertLesson(lesson *models.Lesson) error {
 	mock.Called(lesson)
 
 	return nil
@@ -23,7 +23,7 @@ func (mock *WriterMock) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (mock *WriterMock) StoreExercise(exercise *models.Exercise) error {
+func (mock *WriterMock) UpsertExercise(exercise *models.Exercise) error {
 	mock.Called(exercise)
 
 	return nil

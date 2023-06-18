@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestStoreLesson_createNew(t *testing.T) {
+func TestUpsertLesson_createNew(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -42,7 +42,7 @@ func TestStoreLesson_createNew(t *testing.T) {
 		Description: "description",
 	}
 
-	err = w.StoreLesson(&lesson)
+	err = w.UpsertLesson(&lesson)
 	assert.NoError(t, err)
 
 	stored := fetchLatestLesson(db)
@@ -52,7 +52,7 @@ func TestStoreLesson_createNew(t *testing.T) {
 	assert.Equal(t, lesson.Id, stored.Id)
 }
 
-func TestStoreLesson_updateExisting(t *testing.T) {
+func TestUpsertLesson_updateExisting(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -85,7 +85,7 @@ func TestStoreLesson_updateExisting(t *testing.T) {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	err = w.StoreLesson(&models.Lesson{
+	err = w.UpsertLesson(&models.Lesson{
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
@@ -143,7 +143,7 @@ func TestDeleteLesson(t *testing.T) {
 	assert.Equal(t, "another", findLessonById(db, another.Id).Name)
 }
 
-func TestStoreExercise_createNew(t *testing.T) {
+func TestUpsertExercise_createNew(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -184,7 +184,7 @@ func TestStoreExercise_createNew(t *testing.T) {
 		Answer:   "answer",
 	}
 
-	err = w.StoreExercise(&exercise)
+	err = w.UpsertExercise(&exercise)
 	assert.NoError(t, err)
 
 	stored := fetchLatestExercise(db)
@@ -195,7 +195,7 @@ func TestStoreExercise_createNew(t *testing.T) {
 	assert.Equal(t, exercise.Id, stored.Id)
 }
 
-func TestStoreExercise_updateExisting(t *testing.T) {
+func TestUpsertExercise_updateExisting(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -231,7 +231,7 @@ func TestStoreExercise_updateExisting(t *testing.T) {
 	exercise := Exercise{LessonId: lesson.Id}
 	createExercise(db, &exercise)
 
-	err = w.StoreExercise(&models.Exercise{
+	err = w.UpsertExercise(&models.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",

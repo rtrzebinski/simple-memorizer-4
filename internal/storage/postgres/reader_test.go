@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestFetchAllLessons(t *testing.T) {
+func TestFetchLessons(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -42,7 +42,7 @@ func TestFetchAllLessons(t *testing.T) {
 
 	createExercise(db, &Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchAllLessons()
+	res, err := r.FetchLessons()
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Lessons{}, res)
@@ -108,7 +108,7 @@ func TestHydrateLesson(t *testing.T) {
 	assert.Equal(t, 2, lesson.ExerciseCount)
 }
 
-func TestFetchExercisesOfLesson(t *testing.T) {
+func TestFetchExercises(t *testing.T) {
 	t.Parallel()
 
 	if testing.Short() {
@@ -153,7 +153,7 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	result2 := &Result{}
 	createResult(db, result2)
 
-	res, err := r.FetchExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
+	res, err := r.FetchExercises(models.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(t, err)
 	assert.IsType(t, models.Exercises{}, res)

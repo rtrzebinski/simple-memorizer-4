@@ -72,7 +72,7 @@ func (s Seeder) CapitalsSeed() {
 		Description: "What is the capital of given country?",
 	}
 
-	err := s.w.StoreLesson(&lesson)
+	err := s.w.UpsertLesson(&lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -106,7 +106,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.w.StoreExercise(&exercise)
+		err := s.w.UpsertExercise(&exercise)
 		if err != nil {
 			panic(err)
 		}
@@ -122,7 +122,7 @@ func (s Seeder) LargeLessonSeed() {
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err := s.w.StoreLesson(&lesson)
+	err := s.w.UpsertLesson(&lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -138,7 +138,7 @@ func (s Seeder) LargeLessonSeed() {
 	}
 
 	for k := range exercises {
-		err := s.w.StoreExercise(&exercises[k])
+		err := s.w.UpsertExercise(&exercises[k])
 		if err != nil {
 			panic(err)
 		}

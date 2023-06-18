@@ -19,7 +19,7 @@ func (s *Service) Init(exercises map[int]models.Exercise) {
 
 // Next exercise to memorize
 func (s *Service) Next(previous models.Exercise) models.Exercise {
-	// store previous back if provided
+	// update previous if provided
 	if previous.Id > 0 {
 		s.exercises[previous.Id] = previous
 	}

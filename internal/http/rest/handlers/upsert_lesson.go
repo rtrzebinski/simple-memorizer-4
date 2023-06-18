@@ -10,25 +10,25 @@ import (
 	"net/http"
 )
 
-type StoreLesson struct {
+type UpsertLesson struct {
 	w      internal.Writer
 	lesson models.Lesson
 }
 
-func NewStoreLesson(w internal.Writer) *StoreLesson {
-	return &StoreLesson{w: w}
+func NewUpsertLesson(w internal.Writer) *UpsertLesson {
+	return &UpsertLesson{w: w}
 }
 
-func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *UpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreLesson HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode UpsertLesson HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateStoreLesson(h.lesson, nil)
+	validator := validation.ValidateUpsertLesson(h.lesson, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -36,7 +36,7 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode UpsertLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -44,7 +44,7 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write UpsertLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -53,9 +53,9 @@ func (h *StoreLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreLesson(&h.lesson)
+	err = h.w.UpsertLesson(&h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store lesson: %w", err))
+		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
