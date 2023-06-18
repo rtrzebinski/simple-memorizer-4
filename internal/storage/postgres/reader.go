@@ -123,31 +123,3 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 
 	return exercises, nil
 }
-
-func (r *Reader) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
-	results := models.Results{}
-
-	const query = `
-		SELECT r.id, r.type, r.created_at
-		FROM result r
-		WHERE r.exercise_id = $1
-		`
-
-	rows, err := r.db.Query(query, exercise.Id)
-	if err != nil {
-		return results, err
-	}
-
-	for rows.Next() {
-		var answer models.Result
-
-		err = rows.Scan(&answer.Id, &answer.Type, &answer.CreatedAt)
-		if err != nil {
-			return results, err
-		}
-
-		results = append(results, answer)
-	}
-
-	return results, nil
-}

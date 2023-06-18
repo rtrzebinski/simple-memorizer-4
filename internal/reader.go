@@ -6,5 +6,4 @@ type Reader interface {
 	FetchAllLessons() (models.Lessons, error)
 	HydrateLesson(*models.Lesson) error
 	FetchExercisesOfLesson(models.Lesson) (models.Exercises, error)
-	FetchResultsOfExercise(models.Exercise) (models.Results, error)
 }

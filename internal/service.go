@@ -35,10 +35,6 @@ func (s *Service) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises
 	return exercises, nil
 }
 
-func (s *Service) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
-	return s.r.FetchResultsOfExercise(exercise)
-}
-
 func (s *Service) StoreLesson(lesson *models.Lesson) error {
 	return s.w.StoreLesson(lesson)
 }

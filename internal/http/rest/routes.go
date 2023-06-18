@@ -12,7 +12,6 @@ const (
 	FetchAllLessons        = "/fetch-all-lessons"
 	HydrateLesson          = "/hydrate-lesson"
 	FetchExercisesOfLesson = "/fetch-exercises-of-lesson"
-	FetchAnswersOfExercise = "/fetch-answers-of-exercise"
 
 	// write
 
@@ -29,7 +28,6 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	http.Handle(FetchAllLessons, handlers.NewFetchAllLessons(r))
 	http.Handle(HydrateLesson, handlers.NewHydrateLesson(r))
 	http.Handle(FetchExercisesOfLesson, handlers.NewFetchExercisesOfLesson(r))
-	http.Handle(FetchAnswersOfExercise, handlers.NewFetchResultsOfExercise(r))
 
 	// write
 

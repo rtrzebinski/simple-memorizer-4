@@ -66,22 +66,3 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 
 	return exercises, nil
 }
-
-func (r *Reader) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
-	var results models.Results
-
-	var params = map[string]string{
-		"exercise_id": strconv.Itoa(exercise.Id),
-	}
-
-	respBody, err := r.c.Call("GET", FetchAnswersOfExercise, params, nil)
-	if err != nil {
-		return results, fmt.Errorf("failed to perform HTTP request: %w", err)
-	}
-
-	if err := json.Unmarshal(respBody, &results); err != nil {
-		return results, fmt.Errorf("failed to decode results: %w", err)
-	}
-
-	return results, nil
-}

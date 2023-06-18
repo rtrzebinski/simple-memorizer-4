@@ -24,7 +24,3 @@ func (mock *ReaderMock) HydrateLesson(lesson *models.Lesson) error {
 func (mock *ReaderMock) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises, error) {
 	return mock.Called(lesson).Get(0).(models.Exercises), nil
 }
-
-func (mock *ReaderMock) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
-	return mock.Called(exercise).Get(0).(models.Results), nil
-}

@@ -78,23 +78,3 @@ func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
 	suite.Assert().NoError(err)
 	suite.Assert().Equal(exercises, result)
 }
-
-func (suite *ReaderSuite) TestFetchAnswersOfExercise() {
-	results := models.Results{models.Result{Type: models.Good}}
-	exerciseId := 10
-
-	responseBody, err := json.Marshal(results)
-	suite.Assert().NoError(err)
-
-	method := "GET"
-	route := FetchAnswersOfExercise
-	params := map[string]string{"exercise_id": "10"}
-	reqBody := []byte(nil)
-
-	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
-
-	result, err := suite.reader.FetchResultsOfExercise(models.Exercise{Id: exerciseId})
-
-	suite.Assert().NoError(err)
-	suite.Assert().Equal(results, result)
-}

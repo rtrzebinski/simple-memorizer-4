@@ -71,23 +71,6 @@ func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
 	suite.reader.AssertExpectations(suite.T())
 }
 
-func (suite *ServiceSuite) TestFetchAnswersOfExercise() {
-	exercise := models.Exercise{Id: 1, Question: "Exercise 1"}
-
-	results := models.Results{
-		{Id: 1, Type: models.Good},
-		{Id: 2, Type: models.Bad},
-	}
-
-	suite.reader.On("FetchResultsOfExercise", exercise).Return(results, nil)
-
-	result, err := suite.service.FetchResultsOfExercise(exercise)
-
-	suite.reader.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), results, result)
-}
-
 func (suite *ServiceSuite) TestStoreLesson() {
 	lesson := &models.Lesson{Id: 1, Name: "Lesson 1"}
 
