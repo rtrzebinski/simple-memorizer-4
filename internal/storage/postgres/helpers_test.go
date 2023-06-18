@@ -40,7 +40,7 @@ type (
 )
 
 func createLesson(db *sql.DB, lesson *Lesson) {
-	query := `INSERT INTO lesson (name, description, exercise_count) VALUES ($1, $2, $3) RETURNING id;`
+	query := `INSERT INTO lesson (name, description) VALUES ($1, $2) RETURNING id;`
 
 	if lesson.Name == "" {
 		lesson.Name = randomString()
@@ -50,7 +50,7 @@ func createLesson(db *sql.DB, lesson *Lesson) {
 		lesson.Description = randomString()
 	}
 
-	err := db.QueryRow(query, &lesson.Name, &lesson.Description, &lesson.ExerciseCount).Scan(&lesson.Id)
+	err := db.QueryRow(query, &lesson.Name, &lesson.Description).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func createLesson(db *sql.DB, lesson *Lesson) {
 
 func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	const query = `
-		SELECT l.id, l.name, l.description, l.exercise_count
+		SELECT l.id, l.name, l.description
 		FROM lesson l
 		WHERE l.id = $1;`
 
@@ -70,7 +70,7 @@ func findLessonById(db *sql.DB, lessonId int) *Lesson {
 	for rows.Next() {
 		var lesson Lesson
 
-		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.Description, &lesson.ExerciseCount)
+		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.Description)
 		if err != nil {
 			panic(err)
 		}

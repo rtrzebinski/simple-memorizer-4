@@ -40,6 +40,8 @@ func TestFetchAllLessons(t *testing.T) {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
+	createExercise(db, &Exercise{LessonId: lesson.Id})
+
 	res, err := r.FetchAllLessons()
 
 	assert.NoError(t, err)
@@ -48,6 +50,7 @@ func TestFetchAllLessons(t *testing.T) {
 	assert.Equal(t, lesson.Id, res[0].Id)
 	assert.Equal(t, lesson.Name, res[0].Name)
 	assert.Equal(t, lesson.Description, res[0].Description)
+	assert.Equal(t, 1, res[0].ExerciseCount)
 }
 
 func TestHydrateLesson(t *testing.T) {
@@ -80,11 +83,7 @@ func TestHydrateLesson(t *testing.T) {
 
 	r := NewReader(db)
 
-	l := &Lesson{
-		Name:          "foo",
-		Description:   "bar",
-		ExerciseCount: 10,
-	}
+	l := &Lesson{}
 	createLesson(db, l)
 
 	lesson := &models.Lesson{
@@ -94,9 +93,19 @@ func TestHydrateLesson(t *testing.T) {
 	err = r.HydrateLesson(lesson)
 
 	assert.NoError(t, err)
-	assert.Equal(t, lesson.Name, l.Name)
-	assert.Equal(t, lesson.Description, l.Description)
-	assert.Equal(t, lesson.ExerciseCount, l.ExerciseCount)
+	assert.Equal(t, l.Name, lesson.Name)
+	assert.Equal(t, l.Description, lesson.Description)
+	assert.Equal(t, 0, lesson.ExerciseCount)
+
+	createExercise(db, &Exercise{LessonId: l.Id})
+	createExercise(db, &Exercise{LessonId: l.Id})
+
+	err = r.HydrateLesson(lesson)
+
+	assert.NoError(t, err)
+	assert.Equal(t, l.Name, lesson.Name)
+	assert.Equal(t, l.Description, lesson.Description)
+	assert.Equal(t, 2, lesson.ExerciseCount)
 }
 
 func TestFetchExercisesOfLesson(t *testing.T) {
