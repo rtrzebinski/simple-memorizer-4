@@ -2,12 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"os"
 	"reflect"
+	"time"
 )
 
 func main() {
@@ -17,6 +19,7 @@ func main() {
 		log.Fatalf("Error opening DB: %v", err)
 	}
 	execute(db, "CapitalsSeed")
+	//execute(db, "LargeLessonSeed")
 	os.Exit(0)
 }
 
@@ -41,6 +44,10 @@ func execute(db *sql.DB, seedMethodNames ...string) {
 	for _, item := range seedMethodNames {
 		seed(s, item)
 	}
+}
+
+func randomString() string {
+	return uuid.NewString()
 }
 
 type Seeder struct {
@@ -102,6 +109,61 @@ func (s Seeder) CapitalsSeed() {
 		err := s.w.StoreExercise(&exercise)
 		if err != nil {
 			panic(err)
+		}
+	}
+}
+
+func (s Seeder) LargeLessonSeed() {
+	exercisesCount := 100
+	answersCount := 100
+
+	lesson := models.Lesson{
+		Name:        "Large lesson",
+		Description: "This lesson has plenty of exercises and answers",
+	}
+
+	err := s.w.StoreLesson(&lesson)
+	if err != nil {
+		panic(err)
+	}
+
+	exercises := models.Exercises{}
+
+	for i := exercisesCount; i > 0; i-- {
+		exercises = append(exercises, models.Exercise{
+			Lesson:   &models.Lesson{Id: lesson.Id},
+			Question: randomString(),
+			Answer:   randomString(),
+		})
+	}
+
+	for k := range exercises {
+		err := s.w.StoreExercise(&exercises[k])
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	for i := range exercises {
+		for j := answersCount; j > 0; j-- {
+			answer := &models.Answer{
+				Id:       0,
+				Exercise: &exercises[i],
+			}
+
+			currentTime := time.Now().UnixNano() / int64(time.Millisecond)
+			randomBool := currentTime%2 == 0
+
+			if randomBool == true {
+				answer.Type = models.Good
+			} else {
+				answer.Type = models.Bad
+			}
+
+			err := s.w.StoreAnswer(answer)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }
