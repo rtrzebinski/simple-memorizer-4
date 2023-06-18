@@ -25,13 +25,13 @@ func (c *ExerciseRow) Render() app.UI {
 			app.Text(c.exercise.Answer),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.AnswersProjection.BadAnswers),
+			app.Text(c.exercise.ResultsProjection.BadAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.AnswersProjection.GoodAnswers),
+			app.Text(c.exercise.ResultsProjection.GoodAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.AnswersProjection.GoodAnswersPercent()),
+			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
 			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),

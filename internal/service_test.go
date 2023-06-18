@@ -49,15 +49,15 @@ func (suite *ServiceSuite) TestHydrateLesson() {
 func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
 	lesson := models.Lesson{Id: 1}
 	exercises := models.Exercises{
-		{Id: 1, Answers: []models.Answer{{Type: models.Good}, {Type: models.Good}}},
-		{Id: 2, Answers: []models.Answer{{Type: models.Bad}, {Type: models.Bad}}},
+		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}}},
+		{Id: 2, Results: []models.Result{{Type: models.Bad}, {Type: models.Bad}}},
 	}
 
 	expectedExercises := models.Exercises{
-		{Id: 1, Answers: []models.Answer{{Type: models.Good}, {Type: models.Good}},
-			AnswersProjection: projections.BuildAnswersProjection(exercises[0].Answers)},
-		{Id: 2, Answers: []models.Answer{{Type: models.Bad}, {Type: models.Bad}},
-			AnswersProjection: projections.BuildAnswersProjection(exercises[1].Answers)},
+		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}},
+			ResultsProjection: projections.BuildResultsProjection(exercises[0].Results)},
+		{Id: 2, Results: []models.Result{{Type: models.Bad}, {Type: models.Bad}},
+			ResultsProjection: projections.BuildResultsProjection(exercises[1].Results)},
 	}
 
 	suite.reader.On("FetchExercisesOfLesson", lesson).Return(exercises, nil)
@@ -66,26 +66,26 @@ func (suite *ServiceSuite) TestFetchExercisesOfLesson() {
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises, result)
-	suite.Equal(expectedExercises[0].AnswersProjection, result[0].AnswersProjection)
-	suite.Equal(expectedExercises[1].AnswersProjection, result[1].AnswersProjection)
+	suite.Equal(expectedExercises[0].ResultsProjection, result[0].ResultsProjection)
+	suite.Equal(expectedExercises[1].ResultsProjection, result[1].ResultsProjection)
 	suite.reader.AssertExpectations(suite.T())
 }
 
 func (suite *ServiceSuite) TestFetchAnswersOfExercise() {
 	exercise := models.Exercise{Id: 1, Question: "Exercise 1"}
 
-	answers := models.Answers{
+	results := models.Results{
 		{Id: 1, Type: models.Good},
 		{Id: 2, Type: models.Bad},
 	}
 
-	suite.reader.On("FetchAnswersOfExercise", exercise).Return(answers, nil)
+	suite.reader.On("FetchResultsOfExercise", exercise).Return(results, nil)
 
-	result, err := suite.service.FetchAnswersOfExercise(exercise)
+	result, err := suite.service.FetchResultsOfExercise(exercise)
 
 	suite.reader.AssertExpectations(suite.T())
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), answers, result)
+	assert.Equal(suite.T(), results, result)
 }
 
 func (suite *ServiceSuite) TestStoreLesson() {
@@ -132,12 +132,12 @@ func (suite *ServiceSuite) TestDeleteExercise() {
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *ServiceSuite) TestStoreAnswer() {
-	answer := &models.Answer{Id: 1, Type: models.Good}
+func (suite *ServiceSuite) TestStoreResult() {
+	result := &models.Result{Id: 1, Type: models.Good}
 
-	suite.writer.On("StoreAnswer", answer).Return(nil)
+	suite.writer.On("StoreResult", result).Return(nil)
 
-	err := suite.service.StoreAnswer(answer)
+	err := suite.service.StoreResult(result)
 
 	suite.writer.AssertExpectations(suite.T())
 	assert.NoError(suite.T(), err)

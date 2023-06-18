@@ -29,14 +29,14 @@ func (s *Service) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises
 	}
 
 	for i := range exercises {
-		exercises[i].AnswersProjection = projections.BuildAnswersProjection(exercises[i].Answers)
+		exercises[i].ResultsProjection = projections.BuildResultsProjection(exercises[i].Results)
 	}
 
 	return exercises, nil
 }
 
-func (s *Service) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
-	return s.r.FetchAnswersOfExercise(exercise)
+func (s *Service) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
+	return s.r.FetchResultsOfExercise(exercise)
 }
 
 func (s *Service) StoreLesson(lesson *models.Lesson) error {
@@ -55,6 +55,6 @@ func (s *Service) DeleteExercise(exercise models.Exercise) error {
 	return s.w.DeleteExercise(exercise)
 }
 
-func (s *Service) StoreAnswer(answer *models.Answer) error {
-	return s.w.StoreAnswer(answer)
+func (s *Service) StoreResult(result *models.Result) error {
+	return s.w.StoreResult(result)
 }

@@ -35,8 +35,8 @@ func (mock *WriterMock) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (mock *WriterMock) StoreAnswer(answer *models.Answer) error {
-	mock.Called(answer)
+func (mock *WriterMock) StoreResult(result *models.Result) error {
+	mock.Called(result)
 
 	return nil
 }

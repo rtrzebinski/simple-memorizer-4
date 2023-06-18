@@ -7,5 +7,5 @@ type Writer interface {
 	DeleteLesson(models.Lesson) error
 	StoreExercise(*models.Exercise) error
 	DeleteExercise(models.Exercise) error
-	StoreAnswer(*models.Answer) error
+	StoreResult(*models.Result) error
 }

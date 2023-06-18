@@ -166,20 +166,20 @@ func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (w *Writer) StoreAnswer(answer *models.Answer) error {
+func (w *Writer) StoreResult(result *models.Result) error {
 	var query string
 
-	query = `INSERT INTO answer (type, exercise_id) VALUES ($1, $2) RETURNING id;`
+	query = `INSERT INTO result (type, exercise_id) VALUES ($1, $2) RETURNING id;`
 
-	rows, err := w.db.Query(query, answer.Type, answer.Exercise.Id)
+	rows, err := w.db.Query(query, result.Type, result.Exercise.Id)
 	if err != nil {
-		return fmt.Errorf("failed to execute 'INSERT INTO answer' query: %w", err)
+		return fmt.Errorf("failed to execute 'INSERT INTO result' query: %w", err)
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&answer.Id)
+		err = rows.Scan(&result.Id)
 		if err != nil {
-			return fmt.Errorf("failed to scan answer insert id: %w", err)
+			return fmt.Errorf("failed to scan result insert id: %w", err)
 		}
 	}
 

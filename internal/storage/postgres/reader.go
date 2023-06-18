@@ -57,9 +57,9 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	var exercises models.Exercises
 
 	const query = `
-		SELECT e.id, e.question, e.answer, a.id, a.type, a.created_at 
+		SELECT e.id, e.question, e.answer, r.id, r.type, r.created_at 
 		FROM exercise e
-		LEFT JOIN answer a ON a.exercise_id = e.id 
+		LEFT JOIN result r ON r.exercise_id = e.id 
 		WHERE lesson_id = $1
 		ORDER BY e.id DESC
 		`
@@ -73,37 +73,37 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 		var exerciseId int
 		var exerciseQuestion string
 		var exerciseAnswer string
-		var answerId sql.NullInt64
-		var answerType sql.NullString
-		var answerCreatedAt sql.NullTime
+		var resultId sql.NullInt64
+		var resultType sql.NullString
+		var resultCreatedAt sql.NullTime
 
-		err = rows.Scan(&exerciseId, &exerciseQuestion, &exerciseAnswer, &answerId, &answerType, &answerCreatedAt)
+		err = rows.Scan(&exerciseId, &exerciseQuestion, &exerciseAnswer, &resultId, &resultType, &resultCreatedAt)
 		if err != nil {
 			return exercises, err
 		}
 
-		answer := models.Answer{}
+		result := models.Result{}
 
-		if answerId.Valid == true {
-			numInt, err := strconv.Atoi(strconv.FormatInt(answerId.Int64, 10))
+		if resultId.Valid == true {
+			numInt, err := strconv.Atoi(strconv.FormatInt(resultId.Int64, 10))
 			if err != nil {
 				return exercises, err
 			}
-			answer.Id = numInt
+			result.Id = numInt
 		}
-		if answerType.Valid == true {
-			var ans = models.AnswerType(answerType.String)
-			answer.Type = ans
+		if resultType.Valid == true {
+			var ans = models.ResultType(resultType.String)
+			result.Type = ans
 		}
-		if answerCreatedAt.Valid == true {
-			answer.CreatedAt = answerCreatedAt.Time
+		if resultCreatedAt.Valid == true {
+			result.CreatedAt = resultCreatedAt.Time
 		}
 
 		lastIndex := len(exercises) - 1
 
 		if lastIndex >= 0 && exercises[lastIndex].Id == exerciseId {
-			// existing exercise (if exists it will always have answer at this point)
-			exercises[lastIndex].Answers = append(exercises[lastIndex].Answers, answer)
+			// existing exercise (if exists it will always have result at this point)
+			exercises[lastIndex].Results = append(exercises[lastIndex].Results, result)
 		} else {
 			// new exercise
 			exercise := models.Exercise{
@@ -112,9 +112,9 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 				Answer:   exerciseAnswer,
 			}
 
-			// add answer if exists (mind LEFT JOIN, it might be empty)
-			if answer.Id > 0 {
-				exercise.Answers = models.Answers{answer}
+			// add result if exists (mind LEFT JOIN, it might be empty)
+			if result.Id > 0 {
+				exercise.Results = models.Results{result}
 			}
 
 			exercises = append(exercises, exercise)
@@ -124,30 +124,30 @@ func (r *Reader) FetchExercisesOfLesson(lesson models.Lesson) (models.Exercises,
 	return exercises, nil
 }
 
-func (r *Reader) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
-	answers := models.Answers{}
+func (r *Reader) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
+	results := models.Results{}
 
 	const query = `
-		SELECT a.id, a.type, a.created_at
-		FROM answer a
-		WHERE a.exercise_id = $1
+		SELECT r.id, r.type, r.created_at
+		FROM result r
+		WHERE r.exercise_id = $1
 		`
 
 	rows, err := r.db.Query(query, exercise.Id)
 	if err != nil {
-		return answers, err
+		return results, err
 	}
 
 	for rows.Next() {
-		var answer models.Answer
+		var answer models.Result
 
 		err = rows.Scan(&answer.Id, &answer.Type, &answer.CreatedAt)
 		if err != nil {
-			return answers, err
+			return results, err
 		}
 
-		answers = append(answers, answer)
+		results = append(results, answer)
 	}
 
-	return answers, nil
+	return results, nil
 }

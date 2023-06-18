@@ -19,7 +19,7 @@ func (s *Service) Init(exercises map[int]models.Exercise) {
 
 // Next exercise to memorize
 func (s *Service) Next(previous models.Exercise) models.Exercise {
-	// store previous back with updated number of answers if provided
+	// store previous back if provided
 	if previous.Id > 0 {
 		s.exercises[previous.Id] = previous
 	}
@@ -34,7 +34,7 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 		}
 		// populate candidates with multiplied exercise.id depending on points number
 		// an exercise with 5 points has 5 times more chances to win than an exercise with 1 point etc.
-		for i := 1; i <= points(e.AnswersProjection.GoodAnswersPercent()); i++ {
+		for i := 1; i <= points(e.ResultsProjection.GoodAnswersPercent()); i++ {
 			candidates = append(candidates, e.Id)
 		}
 	}

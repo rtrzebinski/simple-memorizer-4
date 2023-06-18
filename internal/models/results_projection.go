@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type AnswersProjection struct {
+type ResultsProjection struct {
 	LatestBadAnswer  time.Time
 	BadAnswers       int
 	BadAnswersToday  int
@@ -11,7 +11,7 @@ type AnswersProjection struct {
 	GoodAnswersToday int
 }
 
-func (p AnswersProjection) GoodAnswersPercent() int {
+func (p ResultsProjection) GoodAnswersPercent() int {
 	total := p.GoodAnswers + p.BadAnswers
 
 	if total == 0 {

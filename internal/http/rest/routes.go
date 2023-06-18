@@ -20,7 +20,7 @@ const (
 	DeleteLesson   = "/delete-lesson"
 	StoreExercise  = "/store-exercise"
 	DeleteExercise = "/delete-exercise"
-	StoreAnswer    = "/store-answer"
+	StoreResult    = "/store-result"
 )
 
 func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
@@ -29,7 +29,7 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	http.Handle(FetchAllLessons, handlers.NewFetchAllLessons(r))
 	http.Handle(HydrateLesson, handlers.NewHydrateLesson(r))
 	http.Handle(FetchExercisesOfLesson, handlers.NewFetchExercisesOfLesson(r))
-	http.Handle(FetchAnswersOfExercise, handlers.NewFetchAnswersOfExercise(r))
+	http.Handle(FetchAnswersOfExercise, handlers.NewFetchResultsOfExercise(r))
 
 	// write
 
@@ -37,7 +37,7 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	http.Handle(DeleteLesson, handlers.NewDeleteLesson(w))
 	http.Handle(StoreExercise, handlers.NewStoreExercise(w))
 	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
-	http.Handle(StoreAnswer, handlers.NewStoreAnswer(w))
+	http.Handle(StoreResult, handlers.NewStoreResult(w))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
 		return err

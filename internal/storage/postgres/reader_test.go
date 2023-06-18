@@ -132,17 +132,17 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	// to check of exercise without answers will also be fetched
+	// to check of exercise without results will also be fetched
 	exercise2 := &Exercise{LessonId: exercise.LessonId}
 	createExercise(db, exercise2)
 
 	// belongs to exercise, to be included
-	answer1 := &Answer{ExerciseId: exercise.Id}
-	createAnswer(db, answer1)
+	result1 := &Result{ExerciseId: exercise.Id}
+	createResult(db, result1)
 
 	// does not belong to exercise, to be excluded
-	answer2 := &Answer{}
-	createAnswer(db, answer2)
+	result2 := &Result{}
+	createResult(db, result2)
 
 	res, err := r.FetchExercisesOfLesson(models.Lesson{Id: exercise.LessonId})
 
@@ -152,11 +152,11 @@ func TestFetchExercisesOfLesson(t *testing.T) {
 	assert.Equal(t, exercise.Id, res[1].Id)
 	assert.Equal(t, exercise.Question, res[1].Question)
 	assert.Equal(t, exercise.Answer, res[1].Answer)
-	assert.Len(t, res[1].Answers, 1)
-	assert.Empty(t, res[0].Answers)
-	assert.Equal(t, answer1.Id, res[1].Answers[0].Id)
-	assert.Equal(t, answer1.Type, res[1].Answers[0].Type)
-	assert.Equal(t, answer1.CreatedAt, res[1].Answers[0].CreatedAt)
+	assert.Len(t, res[1].Results, 1)
+	assert.Empty(t, res[0].Results)
+	assert.Equal(t, result1.Id, res[1].Results[0].Id)
+	assert.Equal(t, result1.Type, res[1].Results[0].Type)
+	assert.Equal(t, result1.CreatedAt, res[1].Results[0].CreatedAt)
 }
 
 func TestFetchAnswersOfExercise(t *testing.T) {
@@ -192,18 +192,18 @@ func TestFetchAnswersOfExercise(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	// store good answer related to the exercise
-	answer := &Answer{
+	// store good result related to the exercise
+	result := &Result{
 		ExerciseId: exercise.Id,
 	}
-	createAnswer(db, answer)
+	createResult(db, result)
 
-	// store bad answer related to another exercise
-	createAnswer(db, &Answer{})
+	// store bad result related to another exercise
+	createResult(db, &Result{})
 
-	answers, err := r.FetchAnswersOfExercise(models.Exercise{Id: exercise.Id})
+	answers, err := r.FetchResultsOfExercise(models.Exercise{Id: exercise.Id})
 
 	assert.NoError(t, err)
 	assert.Len(t, answers, 1)
-	assert.Equal(t, answer.Id, answers[0].Id)
+	assert.Equal(t, result.Id, answers[0].Id)
 }

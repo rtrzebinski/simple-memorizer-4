@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-func BuildAnswersProjection(answers models.Answers) models.AnswersProjection {
-	projection := models.AnswersProjection{}
+func BuildResultsProjection(results models.Results) models.ResultsProjection {
+	projection := models.ResultsProjection{}
 
-	for _, a := range answers {
+	for _, a := range results {
 		switch a.Type {
 		case models.Good:
 			projection.GoodAnswers++

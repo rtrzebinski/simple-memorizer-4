@@ -120,15 +120,15 @@ func (c *Learn) Render() app.UI {
 		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
 			app.Text("Bad answers: "),
-			app.Text(c.exercise.AnswersProjection.BadAnswers),
+			app.Text(c.exercise.ResultsProjection.BadAnswers),
 		),
 		app.P().Body(
 			app.Text("Good answers: "),
-			app.Text(c.exercise.AnswersProjection.GoodAnswers),
+			app.Text(c.exercise.ResultsProjection.GoodAnswers),
 		),
 		app.P().Body(
 			app.Text("Good answers %: "),
-			app.Text(c.exercise.AnswersProjection.GoodAnswersPercent()),
+			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
 		),
 		app.P().Body(
 			app.Button().
@@ -241,7 +241,7 @@ func (c *Learn) handleGoodAnswer() {
 	exCopy := c.exercise
 	// store answer in the background
 	go func() {
-		if err := c.s.StoreAnswer(&models.Answer{
+		if err := c.s.StoreResult(&models.Result{
 			Exercise: &exCopy,
 			Type:     models.Good,
 		}); err != nil {
@@ -249,7 +249,7 @@ func (c *Learn) handleGoodAnswer() {
 		}
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.AnswersProjection.GoodAnswers++
+	c.exercise.ResultsProjection.GoodAnswers++
 	c.handleNextExercise()
 }
 
@@ -258,7 +258,7 @@ func (c *Learn) handleBadAnswer() {
 	exCopy := c.exercise
 	// store answer in the background
 	go func() {
-		if err := c.s.StoreAnswer(&models.Answer{
+		if err := c.s.StoreResult(&models.Result{
 			Exercise: &exCopy,
 			Type:     models.Bad,
 		}); err != nil {
@@ -266,6 +266,6 @@ func (c *Learn) handleBadAnswer() {
 		}
 	}()
 	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.AnswersProjection.BadAnswers++
+	c.exercise.ResultsProjection.BadAnswers++
 	c.handleNextExercise()
 }

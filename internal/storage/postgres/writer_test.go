@@ -335,17 +335,17 @@ func TestStoreAnswer(t *testing.T) {
 	exercise := &Exercise{}
 	createExercise(db, exercise)
 
-	answer := models.Answer{
+	answer := models.Result{
 		Type: models.Good,
 		Exercise: &models.Exercise{
 			Id: exercise.Id,
 		},
 	}
 
-	err = w.StoreAnswer(&answer)
+	err = w.StoreResult(&answer)
 	assert.NoError(t, err)
 
-	stored := fetchLatestAnswer(db)
+	stored := fetchLatestResult(db)
 
 	assert.Equal(t, answer.Type, stored.Type)
 	assert.Equal(t, answer.Exercise.Id, stored.ExerciseId)

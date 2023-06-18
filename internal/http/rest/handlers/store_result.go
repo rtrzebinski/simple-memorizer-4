@@ -10,25 +10,25 @@ import (
 	"net/http"
 )
 
-type StoreAnswer struct {
+type StoreResult struct {
 	w      internal.Writer
-	answer models.Answer
+	result models.Result
 }
 
-func NewStoreAnswer(w internal.Writer) *StoreAnswer {
-	return &StoreAnswer{w: w}
+func NewStoreResult(w internal.Writer) *StoreResult {
+	return &StoreResult{w: w}
 }
 
-func (h *StoreAnswer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.answer)
+func (h *StoreResult) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.result)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreAnswer HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode StoreResult HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateStoreAnswer(h.answer)
+	validator := validation.ValidateStoreResult(h.result)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -36,7 +36,7 @@ func (h *StoreAnswer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreAnswer HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode StoreResult HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -44,7 +44,7 @@ func (h *StoreAnswer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreAnswer HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write StoreResult HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -53,9 +53,9 @@ func (h *StoreAnswer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreAnswer(&h.answer)
+	err = h.w.StoreResult(&h.result)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store answer: %w", err))
+		log.Print(fmt.Errorf("failed to store result: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

@@ -71,13 +71,13 @@ func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (w *Writer) StoreAnswer(answer *models.Answer) error {
-	body, err := json.Marshal(answer)
+func (w *Writer) StoreResult(result *models.Result) error {
+	body, err := json.Marshal(result)
 	if err != nil {
-		return fmt.Errorf("failed to encode answer: %w", err)
+		return fmt.Errorf("failed to encode result: %w", err)
 	}
 
-	_, err = w.c.Call("POST", StoreAnswer, nil, body)
+	_, err = w.c.Call("POST", StoreResult, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

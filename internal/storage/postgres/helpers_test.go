@@ -31,10 +31,10 @@ type (
 		Answer   string
 	}
 
-	Answer struct {
+	Result struct {
 		Id         int
 		ExerciseId int
-		Type       models.AnswerType
+		Type       models.ResultType
 		CreatedAt  time.Time
 	}
 )
@@ -161,8 +161,8 @@ func fetchLatestExercise(db *sql.DB) Exercise {
 	return exercise
 }
 
-func createAnswer(db *sql.DB, answer *Answer) {
-	query := `INSERT INTO answer (exercise_id, type) VALUES ($1, $2) RETURNING id, created_at;`
+func createResult(db *sql.DB, answer *Result) {
+	query := `INSERT INTO result (exercise_id, type) VALUES ($1, $2) RETURNING id, created_at;`
 
 	if answer.ExerciseId == 0 {
 		exercise := &Exercise{}
@@ -180,12 +180,12 @@ func createAnswer(db *sql.DB, answer *Answer) {
 	}
 }
 
-func fetchLatestAnswer(db *sql.DB) Answer {
-	var answer Answer
+func fetchLatestResult(db *sql.DB) Result {
+	var answer Result
 
 	const query = `
-		SELECT a.id, a.type, a.exercise_id, a.created_at
-		FROM answer a
+		SELECT r.id, r.type, r.exercise_id, r.created_at
+		FROM result r
 		ORDER BY id DESC
 		LIMIT 1;`
 

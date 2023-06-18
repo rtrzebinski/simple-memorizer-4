@@ -14,20 +14,20 @@ import (
 	"time"
 )
 
-func TestFetchAnswersOfExercise(t *testing.T) {
-	answer := models.Answer{
+func TestFetchResultsOfExercise(t *testing.T) {
+	answer := models.Result{
 		Id:        10,
 		Type:      models.Good,
 		CreatedAt: time.Time{},
 	}
-	answers := models.Answers{answer}
+	answers := models.Results{answer}
 
 	exerciseId := 10
 
 	reader := internal.NewReaderMock()
-	reader.On("FetchAnswersOfExercise", models.Exercise{Id: exerciseId}).Return(answers)
+	reader.On("FetchResultsOfExercise", models.Exercise{Id: exerciseId}).Return(answers)
 
-	route := NewFetchAnswersOfExercise(reader)
+	route := NewFetchResultsOfExercise(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -43,7 +43,7 @@ func TestFetchAnswersOfExercise(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.Code)
 
-	var result models.Answers
+	var result models.Results
 	json.Unmarshal(res.Body.Bytes(), &result)
 
 	assert.Equal(t, answers, result)
@@ -52,7 +52,7 @@ func TestFetchAnswersOfExercise(t *testing.T) {
 func TestFetchAnswersOfExercise_invalidInput(t *testing.T) {
 	reader := internal.NewReaderMock()
 
-	route := NewFetchAnswersOfExercise(reader)
+	route := NewFetchResultsOfExercise(reader)
 
 	u, _ := url.Parse("/")
 

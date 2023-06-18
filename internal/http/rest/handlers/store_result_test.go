@@ -13,8 +13,8 @@ import (
 	"testing"
 )
 
-func TestStoreAnswer(t *testing.T) {
-	input := models.Answer{
+func TestStoreResult(t *testing.T) {
+	input := models.Result{
 		Exercise: &models.Exercise{
 			Id: 10,
 		},
@@ -27,9 +27,9 @@ func TestStoreAnswer(t *testing.T) {
 	}
 
 	writer := internal.NewWriterMock()
-	writer.On("StoreAnswer", &input)
+	writer.On("StoreResult", &input)
 
-	route := NewStoreAnswer(writer)
+	route := NewStoreResult(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -39,8 +39,8 @@ func TestStoreAnswer(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestStoreAnswer_invalidInput(t *testing.T) {
-	input := models.Answer{}
+func TestStoreResult_invalidInput(t *testing.T) {
+	input := models.Result{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -49,7 +49,7 @@ func TestStoreAnswer_invalidInput(t *testing.T) {
 
 	writer := internal.NewWriterMock()
 
-	route := NewStoreAnswer(writer)
+	route := NewStoreResult(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -62,5 +62,5 @@ func TestStoreAnswer_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateStoreAnswer(models.Answer{}).Error(), result)
+	assert.Equal(t, validation.ValidateStoreResult(models.Result{}).Error(), result)
 }

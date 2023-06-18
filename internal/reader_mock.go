@@ -25,6 +25,6 @@ func (mock *ReaderMock) FetchExercisesOfLesson(lesson models.Lesson) (models.Exe
 	return mock.Called(lesson).Get(0).(models.Exercises), nil
 }
 
-func (mock *ReaderMock) FetchAnswersOfExercise(exercise models.Exercise) (models.Answers, error) {
-	return mock.Called(exercise).Get(0).(models.Answers), nil
+func (mock *ReaderMock) FetchResultsOfExercise(exercise models.Exercise) (models.Results, error) {
+	return mock.Called(exercise).Get(0).(models.Results), nil
 }

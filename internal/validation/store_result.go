@@ -4,11 +4,11 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
-func ValidateStoreAnswer(a models.Answer) *Validator {
+func ValidateStoreResult(a models.Result) *Validator {
 	validator := NewValidator()
 
 	if a.Type == "" {
-		validator.AddError(ErrAnswerTypeRequired)
+		validator.AddError(ErrResultTypeRequired)
 	}
 
 	if a.Exercise == nil {

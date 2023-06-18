@@ -84,17 +84,17 @@ func (suite *WriterSuite) TestDeleteExercise() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *WriterSuite) TestStoreAnswer() {
-	answer := models.Answer{}
+func (suite *WriterSuite) TestStoreResult() {
+	result := models.Result{}
 
 	method := "POST"
-	route := StoreAnswer
+	route := StoreResult
 	params := map[string]string(nil)
-	reqBody, err := json.Marshal(answer)
+	reqBody, err := json.Marshal(result)
 	suite.Assert().NoError(err)
 
 	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.writer.StoreAnswer(&answer)
+	err = suite.writer.StoreResult(&result)
 	suite.Assert().NoError(err)
 }

@@ -80,10 +80,10 @@ func (suite *ReaderSuite) TestFetchExercisesOfLesson() {
 }
 
 func (suite *ReaderSuite) TestFetchAnswersOfExercise() {
-	answers := models.Answers{models.Answer{Type: models.Good}}
+	results := models.Results{models.Result{Type: models.Good}}
 	exerciseId := 10
 
-	responseBody, err := json.Marshal(answers)
+	responseBody, err := json.Marshal(results)
 	suite.Assert().NoError(err)
 
 	method := "GET"
@@ -93,8 +93,8 @@ func (suite *ReaderSuite) TestFetchAnswersOfExercise() {
 
 	suite.client.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.reader.FetchAnswersOfExercise(models.Exercise{Id: exerciseId})
+	result, err := suite.reader.FetchResultsOfExercise(models.Exercise{Id: exerciseId})
 
 	suite.Assert().NoError(err)
-	suite.Assert().Equal(answers, result)
+	suite.Assert().Equal(results, result)
 }

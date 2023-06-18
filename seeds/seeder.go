@@ -146,7 +146,7 @@ func (s Seeder) LargeLessonSeed() {
 
 	for i := range exercises {
 		for j := answersCount; j > 0; j-- {
-			answer := &models.Answer{
+			answer := &models.Result{
 				Id:       0,
 				Exercise: &exercises[i],
 			}
@@ -160,7 +160,7 @@ func (s Seeder) LargeLessonSeed() {
 				answer.Type = models.Bad
 			}
 
-			err := s.w.StoreAnswer(answer)
+			err := s.w.StoreResult(answer)
 			if err != nil {
 				panic(err)
 			}

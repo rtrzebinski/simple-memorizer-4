@@ -22,7 +22,7 @@ func Test_goodAnswersPercent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			projection := AnswersProjection{BadAnswers: tt.bad, GoodAnswers: tt.good}
+			projection := ResultsProjection{BadAnswers: tt.bad, GoodAnswers: tt.good}
 			assert.Equal(t, tt.percent, projection.GoodAnswersPercent())
 		})
 	}

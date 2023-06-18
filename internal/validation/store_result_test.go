@@ -6,33 +6,33 @@ import (
 	"testing"
 )
 
-func TestValidateStoreAnswer_valid(t *testing.T) {
-	answer := models.Answer{
+func TestValidateStoreResult_valid(t *testing.T) {
+	result := models.Result{
 		Type: models.Good,
 		Exercise: &models.Exercise{
 			Id: 10,
 		},
 	}
 
-	validator := ValidateStoreAnswer(answer)
+	validator := ValidateStoreResult(result)
 
 	assert.False(t, validator.Failed())
 }
 
-func TestValidateStoreAnswer_invalid(t *testing.T) {
+func TestValidateStoreResult_invalid(t *testing.T) {
 	var tests = []struct {
 		name    string
-		answer  models.Answer
+		result  models.Result
 		message string
 	}{
 		{
 			"empty",
-			models.Answer{},
-			"answer.type is required\nexercise.id is required",
+			models.Result{},
+			"result.type is required\nexercise.id is required",
 		},
 		{
 			"missing exercise id",
-			models.Answer{
+			models.Result{
 				Exercise: &models.Exercise{},
 				Type:     models.Good,
 			},
@@ -42,7 +42,7 @@ func TestValidateStoreAnswer_invalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validator := ValidateStoreAnswer(tt.answer)
+			validator := ValidateStoreResult(tt.result)
 			assert.Equal(t, tt.message, validator.Error())
 			assert.True(t, validator.Failed())
 		})

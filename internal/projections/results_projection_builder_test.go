@@ -7,48 +7,48 @@ import (
 	"time"
 )
 
-func TestBuildAnswersProjection(t *testing.T) {
+func TestBuildResultsProjection(t *testing.T) {
 	yesterday := time.Now().Add(-24 * time.Hour)
 	now := time.Now()
 
-	answers := models.Answers{}
+	results := models.Results{}
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Bad,
 		CreatedAt: now,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Bad,
 		CreatedAt: yesterday,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Bad,
 		CreatedAt: yesterday,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Bad,
 		CreatedAt: yesterday,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Good,
 		CreatedAt: now,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Good,
 		CreatedAt: now,
 	})
 
-	answers = append(answers, models.Answer{
+	results = append(results, models.Result{
 		Type:      models.Good,
 		CreatedAt: yesterday,
 	})
 
-	projection := BuildAnswersProjection(answers)
+	projection := BuildResultsProjection(results)
 
 	assert.Equal(t, now, projection.LatestBadAnswer)
 	assert.Equal(t, 4, projection.BadAnswers)

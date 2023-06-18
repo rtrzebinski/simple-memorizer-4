@@ -11,15 +11,15 @@ import (
 	"strconv"
 )
 
-type FetchAnswersOfExercise struct {
+type FetchResultsOfExercise struct {
 	r internal.Reader
 }
 
-func NewFetchAnswersOfExercise(r internal.Reader) *FetchAnswersOfExercise {
-	return &FetchAnswersOfExercise{r: r}
+func NewFetchResultsOfExercise(r internal.Reader) *FetchResultsOfExercise {
+	return &FetchResultsOfExercise{r: r}
 }
 
-func (h *FetchAnswersOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *FetchResultsOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	exerciseId, err := strconv.Atoi(req.URL.Query().Get("exercise_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a exercise_id: %w", err))
@@ -33,7 +33,7 @@ func (h *FetchAnswersOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
-				log.Print(fmt.Errorf("failed to encode FetchAnswersOfExercise HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to encode FetchResultsOfExercise HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -41,7 +41,7 @@ func (h *FetchAnswersOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			_, err = res.Write(encoded)
 			if err != nil {
-				log.Print(fmt.Errorf("failed to write FetchAnswersOfExercise HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to write FetchResultsOfExercise HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -51,17 +51,17 @@ func (h *FetchAnswersOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Re
 		}
 	}
 
-	answers, err := h.r.FetchAnswersOfExercise(models.Exercise{Id: exerciseId})
+	results, err := h.r.FetchResultsOfExercise(models.Exercise{Id: exerciseId})
 	if err != nil {
-		log.Print(fmt.Errorf("failed to fetch answers of exercise: %w", err))
+		log.Print(fmt.Errorf("failed to fetch results of exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
 	}
 
-	encoded, err := json.Marshal(answers)
+	encoded, err := json.Marshal(results)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode FetchAnswersOfExercise HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode FetchResultsOfExercise HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -69,7 +69,7 @@ func (h *FetchAnswersOfExercise) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write FetchAnswersOfExercise HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write FetchResultsOfExercise HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
