@@ -4,6 +4,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestMemorizer_simpleRandomization(t *testing.T) {
@@ -46,37 +47,144 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 	assert.Equal(t, e2.ResultsProjection.GoodAnswers, res.ResultsProjection.GoodAnswers)
 }
 
-func TestMemorizer_points(t *testing.T) {
+func TestPoints(t *testing.T) {
 	var tests = []struct {
-		percent int
-		points  int
+		name           string
+		projection     models.ResultsProjection
+		expectedResult int
 	}{
-		{0, 10},
-		{5, 10},
-		{10, 10},
-		{15, 9},
-		{20, 9},
-		{25, 8},
-		{30, 8},
-		{35, 7},
-		{40, 7},
-		{45, 6},
-		{50, 6},
-		{55, 5},
-		{60, 5},
-		{65, 4},
-		{70, 4},
-		{75, 3},
-		{80, 3},
-		{85, 2},
-		{90, 2},
-		{95, 1},
-		{100, 1},
+		{
+			name: "Only good answers today",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: true,
+				LatestBadAnswerWasToday:  false,
+			},
+			expectedResult: 1,
+		},
+		{
+			name: "Good and bad answers today, good answer most recent",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: true,
+				LatestBadAnswerWasToday:  true,
+				LatestGoodAnswer:         time.Now(),
+				LatestBadAnswer:          time.Now().Add(-time.Hour),
+			},
+			expectedResult: 1,
+		},
+		{
+			name: "Bad answers today (BadAnswersToday = 1)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  true,
+				BadAnswersToday:          1,
+			},
+			expectedResult: 80,
+		},
+		{
+			name: "Bad answers today (BadAnswersToday = 2)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  true,
+				BadAnswersToday:          2,
+			},
+			expectedResult: 60,
+		},
+		{
+			name: "Bad answers today (BadAnswersToday = 3)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  true,
+				BadAnswersToday:          3,
+			},
+			expectedResult: 40,
+		},
+		{
+			name: "Bad answers today (BadAnswersToday = 4)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  true,
+				BadAnswersToday:          4,
+			},
+			expectedResult: 20,
+		},
+		{
+			name: "Bad answers today (BadAnswersToday = 5)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  true,
+				BadAnswersToday:          5,
+			},
+			expectedResult: 1,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 1)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				GoodAnswers:              1,
+			},
+			expectedResult: 80,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 2)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				GoodAnswers:              2,
+			},
+			expectedResult: 60,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 3)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				GoodAnswers:              3,
+			},
+			expectedResult: 40,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 4)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				GoodAnswers:              4,
+			},
+			expectedResult: 20,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 5)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				GoodAnswers:              5,
+			},
+			expectedResult: 1,
+		},
+		{
+			name: "Only good answers before today (GoodAnswers = 1)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				BadAnswers:               0,
+				GoodAnswers:              1,
+			},
+			expectedResult: 80,
+		},
+		{
+			name: "Other cases (GoodAnswersPercent = 66)",
+			projection: models.ResultsProjection{
+				LatestGoodAnswerWasToday: false,
+				LatestBadAnswerWasToday:  false,
+				BadAnswers:               1,
+				GoodAnswers:              2,
+			},
+			expectedResult: 34,
+		},
 	}
 
 	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			assert.Equal(t, tt.points, points(tt.percent))
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expectedResult, points(tt.projection))
 		})
 	}
 }

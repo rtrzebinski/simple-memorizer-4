@@ -1,6 +1,7 @@
 package memorizer
 
 import (
+	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"math/rand"
 	"time"
@@ -32,12 +33,19 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 		if e.Id == previous.Id {
 			continue
 		}
+
+		p := points(e.ResultsProjection)
+
+		app.Log(e.Question, p)
+
 		// populate candidates with multiplied exercise.id depending on points number
 		// an exercise with 5 points has 5 times more chances to win than an exercise with 1 point etc.
-		for i := 1; i <= points(e.ResultsProjection.GoodAnswersPercent()); i++ {
+		for i := 1; i <= p; i++ {
 			candidates = append(candidates, e.Id)
 		}
 	}
+
+	app.Log()
 
 	// get a random winner from candidates
 	winner := candidates[s.r.Intn(len(candidates))]
@@ -46,29 +54,69 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 	return s.exercises[winner]
 }
 
-// converts good answers percent to points
-func points(percent int) int {
-	if percent <= 100 && percent > 90 {
+// converts results projection to points
+func points(p models.ResultsProjection) int {
+	// only good answers today
+	if p.LatestGoodAnswerWasToday && !p.LatestBadAnswerWasToday {
 		return 1
-	} else if percent <= 90 && percent > 80 {
-		return 2
-	} else if percent <= 80 && percent > 70 {
-		return 3
-	} else if percent <= 70 && percent > 60 {
-		return 4
-	} else if percent <= 60 && percent > 50 {
-		return 5
-	} else if percent <= 50 && percent > 40 {
-		return 6
-	} else if percent <= 40 && percent > 30 {
-		return 7
-	} else if percent <= 30 && percent > 20 {
-		return 8
-	} else if percent <= 20 && percent > 10 {
-		return 9
-	} else if percent <= 10 {
-		return 10
 	}
 
-	panic("Percent of good answers must be a value between 0 and 100")
+	// good and bad answers today, good answer most recent
+	if p.LatestGoodAnswerWasToday && p.LatestBadAnswerWasToday && p.LatestGoodAnswer.After(p.LatestBadAnswer) {
+		return 1
+	}
+
+	// bad answers today
+	if p.LatestBadAnswerWasToday {
+		// decrease points with increasing bad answers
+		if p.BadAnswersToday == 1 {
+			return 80
+		}
+
+		if p.BadAnswersToday == 2 {
+			return 60
+		}
+
+		if p.BadAnswersToday == 3 {
+			return 40
+		}
+
+		if p.BadAnswersToday == 4 {
+			return 20
+		}
+
+		return 1
+	}
+
+	// only good answers before today
+	if !p.LatestGoodAnswerWasToday && !p.LatestBadAnswerWasToday && p.BadAnswers == 0 && p.GoodAnswers > 0 {
+		// decrease points with increasing good answers
+		if p.GoodAnswers == 1 {
+			return 80
+		}
+
+		if p.GoodAnswers == 2 {
+			return 60
+		}
+
+		if p.GoodAnswers == 3 {
+			return 40
+		}
+
+		if p.GoodAnswers == 4 {
+			return 20
+		}
+
+		return 1
+	}
+
+	// other cases
+
+	percent := p.GoodAnswersPercent()
+
+	if percent == 100 {
+		return 1
+	}
+
+	return 100 - percent
 }

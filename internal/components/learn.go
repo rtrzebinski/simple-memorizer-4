@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 const PathLearn = "/learn"
@@ -271,9 +270,8 @@ func (c *Learn) handleGoodAnswer() {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
-	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.ResultsProjection.GoodAnswers++
-	c.exercise.ResultsProjection.GoodAnswersToday++
+	// exercise will be passed back to memorizer, needs the updated projection
+	c.exercise.ResultsProjection.RegisterGoodAnswer()
 	c.handleNextExercise()
 }
 
@@ -289,9 +287,7 @@ func (c *Learn) handleBadAnswer() {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
-	// exercise will be passed back to memorizer, it needs the correct answers count
-	c.exercise.ResultsProjection.BadAnswers++
-	c.exercise.ResultsProjection.BadAnswersToday++
-	c.exercise.ResultsProjection.LatestBadAnswer = time.Now()
+	// exercise will be passed back to memorizer, needs the updated projection
+	c.exercise.ResultsProjection.RegisterBadAnswer()
 	c.handleNextExercise()
 }

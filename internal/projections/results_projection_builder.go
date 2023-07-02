@@ -14,6 +14,7 @@ func BuildResultsProjection(results models.Results) models.ResultsProjection {
 			projection.GoodAnswers++
 			if isToday(a.CreatedAt) {
 				projection.GoodAnswersToday++
+				projection.LatestGoodAnswerWasToday = true
 			}
 			if a.CreatedAt.After(projection.LatestGoodAnswer) {
 				projection.LatestGoodAnswer = a.CreatedAt
@@ -22,6 +23,7 @@ func BuildResultsProjection(results models.Results) models.ResultsProjection {
 			projection.BadAnswers++
 			if isToday(a.CreatedAt) {
 				projection.BadAnswersToday++
+				projection.LatestBadAnswerWasToday = true
 			}
 			if a.CreatedAt.After(projection.LatestBadAnswer) {
 				projection.LatestBadAnswer = a.CreatedAt
