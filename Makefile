@@ -98,6 +98,9 @@ dev: ## Prepare dev environment (stop + start + migrate + seed)
 	@make seed
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-dd: ## Run on local k8s / docker-desktop
+dd-deploy: ## Deploy to local docker-desktop k8s cluster
 	kubectl apply -f k8s/docker-desktop.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
+
+dd-logs: ## Docker-desktop k8s logs
+	kubectl logs -l name=sm4-web -f
