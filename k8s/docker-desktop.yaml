@@ -16,9 +16,12 @@ spec:
         - name: sm4-web
           image: rtrzebinski/sm4:latest
           imagePullPolicy: Always
-          args: ["/app/bin/simple-memorizer"]
+          args: [ "/app/bin/simple-memorizer" ]
           ports:
             - containerPort: 8000
+          env:
+            - name: DB_DSN
+              value: "postgres://postgres:postgres@postgresdb:5432/postgres?sslmode=disable"
 ---
 apiVersion: v1
 kind: Service
@@ -31,3 +34,85 @@ spec:
       targetPort: 8000
   selector:
     name: sm4-web
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgresdb-persistent-volume
+  labels:
+    type: local
+    app: postgresdb
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/db"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-persistent-volume-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-secret-credentials
+  labels:
+    app: postgresdb
+data:
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresdb
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: postgresdb
+  template:
+    metadata:
+      labels:
+        app: postgresdb
+    spec:
+      containers:
+        - name: postgresdb
+          image: postgres
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: db-secret-credentials
+          volumeMounts:
+            - mountPath: /var/lib/postgres/data
+              name: db-data
+      volumes:
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: db-persistent-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresdb
+  labels:
+    app: postgresdb
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+  selector:
+    app: postgresdb

@@ -102,5 +102,11 @@ dd-deploy: ## Deploy to local docker-desktop k8s cluster
 	kubectl apply -f k8s/docker-desktop.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
+dd-delete: ## Delete from local docker-desktop k8s cluster
+	kubectl delete -f k8s/docker-desktop.yaml
+
 dd-logs: ## Docker-desktop k8s logs
 	kubectl logs -l name=sm4-web -f
+
+dd-sh: ## Docker-desktop k8s sm4-web shell
+	kubectl exec -it deployment.apps/sm4-web-deployment -- sh
