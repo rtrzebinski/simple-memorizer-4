@@ -102,6 +102,9 @@ dd-deploy: ## Deploy to local docker-desktop k8s cluster
 	kubectl apply -f k8s/docker-desktop.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
+dd-migrate: ## Migrate db in local docker-desktop k8s cluster
+	kubectl apply -f k8s/docker-desktop-migrate.yaml
+
 dd-delete: ## Delete from local docker-desktop k8s cluster
 	kubectl delete -f k8s/docker-desktop.yaml
 
