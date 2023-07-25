@@ -97,3 +97,7 @@ dev: ## Prepare dev environment (stop + start + migrate + seed)
 	@make migrate
 	@make seed
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
+
+dd: ## Run on local k8s / docker-desktop
+	kubectl apply -f k8s/docker-desktop.yaml
+	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
