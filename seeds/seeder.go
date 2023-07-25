@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
@@ -12,9 +13,22 @@ import (
 	"time"
 )
 
+type config struct {
+	Db struct {
+		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
+		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable"`
+	}
+}
+
 func main() {
+	// Configuration
+	var cfg config
+	if err := envconfig.Process("", &cfg); err != nil {
+		log.Fatalf("Error reading config: %v", err)
+	}
+
 	// connect DB
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable")
+	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
 	if err != nil {
 		log.Fatalf("Error opening DB: %v", err)
 	}
