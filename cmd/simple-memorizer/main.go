@@ -14,6 +14,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -31,12 +32,16 @@ type config struct {
 	}
 }
 
+func init() {
+	log.SetOutput(os.Stdout)
+}
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	if err := run(ctx); err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
 }
 

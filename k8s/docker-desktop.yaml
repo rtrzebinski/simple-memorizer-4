@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm4-web-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: sm4-web
+  template:
+    metadata:
+      labels:
+        name: sm4-web
+    spec:
+      containers:
+        - name: sm4-web
+          image: rtrzebinski/sm4:latest
+          imagePullPolicy: Always
+          args: ["/app/bin/simple-memorizer"]
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm4-lb
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9000
+      targetPort: 8000
+  selector:
+    name: sm4-web
