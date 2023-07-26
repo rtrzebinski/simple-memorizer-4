@@ -124,7 +124,7 @@ metadata:
   name: sm4-migration-job
 spec:
   backoffLimit: 0
-  ttlSecondsAfterFinished: 300
+  ttlSecondsAfterFinished: 60
   template:
     spec:
       containers:

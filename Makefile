@@ -103,13 +103,16 @@ dd-deploy: ## Docker-desktop k8s deploy
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 dd-delete: ## Docker-desktop k8s delete
-	kubectl delete -f k8s/docker-desktop.yaml
+	@kubectl delete -f k8s/docker-desktop.yaml
 
 dd-logs: ## Docker-desktop k8s logs
-	kubectl logs -l name=sm4-web -f
+	@kubectl logs -l name=sm4-web -f
 
 dd-sh: ## Docker-desktop k8s shell
-	kubectl exec -it deployment.apps/sm4-web-deployment -- sh
+	@kubectl exec -it deployment.apps/sm4-web-deployment -- sh
 
 dd-db: ## Docker-desktop k8s db cli
-	PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
+	@PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
+
+dd-seed: ## Docker-desktop k8s db seed
+	@kubectl exec deployment.apps/sm4-web-deployment -- make seed
