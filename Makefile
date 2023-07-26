@@ -113,3 +113,6 @@ dd-logs: ## Docker-desktop k8s logs
 
 dd-sh: ## Docker-desktop k8s shell
 	kubectl exec -it deployment.apps/sm4-web-deployment -- sh
+
+dd-db: ## Docker-desktop k8s db cli
+	PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
