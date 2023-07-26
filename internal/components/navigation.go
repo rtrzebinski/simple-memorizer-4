@@ -13,8 +13,6 @@ func (c *Navigation) Render() app.UI {
 			app.A().Href(PathHome).Text("Home"),
 			app.Text(" | "),
 			app.A().Href(PathLessons).Text("Lessons"),
-			app.Text(" | "),
-			app.A().Href(PathHome).Text("Test"),
 		),
 	)
 }
