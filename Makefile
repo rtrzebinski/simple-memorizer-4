@@ -98,18 +98,18 @@ dev: ## Prepare dev environment (stop + start + migrate + seed)
 	@make seed
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-dd-deploy: ## Deploy to local docker-desktop k8s cluster
+dd-deploy: ## Docker-desktop k8s deploy
 	kubectl apply -f k8s/docker-desktop.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
-dd-migrate: ## Migrate db in local docker-desktop k8s cluster
+dd-migrate: ## Docker-desktop k8s db migrate
 	kubectl apply -f k8s/docker-desktop-migrate.yaml
 
-dd-delete: ## Delete from local docker-desktop k8s cluster
+dd-delete: ## Docker-desktop k8s delete
 	kubectl delete -f k8s/docker-desktop.yaml
 
 dd-logs: ## Docker-desktop k8s logs
 	kubectl logs -l name=sm4-web -f
 
-dd-sh: ## Docker-desktop k8s sm4-web shell
+dd-sh: ## Docker-desktop k8s shell
 	kubectl exec -it deployment.apps/sm4-web-deployment -- sh
