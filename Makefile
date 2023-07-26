@@ -102,9 +102,6 @@ dd-deploy: ## Docker-desktop k8s deploy
 	kubectl apply -f k8s/docker-desktop.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
-dd-migrate: ## Docker-desktop k8s db migrate
-	kubectl apply -f k8s/docker-desktop-migrate.yaml
-
 dd-delete: ## Docker-desktop k8s delete
 	kubectl delete -f k8s/docker-desktop.yaml
 

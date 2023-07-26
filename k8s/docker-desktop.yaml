@@ -79,7 +79,7 @@ kind: Deployment
 metadata:
   name: postgresdb
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: postgresdb
@@ -117,3 +117,18 @@ spec:
       port: 5432
   selector:
     app: postgresdb
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sm4-migration-job
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: rtrzebinski/sm4:latest
+          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@postgresdb:5432/postgres?sslmode=disable", "up" ]
+      restartPolicy: OnFailure
