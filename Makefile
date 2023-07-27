@@ -110,7 +110,7 @@ dd-delete: ## Docker-desktop k8s delete
 	@kubectl delete -f k8s/docker-desktop.yaml
 
 dd-logs: ## Docker-desktop k8s logs
-	@kubectl logs -l name=sm4-web -f
+	@kubectl logs -l app=sm4-web -f
 
 dd-sh: ## Docker-desktop k8s shell
 	@kubectl exec -it deployment.apps/sm4-web-deployment -- sh

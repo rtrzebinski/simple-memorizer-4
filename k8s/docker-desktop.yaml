@@ -6,11 +6,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      name: sm4-web
+      app: sm4-web
   template:
     metadata:
       labels:
-        name: sm4-web
+        app: sm4-web
     spec:
       containers:
         - name: sm4-web
@@ -33,7 +33,7 @@ spec:
     - port: 9000
       targetPort: 8000
   selector:
-    name: sm4-web
+    app: sm4-web
 ---
 apiVersion: v1
 kind: PersistentVolume
