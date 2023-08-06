@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"database/sql"
 	"fmt"
@@ -75,6 +76,25 @@ func run(ctx context.Context) error {
 	// instructions.
 	app.RunWhenOnBrowser()
 
+	// Version
+	file, err := os.Open("version")
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var version string
+
+	if scanner.Scan() {
+		version = scanner.Text()
+		log.Println("version", version)
+	} else {
+		log.Println("version unknown")
+	}
+
 	// Handle home page
 	http.Handle("/", &app.Handler{
 		Name:        "Home",
@@ -90,6 +110,9 @@ func run(ctx context.Context) error {
 		Styles: []string{
 			// todo find a way to only load on a learning page
 			//"/web/hello.css",
+		},
+		Env: app.Environment{
+			"version": version,
 		},
 	})
 

@@ -1,6 +1,8 @@
 package components
 
-import "github.com/maxence-charriere/go-app/v9/pkg/app"
+import (
+	"github.com/maxence-charriere/go-app/v9/pkg/app"
+)
 
 type Navigation struct {
 	app.Compo
@@ -13,6 +15,8 @@ func (c *Navigation) Render() app.UI {
 			app.A().Href(PathHome).Text("Home"),
 			app.Text(" | "),
 			app.A().Href(PathLessons).Text("Lessons"),
+			app.Text(" | "),
+			app.Text(app.Getenv("version")),
 		),
 	)
 }
