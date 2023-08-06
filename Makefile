@@ -71,6 +71,8 @@ build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
 	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd/simple-memorizer
 	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd/simple-memorizer
+	@git rev-parse HEAD > version
+	@date >> version
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 run: ## Build and run locally
