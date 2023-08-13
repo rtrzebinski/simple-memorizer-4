@@ -71,6 +71,9 @@ func (c *Exercises) Render() app.UI {
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(c.handleStartLearning).Disabled(c.lesson.ExerciseCount < 2),
 			app.Button().Text("Add a new exercise").OnClick(c.handleAddExercise).Hidden(c.formVisible),
+			app.A().Href(rest.ExportLessonCsv+"?lesson_id="+strconv.Itoa(c.lesson.Id)).Download("").Body(
+				app.Button().Text("CSV export"),
+			),
 		),
 		app.P().Body(
 			app.Text("Lesson name: "),

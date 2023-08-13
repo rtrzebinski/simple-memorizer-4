@@ -20,6 +20,10 @@ const (
 	UpsertExercise = "/upsert-exercise"
 	DeleteExercise = "/delete-exercise"
 	StoreResult    = "/store-result"
+
+	// download
+
+	ExportLessonCsv = "/export-lesson-csv"
 )
 
 func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
@@ -36,6 +40,10 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	http.Handle(UpsertExercise, handlers.NewUpsertExercise(w))
 	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
 	http.Handle(StoreResult, handlers.NewStoreResult(w))
+
+	// download
+
+	http.Handle(ExportLessonCsv, handlers.NewExportLessonCsv(r))
 
 	if err := http.ListenAndServe(port, nil); err != nil {
 		return err
