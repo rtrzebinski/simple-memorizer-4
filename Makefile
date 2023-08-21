@@ -3,6 +3,7 @@ OK_COLOR=\033[32;01m
 ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
 SERVICE_NAME=sm
+HOME ?= $(shell echo $$HOME)
 
 default: help
 
@@ -121,3 +122,10 @@ dd-db: ## Docker-desktop k8s db cli
 
 dd-seed: ## Docker-desktop k8s db seed
 	@kubectl exec deployment.apps/sm4-web-deployment -- make seed
+
+dd-db-backup-deploy: ## Docker-desktop k8s db backup CRON job deploy
+	@mkdir -p $(HOME)/sm4-db-backup
+	@envsubst < k8s/docker-desktop-db-backup.yaml  | kubectl apply -f -
+
+dd-db-backup-delete: ## Docker-desktop k8s db backup CRON job delete
+	@kubectl delete -f k8s/docker-desktop-db-backup.yaml

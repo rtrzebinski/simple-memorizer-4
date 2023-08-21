@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+spec:
+  schedule: "* * * * *"  # Schedule to run every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: db-backup
+              image: postgres:latest
+              env:
+                - name: PGPASSWORD
+                  value: "postgres"
+              command: [ "/bin/sh", "-c" ]
+              args:
+                - "pg_dump -h postgresdb -U postgres postgres > /var/dump/sm4_db_$(date +%y-%m-%d_%H:%M:%S).sql"
+              volumeMounts:
+                - name: dump-volume
+                  mountPath: /var/dump
+          restartPolicy: Never
+          volumes:
+            - name: dump-volume
+              hostPath:
+                path: $HOME/sm4-db-backup
