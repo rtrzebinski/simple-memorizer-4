@@ -101,7 +101,8 @@ dev: ## Prepare dev environment (stop + start + migrate + seed)
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 dd-deploy: ## Docker-desktop k8s deploy
-	kubectl apply -f k8s/docker-desktop.yaml
+	@mkdir -p $(HOME)/sm4-db
+	@envsubst < k8s/docker-desktop.yaml | kubectl apply -f -
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 dd-rollout: ## Docker-desktop k8s rollout

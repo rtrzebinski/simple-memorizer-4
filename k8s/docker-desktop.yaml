@@ -36,34 +36,6 @@ spec:
     app: sm4-web
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgresdb-persistent-volume
-  labels:
-    type: local
-    app: postgresdb
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 8Gi
-  accessModes:
-    - ReadWriteMany
-  hostPath:
-    path: "/data/db"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: db-persistent-volume-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 8Gi
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: db-secret-credentials
@@ -97,12 +69,12 @@ spec:
             - configMapRef:
                 name: db-secret-credentials
           volumeMounts:
-            - mountPath: /var/lib/postgres/data
-              name: db-data
+            - name: db-volume
+              mountPath: /var/lib/postgresql/data
       volumes:
-        - name: db-data
-          persistentVolumeClaim:
-            claimName: db-persistent-volume-claim
+        - name: db-volume
+          hostPath:
+            path: $HOME/sm4-db
 ---
 apiVersion: v1
 kind: Service
