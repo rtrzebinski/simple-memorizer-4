@@ -25,11 +25,21 @@ help: ## Show this help
         printf "%s\n" $$help_info; \
     done
 
-start: ## Start containers (docker compose up)
+dev: ## Prepare local dev environment (stop + start + migrate + seed)
+	@echo "$(OK_COLOR)==> Prepare dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
+	@make stop
+	@make start
+	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
+	@sleep 1
+	@make migrate
+	@make seed
+	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
+
+start: ## Start docker-compose containers
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml up -d --remove-orphans
 
-stop: ## Stop containers (docker compose down)
+stop: ## Stop docker-compose containers
 	@echo "$(OK_COLOR)==> Bringing containers down for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml down --remove-orphans
 
@@ -90,43 +100,44 @@ test-short: ## Test short (unit)
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-dev: ## Prepare dev environment (stop + start + migrate + seed)
-	@echo "$(OK_COLOR)==> Prepare dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
-	@make stop
-	@make start
-	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
-	@sleep 1
-	@make migrate
-	@make seed
-	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
-
-dd-deploy: ## Docker-desktop k8s deploy
+k8s-deploy: ## Kubernetes deploy
 	@mkdir -p $(HOME)/sm4-db
-	@envsubst < k8s/docker-desktop.yaml | kubectl apply -f -
+	@envsubst < k8s/local.yaml | kubectl apply -f -
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
-dd-rollout: ## Docker-desktop k8s rollout
+k8s-rollout: ## Kubernetes rollout
 	kubectl rollout restart deployment.apps/sm4-web
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
-dd-delete: ## Docker-desktop k8s delete
-	@kubectl delete -f k8s/docker-desktop.yaml
+k8s-delete: ## Kubernetes delete
+	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
 
-dd-logs: ## Docker-desktop k8s logs
+k8s-logs: ## Kubernetes web app logs
 	@kubectl logs -l app=sm4-web -f
 
-dd-sh: ## Docker-desktop k8s shell
+k8s-sh: ## Kubernetes web app shell
 	@kubectl exec -it deployment.apps/sm4-web -- sh
 
-dd-db: ## Docker-desktop k8s db cli
+k8s-db: ## Kubernetes db cli
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
 
-dd-seed: ## Docker-desktop k8s db seed
+k8s-seed: ## Kubernetes db seed
 	@kubectl exec deployment.apps/sm4-web -- make seed
 
-dd-db-backup-deploy: ## Docker-desktop k8s db backup CRON job deploy
+k8s-db-backup-deploy: ## Kubernetes db backup CRON job deploy
 	@mkdir -p $(HOME)/sm4-db-backup
-	@envsubst < k8s/docker-desktop-db-backup.yaml  | kubectl apply -f -
+	@envsubst < k8s/local-db-backup.yaml  | kubectl apply -f -
 
-dd-db-backup-delete: ## Docker-desktop k8s db backup CRON job delete
-	@kubectl delete -f k8s/docker-desktop-db-backup.yaml
+k8s-db-backup-delete: ## Kubernetes db backup CRON job delete
+	@kubectl delete -f k8s/local-db-backup.yaml --ignore-not-found=true
+
+k8s-deploy-all: ## Kubernetes deploy all objects
+	@mkdir -p $(HOME)/sm4-db
+	@envsubst < k8s/local.yaml | kubectl apply -f -
+	@mkdir -p $(HOME)/sm4-db-backup
+	@envsubst < k8s/local-db-backup.yaml  | kubectl apply -f -
+	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
+
+k8s-delete-all: ## Kubernetes delete all objects
+	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
+	@kubectl delete -f k8s/local-db-backup.yaml --ignore-not-found=true
