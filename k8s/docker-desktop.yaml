@@ -95,8 +95,7 @@ kind: Job
 metadata:
   name: sm4-migration-job
 spec:
-  backoffLimit: 0
-  ttlSecondsAfterFinished: 60
+  ttlSecondsAfterFinished: 120
   template:
     spec:
       containers:
