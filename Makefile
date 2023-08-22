@@ -106,7 +106,7 @@ dd-deploy: ## Docker-desktop k8s deploy
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 dd-rollout: ## Docker-desktop k8s rollout
-	kubectl rollout restart deployment.apps/sm4-web-deployment
+	kubectl rollout restart deployment.apps/sm4-web
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 dd-delete: ## Docker-desktop k8s delete
@@ -116,13 +116,13 @@ dd-logs: ## Docker-desktop k8s logs
 	@kubectl logs -l app=sm4-web -f
 
 dd-sh: ## Docker-desktop k8s shell
-	@kubectl exec -it deployment.apps/sm4-web-deployment -- sh
+	@kubectl exec -it deployment.apps/sm4-web -- sh
 
 dd-db: ## Docker-desktop k8s db cli
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
 
 dd-seed: ## Docker-desktop k8s db seed
-	@kubectl exec deployment.apps/sm4-web-deployment -- make seed
+	@kubectl exec deployment.apps/sm4-web -- make seed
 
 dd-db-backup-deploy: ## Docker-desktop k8s db backup CRON job deploy
 	@mkdir -p $(HOME)/sm4-db-backup

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sm4-web-deployment
+  name: sm4-web
 spec:
   replicas: 2
   selector:
@@ -21,7 +21,7 @@ spec:
             - containerPort: 8000
           env:
             - name: DB_DSN
-              value: "postgres://postgres:postgres@postgresdb:5432/postgres?sslmode=disable"
+              value: "postgres://postgres:postgres@sm4-postgresdb:5432/postgres?sslmode=disable"
 ---
 apiVersion: v1
 kind: Service
@@ -38,9 +38,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: db-secret-credentials
+  name: sm4-db-secret-credentials
   labels:
-    app: postgresdb
+    app: sm4-postgresdb
 data:
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
@@ -49,25 +49,25 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgresdb
+  name: sm4-postgresdb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresdb
+      app: sm4-postgresdb
   template:
     metadata:
       labels:
-        app: postgresdb
+        app: sm4-postgresdb
     spec:
       containers:
-        - name: postgresdb
+        - name: sm4-postgresdb
           image: postgres
           ports:
             - containerPort: 5432
           envFrom:
             - configMapRef:
-                name: db-secret-credentials
+                name: sm4-db-secret-credentials
           volumeMounts:
             - name: db-volume
               mountPath: /var/lib/postgresql/data
@@ -79,16 +79,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgresdb
+  name: sm4-postgresdb
   labels:
-    app: postgresdb
+    app: sm4-postgresdb
 spec:
   type: NodePort
   ports:
     - nodePort: 30001
       port: 5432
   selector:
-    app: postgresdb
+    app: sm4-postgresdb
 ---
 apiVersion: batch/v1
 kind: Job
@@ -101,5 +101,5 @@ spec:
       containers:
         - name: migrate
           image: rtrzebinski/sm4:latest
-          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@postgresdb:5432/postgres?sslmode=disable", "up" ]
+          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-postgresdb:5432/postgres?sslmode=disable", "up" ]
       restartPolicy: OnFailure
