@@ -100,9 +100,23 @@ test-short: ## Test short (unit)
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
+k8s-deploy-all: ## Kubernetes deploy all objects
+	@mkdir -p $(HOME)/sm4-db
+	@envsubst < k8s/local.yaml | kubectl apply -f -
+	@kubectl apply -f k8s/local-db-migration-job.yaml
+	@mkdir -p $(HOME)/sm4-db-backup
+	@envsubst < k8s/local-db-backup-cronjob.yaml  | kubectl apply -f -
+	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
+
+k8s-delete-all: ## Kubernetes delete all objects
+	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
+	@kubectl delete -f k8s/local-db-migration-job.yaml --ignore-not-found=true
+	@kubectl delete -f k8s/local-db-backup-cronjob.yaml --ignore-not-found=true
+
 k8s-deploy: ## Kubernetes deploy
 	@mkdir -p $(HOME)/sm4-db
 	@envsubst < k8s/local.yaml | kubectl apply -f -
+	@kubectl apply -f k8s/local-db-migration-job.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-rollout: ## Kubernetes rollout
@@ -121,23 +135,15 @@ k8s-sh: ## Kubernetes web app shell
 k8s-db: ## Kubernetes db cli
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
 
-k8s-seed: ## Kubernetes db seed
+k8s-db-migrate: ## Kubernetes db migrate
+	@kubectl apply -f k8s/local-db-migration-job.yaml
+
+k8s-db-seed: ## Kubernetes db seed
 	@kubectl exec deployment.apps/sm4-web -- make seed
 
-k8s-db-backup-deploy: ## Kubernetes db backup CRON job deploy
+k8s-db-backup-cronjob-deploy: ## Kubernetes db backup CRON job deploy
 	@mkdir -p $(HOME)/sm4-db-backup
-	@envsubst < k8s/local-db-backup.yaml  | kubectl apply -f -
+	@envsubst < k8s/local-db-backup-cronjob.yaml  | kubectl apply -f -
 
-k8s-db-backup-delete: ## Kubernetes db backup CRON job delete
-	@kubectl delete -f k8s/local-db-backup.yaml --ignore-not-found=true
-
-k8s-deploy-all: ## Kubernetes deploy all objects
-	@mkdir -p $(HOME)/sm4-db
-	@envsubst < k8s/local.yaml | kubectl apply -f -
-	@mkdir -p $(HOME)/sm4-db-backup
-	@envsubst < k8s/local-db-backup.yaml  | kubectl apply -f -
-	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
-
-k8s-delete-all: ## Kubernetes delete all objects
-	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
-	@kubectl delete -f k8s/local-db-backup.yaml --ignore-not-found=true
+k8s-db-backup-cronjob-delete: ## Kubernetes db backup CRON job delete
+	@kubectl delete -f k8s/local-db-backup-cronjob.yaml --ignore-not-found=true

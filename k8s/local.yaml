@@ -89,17 +89,3 @@ spec:
       port: 5432
   selector:
     app: sm4-postgresdb
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: sm4-migration-job
-spec:
-  ttlSecondsAfterFinished: 120
-  template:
-    spec:
-      containers:
-        - name: migrate
-          image: rtrzebinski/sm4:latest
-          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-postgresdb:5432/postgres?sslmode=disable", "up" ]
-      restartPolicy: OnFailure
