@@ -21,12 +21,12 @@ spec:
             - containerPort: 8000
           env:
             - name: DB_DSN
-              value: "postgres://postgres:postgres@sm4-postgresdb:5432/postgres?sslmode=disable"
+              value: "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sm4-lb
+  name: sm4-web
 spec:
   type: LoadBalancer
   ports:
@@ -38,9 +38,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sm4-db-secret-credentials
+  name: sm4-db-credentials
   labels:
-    app: sm4-postgresdb
+    app: sm4-db
 data:
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
@@ -49,25 +49,25 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sm4-postgresdb
+  name: sm4-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sm4-postgresdb
+      app: sm4-db
   template:
     metadata:
       labels:
-        app: sm4-postgresdb
+        app: sm4-db
     spec:
       containers:
-        - name: sm4-postgresdb
+        - name: sm4-db
           image: postgres
           ports:
             - containerPort: 5432
           envFrom:
             - configMapRef:
-                name: sm4-db-secret-credentials
+                name: sm4-db-credentials
           volumeMounts:
             - name: db-volume
               mountPath: /var/lib/postgresql/data
@@ -79,13 +79,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sm4-postgresdb
+  name: sm4-db
   labels:
-    app: sm4-postgresdb
+    app: sm4-db
 spec:
   type: NodePort
   ports:
     - nodePort: 30001
       port: 5432
   selector:
-    app: sm4-postgresdb
+    app: sm4-db

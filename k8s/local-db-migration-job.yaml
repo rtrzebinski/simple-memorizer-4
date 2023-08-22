@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: sm4-migration-job
+  name: sm4-db-migration-job
 spec:
   ttlSecondsAfterFinished: 10
   template:
@@ -9,5 +9,5 @@ spec:
       containers:
         - name: migrate
           image: rtrzebinski/sm4:latest
-          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-postgresdb:5432/postgres?sslmode=disable", "up" ]
+          args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable", "up" ]
       restartPolicy: OnFailure

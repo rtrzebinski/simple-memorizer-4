@@ -102,20 +102,20 @@ test-short: ## Test short (unit)
 
 k8s-deploy-all: ## Kubernetes deploy all objects
 	@mkdir -p $(HOME)/sm4-db
-	@envsubst < k8s/local.yaml | kubectl apply -f -
+	@envsubst < k8s/local-deployment.yaml | kubectl apply -f -
 	@kubectl apply -f k8s/local-db-migration-job.yaml
 	@mkdir -p $(HOME)/sm4-db-backup
 	@envsubst < k8s/local-db-backup-cronjob.yaml  | kubectl apply -f -
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-delete-all: ## Kubernetes delete all objects
-	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
+	@kubectl delete -f k8s/local-deployment.yaml --ignore-not-found=true
 	@kubectl delete -f k8s/local-db-migration-job.yaml --ignore-not-found=true
 	@kubectl delete -f k8s/local-db-backup-cronjob.yaml --ignore-not-found=true
 
 k8s-deploy: ## Kubernetes deploy
 	@mkdir -p $(HOME)/sm4-db
-	@envsubst < k8s/local.yaml | kubectl apply -f -
+	@envsubst < k8s/local-deployment.yaml | kubectl apply -f -
 	@kubectl apply -f k8s/local-db-migration-job.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
@@ -124,7 +124,7 @@ k8s-rollout: ## Kubernetes rollout
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-delete: ## Kubernetes delete
-	@kubectl delete -f k8s/local.yaml --ignore-not-found=true
+	@kubectl delete -f k8s/local-deployment.yaml --ignore-not-found=true
 
 k8s-logs: ## Kubernetes web app logs
 	@kubectl logs -l app=sm4-web -f
