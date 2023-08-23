@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
             - name: sm4-db-backup
-              image: postgres:latest
+              image: postgres:15.4-alpine
               env:
                 - name: PGPASSWORD
                   value: "postgres"
