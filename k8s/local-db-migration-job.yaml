@@ -6,6 +6,10 @@ spec:
   ttlSecondsAfterFinished: 10
   template:
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: [ "sh", "-c", "until nc -z sm4-db 5432 > /dev/null; do echo waiting for sm4-db.; sleep 1; done;" ]
       containers:
         - name: migrate
           image: rtrzebinski/sm4:latest
