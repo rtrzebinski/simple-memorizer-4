@@ -7,11 +7,15 @@ spec:
   template:
     spec:
       initContainers:
-        - name: wait-for-db
-          image: busybox
-          command: [ "sh", "-c", "until nc -z sm4-db 5432 > /dev/null; do echo waiting for sm4-db.; sleep 1; done;" ]
+        - name: check-db-ready
+          image: postgres:15.4-alpine
+          command:
+            - sh
+            - -c
+          args:
+            - until pg_isready -h sm4-db -p 5432; do echo database is not ready; sleep 2; done;
       containers:
         - name: migrate
           image: rtrzebinski/sm4:latest
           args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable", "up" ]
-      restartPolicy: OnFailure
+      restartPolicy: Never
