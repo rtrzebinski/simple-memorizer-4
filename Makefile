@@ -103,11 +103,11 @@ test-short: ## Test short (unit)
 k8s-start: ## Kubernetes deploy all objects
 	@kubectl create namespace sm4
 	@mkdir -p $(HOME)/sm4-db
-	@kubectl -n sm4 apply -f k8s/local-web-deployment.yaml
-	@envsubst < k8s/local-db-deployment.yaml | kubectl -n sm4 apply -f -
-	@kubectl -n sm4 apply -f k8s/local-db-migration-job.yaml
+	@kubectl -n sm4 apply -f k8s/web-deployment.yaml
+	@envsubst < k8s/db-deployment.yaml | kubectl -n sm4 apply -f -
+	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
 	@mkdir -p $(HOME)/sm4-db-backup
-	@envsubst < k8s/local-db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
+	@envsubst < k8s/db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-status: ## Kubernetes show objects
@@ -130,7 +130,7 @@ k8s-db: ## Kubernetes db cli
 	@PGPASSWORD=postgres psql -U postgres -d postgres --port 30001 --host localhost
 
 k8s-db-migrate: ## Kubernetes db migrate
-	@kubectl -n sm4 apply -f k8s/local-db-migration-job.yaml
+	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
 
 k8s-db-seed: ## Kubernetes db seed
 	@kubectl -n sm4 exec deployment.apps/sm4-web -- make seed
