@@ -100,7 +100,7 @@ test-short: ## Test short (unit)
 	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-k8s-start: ## Kubernetes deploy all objects
+k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@kubectl create namespace sm4
 	@mkdir -p $(HOME)/sm4-db
 	@kubectl -n sm4 apply -f k8s/web-deployment.yaml
@@ -110,13 +110,13 @@ k8s-start: ## Kubernetes deploy all objects
 	@envsubst < k8s/db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
-k8s-status: ## Kubernetes show objects
+k8s-status: ## Kubernetes show all objects
 	@kubectl -n sm4 get all
 
 k8s-stop: ## Kubernetes delete all objects
 	@kubectl delete namespace sm4 --ignore-not-found=true
 
-k8s-rollout: ## Kubernetes rollout
+k8s-rollout: ## Kubernetes rollout (Docker hub tag 'latest' image)
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-web
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
