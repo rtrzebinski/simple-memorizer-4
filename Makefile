@@ -116,6 +116,10 @@ k8s-status: ## Kubernetes show all objects
 k8s-stop: ## Kubernetes delete all objects
 	@kubectl delete namespace sm4 --ignore-not-found=true
 
+k8s-reset: ## Kubernetes stop and start
+	@make k8s-stop
+	@make k8s-start
+
 k8s-rollout: ## Kubernetes rollout (Docker hub tag 'latest' image)
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-web
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
