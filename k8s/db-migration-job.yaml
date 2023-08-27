@@ -17,10 +17,10 @@ spec:
           resources:
             limits:
               cpu: 200m
-              memory: 64Mi
+              memory: 32Mi
             requests:
               cpu: 100m
-              memory: 32Mi
+              memory: 16Mi
       containers:
         - name: migrate
           image: rtrzebinski/sm4:latest
@@ -28,8 +28,8 @@ spec:
           resources:
             limits:
               cpu: 200m
-              memory: 128Mi
+              memory: 64Mi
             requests:
               cpu: 100m
-              memory: 64Mi
+              memory: 32Mi
       restartPolicy: Never

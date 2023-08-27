@@ -25,10 +25,10 @@ spec:
               resources:
                 limits:
                   cpu: 200m
-                  memory: 128Mi
+                  memory: 64Mi
                 requests:
                   cpu: 100m
-                  memory: 64Mi
+                  memory: 32Mi
           restartPolicy: Never
           volumes:
             - name: dump-volume
