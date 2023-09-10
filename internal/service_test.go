@@ -104,6 +104,19 @@ func (suite *ServiceSuite) TestUpsertExercise() {
 	assert.NoError(suite.T(), err)
 }
 
+func (suite *ServiceSuite) TestStoreExercises() {
+	exercises := models.Exercises{
+		models.Exercise{Id: 1, Question: "Exercise 1"},
+	}
+
+	suite.writer.On("StoreExercises", exercises).Return(nil)
+
+	err := suite.service.StoreExercises(exercises)
+
+	suite.writer.AssertExpectations(suite.T())
+	assert.NoError(suite.T(), err)
+}
+
 func (suite *ServiceSuite) TestDeleteExercise() {
 	exercise := models.Exercise{Id: 1, Question: "Exercise 1"}
 

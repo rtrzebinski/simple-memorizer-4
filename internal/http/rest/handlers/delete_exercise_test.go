@@ -59,5 +59,5 @@ func TestDeleteExercise_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateExerciseIdentified(models.Exercise{}).Error(), result)
+	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
 }

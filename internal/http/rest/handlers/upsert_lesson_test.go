@@ -60,5 +60,5 @@ func TestUsertLesson_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertLesson(models.Lesson{}, nil).Error(), result)
+	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
 }

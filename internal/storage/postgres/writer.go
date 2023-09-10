@@ -83,6 +83,22 @@ func (w *Writer) UpsertExercise(exercise *models.Exercise) error {
 	return nil
 }
 
+func (w *Writer) StoreExercises(exercises models.Exercises) error {
+	const query = `
+		INSERT INTO exercise (lesson_id, question, answer)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (lesson_id, question) DO NOTHING;`
+
+	for _, exercise := range exercises {
+		_, err := w.db.Query(query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
+		if err != nil {
+			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 
 	query := `DELETE FROM exercise WHERE id = $1;`

@@ -62,5 +62,5 @@ func TestStoreResult_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateStoreResult(models.Result{}).Error(), result)
+	assert.Equal(t, validation.ValidateStoreResult(input).Error(), result)
 }

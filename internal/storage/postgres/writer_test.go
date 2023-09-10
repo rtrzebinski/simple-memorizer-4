@@ -244,6 +244,83 @@ func TestUpsertExercise_updateExisting(t *testing.T) {
 	assert.Equal(t, "newAnswer", stored.Answer)
 }
 
+func TestStoreExercises(t *testing.T) {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+
+	// container and database
+	container, db, err := createPostgresContainer(ctx, "testdb")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer container.Terminate(ctx)
+
+	// migration
+	mig, err := newMigrator(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mig.Up()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := NewWriter(db)
+
+	lesson := &Lesson{}
+	createLesson(db, lesson)
+
+	// exercise1 existing
+	exercise1 := models.Exercise{
+		Lesson: &models.Lesson{
+			Id: lesson.Id,
+		},
+		Question: "question1",
+		Answer:   "answer1",
+	}
+
+	// store exercise 1 to db
+	createExercise(db, &Exercise{
+		LessonId: exercise1.Lesson.Id,
+		Question: exercise1.Question,
+		Answer:   exercise1.Answer,
+	})
+
+	// exercise2 not existing
+	exercise2 := models.Exercise{
+		Lesson: &models.Lesson{
+			Id: lesson.Id,
+		},
+		Question: "question2",
+		Answer:   "answer2",
+	}
+
+	exercises := models.Exercises{exercise1, exercise2}
+
+	err = w.StoreExercises(exercises)
+	assert.NoError(t, err)
+
+	ex1 := findExerciseById(db, 1)
+	assert.Equal(t, exercise1.Lesson.Id, ex1.LessonId)
+	assert.Equal(t, exercise1.Question, ex1.Question)
+	assert.Equal(t, exercise1.Answer, ex1.Answer)
+
+	// ID of inserted exercise will be 3, not 2,
+	// this is because 'ON CONFLICT (lesson_id, question) DO NOTHING',
+	// is still increasing PK auto increment value, even if nothing is inserted
+	ex2 := findExerciseById(db, 3)
+	assert.Equal(t, exercise2.Lesson.Id, ex2.LessonId)
+	assert.Equal(t, exercise2.Question, ex2.Question)
+	assert.Equal(t, exercise2.Answer, ex2.Answer)
+}
+
 func TestDeleteExercise(t *testing.T) {
 	t.Parallel()
 

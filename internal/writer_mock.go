@@ -29,6 +29,12 @@ func (mock *WriterMock) UpsertExercise(exercise *models.Exercise) error {
 	return nil
 }
 
+func (mock *WriterMock) StoreExercises(exercises models.Exercises) error {
+	mock.Called(exercises)
+
+	return nil
+}
+
 func (mock *WriterMock) DeleteExercise(exercise models.Exercise) error {
 	mock.Called(exercise)
 
