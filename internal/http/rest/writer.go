@@ -57,6 +57,20 @@ func (w *Writer) UpsertExercise(exercise *models.Exercise) error {
 	return nil
 }
 
+func (w *Writer) StoreExercises(exercises models.Exercises) error {
+	body, err := json.Marshal(exercises)
+	if err != nil {
+		return fmt.Errorf("failed to encode exercises: %w", err)
+	}
+
+	_, err = w.c.Call("POST", StoreExercises, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
+}
+
 func (w *Writer) DeleteExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {

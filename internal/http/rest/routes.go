@@ -18,6 +18,7 @@ const (
 	UpsertLesson   = "/upsert-lesson"
 	DeleteLesson   = "/delete-lesson"
 	UpsertExercise = "/upsert-exercise"
+	StoreExercises = "/store-exercises"
 	DeleteExercise = "/delete-exercise"
 	StoreResult    = "/store-result"
 
@@ -38,6 +39,7 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 	http.Handle(UpsertLesson, handlers.NewUpsertLesson(w))
 	http.Handle(DeleteLesson, handlers.NewDeleteLesson(w))
 	http.Handle(UpsertExercise, handlers.NewUpsertExercise(w))
+	http.Handle(StoreExercises, handlers.NewStoreExercises(w))
 	http.Handle(DeleteExercise, handlers.NewDeleteExercise(w))
 	http.Handle(StoreResult, handlers.NewStoreResult(w))
 

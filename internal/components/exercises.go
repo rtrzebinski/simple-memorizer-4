@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
@@ -74,6 +75,8 @@ func (c *Exercises) Render() app.UI {
 			app.A().Href(rest.ExportLessonCsv+"?lesson_id="+strconv.Itoa(c.lesson.Id)).Download("").Body(
 				app.Button().Text("CSV export"),
 			),
+			//app.Label().For("csv-upload-button").Text("CSV import"), todo style with bootstrap
+			app.Input().ID("csv-upload-button").Type("file").Name("csv-import.csv").Accept(".csv").OnInput(c.handleCsvUpload),
 		),
 		app.P().Body(
 			app.Text("Lesson name: "),
@@ -136,6 +139,77 @@ func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
 // handleAddExercise display add exercise form
 func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
 	c.formVisible = true
+}
+
+func (c *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
+	file := e.Get("target").Get("files").Index(0)
+
+	// validate file type which can be changed by the user in the file picker
+	if file.Get("type").String() != "text/csv" {
+		app.Log("invalid file type", file.Get("type").String())
+		return
+	}
+
+	// read bytes from uploaded file
+	data, err := readFile(file)
+	if err != nil {
+		app.Log(err)
+		return
+	}
+
+	// extract records from bytes slice
+	records, err := csv.ReadAll(data)
+	if err != nil {
+		app.Log(err)
+		return
+	}
+
+	// prepare exercises to be stored
+	var exercises models.Exercises
+	for _, rec := range records {
+		exercises = append(exercises, models.Exercise{
+			Lesson:   &c.lesson,
+			Question: rec[0],
+			Answer:   rec[1],
+		})
+	}
+
+	// store uploaded exercises
+	err = c.s.StoreExercises(exercises)
+	if err != nil {
+		app.Log(err)
+		return
+	}
+
+	// reload the UI
+	c.displayExercisesOfLesson()
+}
+
+// readFile some JS magic converting uploaded file to a slice of bytes
+// https://github.com/maxence-charriere/go-app/issues/882
+func readFile(file app.Value) (data []byte, err error) {
+	done := make(chan bool)
+
+	// https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+	reader := app.Window().Get("FileReader").New()
+	reader.Set("onloadend", app.FuncOf(func(this app.Value, args []app.Value) interface{} {
+		done <- true
+		return nil
+	}))
+	reader.Call("readAsArrayBuffer", file)
+	<-done
+
+	readerError := reader.Get("error")
+
+	if !readerError.IsNull() {
+		err = fmt.Errorf("file reader error : %s", readerError.Get("message").String())
+	} else {
+		uint8Array := app.Window().Get("Uint8Array").New(reader.Get("result"))
+		data = make([]byte, uint8Array.Length())
+		app.CopyBytesToGo(data, uint8Array)
+	}
+
+	return data, err
 }
 
 // handleSave create new or update existing exercise

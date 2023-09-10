@@ -122,7 +122,7 @@ func createExercise(db *sql.DB, exercise *Exercise) {
 
 func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
 	const query = `
-		SELECT e.id, e.question, e.answer
+		SELECT e.id, e.question, e.answer, e.lesson_id
 		FROM exercise e
 		WHERE e.id = $1;`
 
@@ -134,7 +134,7 @@ func findExerciseById(db *sql.DB, exerciseId int) *Exercise {
 	for rows.Next() {
 		var exercise Exercise
 
-		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer)
+		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.LessonId)
 		if err != nil {
 			panic(err)
 		}

@@ -69,6 +69,21 @@ func (suite *WriterSuite) TestUpsertExercise() {
 	suite.Assert().NoError(err)
 }
 
+func (suite *WriterSuite) TestStoreExercises() {
+	exercises := models.Exercises{}
+
+	method := "POST"
+	route := StoreExercises
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercises)
+	suite.Assert().NoError(err)
+
+	suite.client.On("Call", method, route, params, reqBody).Return([]byte(""))
+
+	err = suite.writer.StoreExercises(exercises)
+	suite.Assert().NoError(err)
+}
+
 func (suite *WriterSuite) TestDeleteExercise() {
 	exercise := models.Exercise{}
 

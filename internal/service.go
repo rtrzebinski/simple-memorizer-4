@@ -47,6 +47,10 @@ func (s *Service) UpsertExercise(exercise *models.Exercise) error {
 	return s.w.UpsertExercise(exercise)
 }
 
+func (s *Service) StoreExercises(exercises models.Exercises) error {
+	return s.w.StoreExercises(exercises)
+}
+
 func (s *Service) DeleteExercise(exercise models.Exercise) error {
 	return s.w.DeleteExercise(exercise)
 }
