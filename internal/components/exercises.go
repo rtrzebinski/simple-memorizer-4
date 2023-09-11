@@ -181,6 +181,9 @@ func (c *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 		return
 	}
 
+	// reset file input for next upload
+	e.Get("target").Set("value", "")
+
 	// reload the UI
 	c.displayExercisesOfLesson()
 }
