@@ -108,6 +108,7 @@ k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
 	@mkdir -p $(HOME)/sm4-db-backup
 	@envsubst < k8s/db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
+	@kubectl apply -f k8s/metrics-server.yaml
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-status: ## Kubernetes show all objects
@@ -115,6 +116,7 @@ k8s-status: ## Kubernetes show all objects
 
 k8s-stop: ## Kubernetes delete all objects
 	@kubectl delete namespace sm4 --ignore-not-found=true
+	@kubectl delete -f k8s/metrics-server.yaml --ignore-not-found=true
 
 k8s-reset: ## Kubernetes stop and start
 	@make k8s-stop
