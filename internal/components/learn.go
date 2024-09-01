@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/memorizer"
@@ -65,8 +65,8 @@ func (c *Learn) OnMount(ctx app.Context) {
 	c.memorizer.Init(exercises)
 
 	c.handleNextExercise()
-	c.bindKeys()
-	c.bindSwipes()
+	c.bindKeys(ctx)
+	c.bindSwipes(ctx)
 }
 
 // HydrateLesson in go routine
@@ -76,8 +76,6 @@ func (c *Learn) hydrateLesson() {
 		if err != nil {
 			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		}
-		// needs to be run manually so UI reflects the change
-		c.Update()
 	}()
 }
 
@@ -104,49 +102,38 @@ func (c *Learn) Render() app.UI {
 		),
 		app.P().Body(
 			app.Text("Question: "),
-			app.If(c.exercise.Question != "",
-				app.Text(c.exercise.Question),
-			).Else(
-				app.Text(""),
-			),
+			app.If(c.exercise.Question != "", func() app.UI {
+				return app.Text(c.exercise.Question)
+			}).Else(func() app.UI {
+				return app.Text("")
+			}),
 		),
 		app.P().Body(
 			app.Text("Answer: "),
-			app.If(c.exercise.Answer != "",
-				app.Text(c.exercise.Answer),
-			).Else(
-				app.Text(""),
-			),
+			app.If(c.exercise.Answer != "", func() app.UI {
+				return app.Text(c.exercise.Answer)
+			}).Else(func() app.UI {
+				return app.Text("")
+			}),
 		).Hidden(!c.isAnswerVisible),
 		app.P().Body(
 			app.Text(c.exercise.ResultsProjection.BadAnswers),
 			app.Text(" bad answers"),
-			app.If(c.exercise.ResultsProjection.BadAnswers > 0,
-				app.If(c.exercise.ResultsProjection.BadAnswersToday > 0,
-					app.Text(" (today: "),
-					app.Text(c.exercise.ResultsProjection.BadAnswersToday),
-					app.Text(")"),
-				).Else(
-					app.Text(" (latest: "),
-					app.Text(c.exercise.ResultsProjection.LatestBadAnswer.Format("2 Jan 2006 15:04")),
-					app.Text(")"),
-				),
-			),
+			app.If(c.exercise.ResultsProjection.BadAnswers > 0 && c.exercise.ResultsProjection.BadAnswersToday > 0, func() app.UI {
+				return app.Text(" (today: " + strconv.Itoa(c.exercise.ResultsProjection.BadAnswersToday) + ")")
+			}).Else(func() app.UI {
+				return app.Text(" (latest: " + c.exercise.ResultsProjection.LatestBadAnswer.Format("2 Jan 2006 15:04") + ")")
+			}),
 		),
 		app.P().Body(
 			app.Text(c.exercise.ResultsProjection.GoodAnswers),
 			app.Text(" good answers"),
-			app.If(c.exercise.ResultsProjection.GoodAnswers > 0,
-				app.If(c.exercise.ResultsProjection.GoodAnswersToday > 0,
-					app.Text(" (today: "),
-					app.Text(c.exercise.ResultsProjection.GoodAnswersToday),
-					app.Text(")"),
-				).Else(
-					app.Text(" (latest: "),
-					app.Text(c.exercise.ResultsProjection.LatestGoodAnswer.Format("2 Jan 2006 15:04")),
-					app.Text(")"),
-				),
-			),
+
+			app.If(c.exercise.ResultsProjection.GoodAnswers > 0 && c.exercise.ResultsProjection.GoodAnswersToday > 0, func() app.UI {
+				return app.Text(" (today: " + strconv.Itoa(c.exercise.ResultsProjection.GoodAnswersToday) + ")")
+			}).Else(func() app.UI {
+				return app.Text(" (latest: " + c.exercise.ResultsProjection.LatestGoodAnswer.Format("2 Jan 2006 15:04") + ")")
+			}),
 		),
 		app.P().Body(
 			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
@@ -187,58 +174,80 @@ func (c *Learn) Render() app.UI {
 	)
 }
 
-func (c *Learn) bindKeys() {
-	var f func()
-
-	f = app.Window().AddEventListener("keyup", func(ctx app.Context, e app.Event) {
-		// bind actions to keyboard shortcuts
-		switch e.Get("code").String() {
-		case "Space":
-			if c.isAnswerVisible == true {
-				c.handleNextExercise()
-			} else {
+func (c *Learn) bindKeys(ctx app.Context) {
+	hFn := func(this app.Value, args []app.Value) any {
+		event := args[0]
+		app.Log("key pressed: " + event.Get("code").String())
+		ctx.Dispatch(func(ctx app.Context) {
+			// bind actions to keyboard shortcuts
+			switch event.Get("code").String() {
+			case "Space":
+				if c.isAnswerVisible == true {
+					c.handleNextExercise()
+				} else {
+					c.handleViewAnswer()
+				}
+			case "KeyV", "ArrowUp":
 				c.handleViewAnswer()
+			case "KeyG", "ArrowRight":
+				c.handleGoodAnswer()
+			case "KeyB", "ArrowLeft":
+				c.handleBadAnswer()
+			case "KeyN", "ArrowDown":
+				c.handleNextExercise()
 			}
-		case "KeyV", "ArrowUp":
-			c.handleViewAnswer()
-		case "KeyG", "ArrowRight":
-			c.handleGoodAnswer()
-		case "KeyB", "ArrowLeft":
-			c.handleBadAnswer()
-		case "KeyN", "ArrowDown":
-			c.handleNextExercise()
-		}
-	})
+		})
 
-	c.unsubscribers = append(c.unsubscribers, f)
+		return nil
+	}
+
+	fo := app.FuncOf(hFn)
+
+	app.Window().Call("addEventListener", "keyup", fo)
+
+	c.unsubscribers = append(c.unsubscribers, func() {
+		app.Window().Call("removeEventListener", "keyup", fo)
+		fo.Release()
+	})
 }
 
-func (c *Learn) bindSwipes() {
-	var f func()
-
-	f = app.Window().AddEventListener("swiped-left", func(ctx app.Context, e app.Event) {
+func (c *Learn) bindSwipes(ctx app.Context) {
+	c.bindSwipe(ctx, "swiped-left", func(ctx app.Context) {
 		c.handleBadAnswer()
 	})
-	c.unsubscribers = append(c.unsubscribers, f)
-
-	f = app.Window().AddEventListener("swiped-right", func(ctx app.Context, e app.Event) {
+	c.bindSwipe(ctx, "swiped-right", func(ctx app.Context) {
 		c.handleGoodAnswer()
 	})
-	c.unsubscribers = append(c.unsubscribers, f)
-
-	f = app.Window().AddEventListener("swiped-up", func(ctx app.Context, e app.Event) {
+	c.bindSwipe(ctx, "swiped-up", func(ctx app.Context) {
 		c.handleNextExercise()
 	})
-	c.unsubscribers = append(c.unsubscribers, f)
-
-	f = app.Window().AddEventListener("swiped-down", func(ctx app.Context, e app.Event) {
+	c.bindSwipe(ctx, "swiped-down", func(ctx app.Context) {
 		c.handleViewAnswer()
 	})
-	c.unsubscribers = append(c.unsubscribers, f)
+}
+
+func (c *Learn) bindSwipe(ctx app.Context, eventName string, v func(app.Context)) {
+	hFn := func(this app.Value, args []app.Value) any {
+		ctx.Dispatch(func(ctx app.Context) {
+			v(ctx)
+		})
+
+		return nil
+	}
+
+	fo := app.FuncOf(hFn)
+
+	app.Window().Call("addEventListener", eventName, fo)
+
+	c.unsubscribers = append(c.unsubscribers, func() {
+		app.Window().Call("removeEventListener", eventName, fo)
+		fo.Release()
+	})
 }
 
 // handleShowExercises start learning a current lesson
 func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
+	app.Log("handleShowExercises")
 	u, _ := url.Parse(PathExercises)
 
 	// set lesson_id in the url
@@ -250,15 +259,18 @@ func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
 }
 
 func (c *Learn) handleNextExercise() {
+	app.Log("handleNextExercise")
 	c.isAnswerVisible = false
 	c.exercise = c.memorizer.Next(c.exercise)
 }
 
 func (c *Learn) handleViewAnswer() {
+	app.Log("handleViewAnswer")
 	c.isAnswerVisible = true
 }
 
 func (c *Learn) handleGoodAnswer() {
+	app.Log("handleGoodAnswer")
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
 	// save answer in the background
@@ -276,6 +288,7 @@ func (c *Learn) handleGoodAnswer() {
 }
 
 func (c *Learn) handleBadAnswer() {
+	app.Log("handleBadAnswer")
 	// copy so go routine will not rely on dynamic c.exercise
 	exCopy := c.exercise
 	// save answer in the background

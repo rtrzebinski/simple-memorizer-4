@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/components"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/http/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
@@ -56,12 +56,12 @@ func run(ctx context.Context) error {
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route(components.PathHome, &components.Home{})
+	app.Route(components.PathHome, func() app.Composer { return &components.Home{} })
 
 	// Associate other frontend routes
-	app.Route(components.PathLessons, &components.Lessons{})
-	app.Route(components.PathExercises, &components.Exercises{})
-	app.Route(components.PathLearn, &components.Learn{})
+	app.Route(components.PathLessons, func() app.Composer { return &components.Lessons{} })
+	app.Route(components.PathExercises, func() app.Composer { return &components.Exercises{} })
+	app.Route(components.PathLearn, func() app.Composer { return &components.Learn{} })
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -100,9 +100,9 @@ func run(ctx context.Context) error {
 		Name:        "Home",
 		Description: "Home page",
 		Icon: app.Icon{
-			Default:    "/web/logo-192.png",
-			Large:      "/web/logo-512.png",
-			AppleTouch: "/web/logo-192.png",
+			Default:  "/web/logo-192.png",
+			Large:    "/web/logo-512.png",
+			Maskable: "/web/logo-192.png",
 		},
 		Scripts: []string{
 			"/web/swiped-events.js",
@@ -111,7 +111,7 @@ func run(ctx context.Context) error {
 			// todo find a way to only load on a learning page
 			//"/web/hello.css",
 		},
-		Env: app.Environment{
+		Env: map[string]string{
 			"version": version,
 		},
 	})

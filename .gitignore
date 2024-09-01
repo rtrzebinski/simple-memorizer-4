@@ -17,3 +17,5 @@
 bin/*
 web/app.wasm
 version
+
+.idea/
