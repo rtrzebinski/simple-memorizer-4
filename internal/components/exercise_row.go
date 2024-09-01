@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
@@ -34,8 +34,8 @@ func (c *ExerciseRow) Render() app.UI {
 			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(c.onEdit(), fmt.Sprintf("%p", c)),
-			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id), fmt.Sprintf("%p", c)),
+			app.Button().Text("Edit").OnClick(c.onEdit()),
+			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id)),
 		),
 	)
 }

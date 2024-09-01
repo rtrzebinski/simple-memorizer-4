@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
@@ -60,8 +60,6 @@ func (c *Exercises) hydrateLesson() {
 		if err != nil {
 			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		}
-		// needs to be run manually so UI reflects the change
-		c.Update()
 	}()
 }
 
