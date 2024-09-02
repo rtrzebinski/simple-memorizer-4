@@ -34,8 +34,8 @@ func (c *ExerciseRow) Render() app.UI {
 			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(c.onEdit()),
-			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id)),
+			app.Button().Text("Edit").OnClick(c.onEdit(), app.EventScope(fmt.Sprintf("%p", c))),
+			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id), app.EventScope(fmt.Sprintf("%p", c))),
 		),
 	)
 }
