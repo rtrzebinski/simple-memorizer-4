@@ -63,8 +63,6 @@ func run(ctx context.Context) error {
 	app.Route(components.PathExercises, func() app.Composer { return &components.Exercises{} })
 	app.Route(components.PathLearn, func() app.Composer { return &components.Learn{} })
 
-	go intervalUpdater(time.Second * 5)
-
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
 	//
@@ -179,12 +177,4 @@ func run(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-func intervalUpdater(delay time.Duration) {
-	time.AfterFunc(delay, func() {
-		app.Log("checking for update")
-		app.TryUpdate()
-		intervalUpdater(delay)
-	})
 }
