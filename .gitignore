@@ -19,3 +19,4 @@ web/app.wasm
 version
 
 .idea/
+test.go
