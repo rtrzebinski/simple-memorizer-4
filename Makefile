@@ -87,7 +87,7 @@ build: ## Build client and server
 
 run: ## Build and run locally
 	@make build
-	@echo "$(OK_COLOR)==> Running on http://localhost:8000 $(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
 	@go run cmd/simple-memorizer/main.go
 
 test: ## Test all

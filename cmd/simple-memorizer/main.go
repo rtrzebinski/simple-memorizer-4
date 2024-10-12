@@ -25,7 +25,9 @@ type config struct {
 		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable"`
 	}
 	Api struct {
-		Port string `envconfig:"API_PORT" default:":8000"`
+		Port     string `envconfig:"API_PORT" default:":8000"`
+		CertFile string `envconfig:"API_CERT_FILE" default:"dev/localhost-cert.pem"`
+		KeyFile  string `envconfig:"API_KEY_FILE" default:"dev/localhost-key.pem"`
 	}
 	Web struct {
 		ProbeAddr       string        `envconfig:"WEB_PROBE_HOST" default:"0.0.0.0:9090"`
@@ -147,7 +149,7 @@ func run(ctx context.Context) error {
 	// Start API server and send errors to the channel
 	go func() {
 		log.Printf("initializing API server on port: %s", cfg.Api.Port)
-		serverErrors <- rest.ListenAndServe(r, w, cfg.Api.Port)
+		serverErrors <- rest.ListenAndServe(r, w, cfg.Api.Port, cfg.Api.CertFile, cfg.Api.KeyFile)
 	}()
 
 	// Signal notifier
