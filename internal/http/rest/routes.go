@@ -27,7 +27,7 @@ const (
 	ExportLessonCsv = "/export-lesson-csv"
 )
 
-func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
+func ListenAndServe(r internal.Reader, w internal.Writer, port, certFile, keyFile string) error {
 	// read
 
 	http.Handle(FetchLessons, handlers.NewFetchLessons(r))
@@ -47,7 +47,7 @@ func ListenAndServe(r internal.Reader, w internal.Writer, port string) error {
 
 	http.Handle(ExportLessonCsv, handlers.NewExportLessonCsv(r))
 
-	if err := http.ListenAndServe(port, nil); err != nil {
+	if err := http.ListenAndServeTLS(port, certFile, keyFile, nil); err != nil {
 		return err
 	}
 
