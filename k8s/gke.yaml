@@ -20,7 +20,6 @@ spec:
       containers:
         - name: simple-memorizer-4
           image: "gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
-          args: ["/app/bin/simple-memorizer"]
           ports:
             - name: app
               containerPort: 8000

@@ -20,3 +20,6 @@ version
 
 .idea/
 test.go
+
+.DS_Store
+internal/.DS_Store

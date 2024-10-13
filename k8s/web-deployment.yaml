@@ -16,7 +16,6 @@ spec:
         - name: sm4-web
           image: rtrzebinski/sm4:latest
           imagePullPolicy: Always
-          args: [ "/app/bin/simple-memorizer" ]
           ports:
             - containerPort: 8000
           env:
