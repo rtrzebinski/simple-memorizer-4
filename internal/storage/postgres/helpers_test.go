@@ -214,7 +214,7 @@ func createPostgresContainer(ctx context.Context, dbname string) (testcontainers
 
 	req := testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        "postgres:15.4-alpine",
+			Image:        "postgres:17.0-alpine",
 			ExposedPorts: []string{port},
 			Cmd:          []string{"postgres", "-c", "fsync=off"},
 			Env:          env,
