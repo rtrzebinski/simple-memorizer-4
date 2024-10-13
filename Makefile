@@ -35,7 +35,7 @@ dev: ## Prepare local dev environment (stop + start + migrate + seed)
 	@make start
 	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
 	@until docker exec dev-sm-db-1 pg_isready 2>&1 | grep -q "accepting connections"; do \
-          sleep 1; \
+          sleep 0.2; \
           echo "still waiting..."; \
          done
 	@make migrate
