@@ -6,9 +6,14 @@ import (
 
 const PathHome = "/"
 
-// A Home component
+// Home is a component that displays the home page
 type Home struct {
 	app.Compo
+}
+
+// NewHome creates a new Home component
+func NewHome() *Home {
+	return &Home{}
 }
 
 // The Render method is where the component appearance is defined.

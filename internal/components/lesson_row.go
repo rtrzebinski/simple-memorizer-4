@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// LessonRow is a component that displays a row in the lessons table
 type LessonRow struct {
 	app.Compo
 	parent *Lessons
@@ -40,6 +41,7 @@ func (c *LessonRow) Render() app.UI {
 	)
 }
 
+// onEdit handles edit button click
 func (c *LessonRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		c.parent.inputId = c.lesson.Id
@@ -50,6 +52,7 @@ func (c *LessonRow) onEdit() app.EventHandler {
 	}
 }
 
+// onDelete handles delete button click
 func (c *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
@@ -70,6 +73,7 @@ func (c *LessonRow) onDelete(id int) app.EventHandler {
 	}
 }
 
+// onExercises handles exercises button click
 func (c *LessonRow) onExercises(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		u, _ := url.Parse(PathExercises)
@@ -83,6 +87,7 @@ func (c *LessonRow) onExercises(id int) app.EventHandler {
 	}
 }
 
+// onLearn handles learn button click
 func (c *LessonRow) onLearn(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		u, _ := url.Parse(PathLearn)

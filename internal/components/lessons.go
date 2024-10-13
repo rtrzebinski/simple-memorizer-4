@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
-	"net/http"
 )
 
 const PathLessons = "/lessons"
 
+// Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
 	s *internal.Service
@@ -28,15 +27,15 @@ type Lessons struct {
 	saveButtonDisabled bool
 }
 
+// NewLessons creates a new Lessons component
+func NewLessons(s *internal.Service) *Lessons {
+	return &Lessons{
+		s: s,
+	}
+}
+
 // The OnMount method is run once component is mounted
-func (c *Lessons) OnMount(ctx app.Context) {
-	u := app.Window().URL()
-
-	// create a service, because if go-app lib limitations it can not be injected from main
-	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.s = internal.NewService(r, w)
-
+func (c *Lessons) OnMount(_ app.Context) {
 	c.displayAllLessons()
 }
 
@@ -82,13 +81,13 @@ func (c *Lessons) Render() app.UI {
 }
 
 // handleAddLesson display add lesson form
-func (c *Lessons) handleAddLesson(ctx app.Context, e app.Event) {
+func (c *Lessons) handleAddLesson(_ app.Context, e app.Event) {
 	c.formVisible = true
 	c.inputId = 0
 }
 
 // handleSave create new or update existing lesson
-func (c *Lessons) handleSave(ctx app.Context, e app.Event) {
+func (c *Lessons) handleSave(_ app.Context, e app.Event) {
 	e.PreventDefault()
 
 	var err error
@@ -132,10 +131,12 @@ func (c *Lessons) handleSave(ctx app.Context, e app.Event) {
 	c.displayAllLessons()
 }
 
-func (c *Lessons) handleCancel(ctx app.Context, e app.Event) {
+// handleCancel handle cancel button click
+func (c *Lessons) handleCancel(_ app.Context, _ app.Event) {
 	c.resetForm()
 }
 
+// resetForm reset form fields
 func (c *Lessons) resetForm() {
 	c.inputId = 0
 	c.inputName = ""
@@ -145,6 +146,7 @@ func (c *Lessons) resetForm() {
 	c.formVisible = false
 }
 
+// displayAllLessons fetch all lessons from the database and display them
 func (c *Lessons) displayAllLessons() {
 	lessons, err := c.s.FetchLessons()
 	if err != nil {

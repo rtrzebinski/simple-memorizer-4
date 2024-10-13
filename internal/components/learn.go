@@ -4,17 +4,15 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/memorizer"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
-	"net/http"
 	"net/url"
 	"strconv"
 )
 
 const PathLearn = "/learn"
 
-// A Learn component
+// Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
 	s         *internal.Service
@@ -30,14 +28,16 @@ type Learn struct {
 	unsubscribers []func()
 }
 
+// NewLearn creates a new Learn component
+func NewLearn(s *internal.Service) *Learn {
+	return &Learn{
+		s: s,
+	}
+}
+
 // The OnMount method is run once component is mounted
 func (c *Learn) OnMount(ctx app.Context) {
 	u := app.Window().URL()
-
-	// create a service, because if go-app lib limitations it can not be injected from main
-	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.s = internal.NewService(r, w)
 
 	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
@@ -174,6 +174,7 @@ func (c *Learn) Render() app.UI {
 	)
 }
 
+// bindKeys binds keyboard events to actions
 func (c *Learn) bindKeys(ctx app.Context) {
 	hFn := func(this app.Value, args []app.Value) any {
 		event := args[0]
@@ -211,6 +212,7 @@ func (c *Learn) bindKeys(ctx app.Context) {
 	})
 }
 
+// bindSwipes binds swipe events to actions
 func (c *Learn) bindSwipes(ctx app.Context) {
 	c.bindSwipe(ctx, "swiped-left", func(ctx app.Context) {
 		c.handleBadAnswer()
@@ -226,6 +228,7 @@ func (c *Learn) bindSwipes(ctx app.Context) {
 	})
 }
 
+// bindSwipe binds swipe event to an action
 func (c *Learn) bindSwipe(ctx app.Context, eventName string, v func(app.Context)) {
 	hFn := func(this app.Value, args []app.Value) any {
 		ctx.Dispatch(func(ctx app.Context) {
@@ -246,7 +249,7 @@ func (c *Learn) bindSwipe(ctx app.Context, eventName string, v func(app.Context)
 }
 
 // handleShowExercises start learning a current lesson
-func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
+func (c *Learn) handleShowExercises(ctx app.Context, _ app.Event) {
 	app.Log("handleShowExercises")
 	u, _ := url.Parse(PathExercises)
 
@@ -258,17 +261,20 @@ func (c *Learn) handleShowExercises(ctx app.Context, e app.Event) {
 	ctx.NavigateTo(u)
 }
 
+// handleNextExercise moves to the next exercise
 func (c *Learn) handleNextExercise() {
 	app.Log("handleNextExercise")
 	c.isAnswerVisible = false
 	c.exercise = c.memorizer.Next(c.exercise)
 }
 
+// handleViewAnswer shows the answer
 func (c *Learn) handleViewAnswer() {
 	app.Log("handleViewAnswer")
 	c.isAnswerVisible = true
 }
 
+// handleGoodAnswer increments good answers and moves to the next exercise
 func (c *Learn) handleGoodAnswer() {
 	app.Log("handleGoodAnswer")
 	// copy so go routine will not rely on dynamic c.exercise
@@ -287,6 +293,7 @@ func (c *Learn) handleGoodAnswer() {
 	c.handleNextExercise()
 }
 
+// handleBadAnswer increments bad answers and moves to the next exercise
 func (c *Learn) handleBadAnswer() {
 	app.Log("handleBadAnswer")
 	// copy so go routine will not rely on dynamic c.exercise

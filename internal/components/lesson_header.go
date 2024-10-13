@@ -4,6 +4,7 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+// LessonHeader is a component that displays the header of the lessons table
 type LessonHeader struct {
 	app.Compo
 }

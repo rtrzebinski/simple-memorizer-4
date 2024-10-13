@@ -4,6 +4,7 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+// Navigation is a component that displays the navigation bar
 type Navigation struct {
 	app.Compo
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 )
 
+// ExerciseRow is a component that displays a single row of the exercises table
 type ExerciseRow struct {
 	app.Compo
 	parent   *Exercises
@@ -40,6 +41,7 @@ func (c *ExerciseRow) Render() app.UI {
 	)
 }
 
+// onDelete handles delete button click
 func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise
@@ -61,6 +63,7 @@ func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 	}
 }
 
+// onEdit handles edit button click
 func (c *ExerciseRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		c.parent.inputId = c.exercise.Id

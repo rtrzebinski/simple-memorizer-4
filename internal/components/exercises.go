@@ -8,13 +8,13 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/validation"
-	"net/http"
 	"net/url"
 	"strconv"
 )
 
 const PathExercises = "/exercises"
 
+// Exercises is a component that displays all exercises of a lesson
 type Exercises struct {
 	app.Compo
 	s *internal.Service
@@ -32,15 +32,18 @@ type Exercises struct {
 	saveButtonDisabled bool
 }
 
+// NewExercises creates a new Exercises component
+func NewExercises(s *internal.Service) *Exercises {
+	return &Exercises{
+		s: s,
+	}
+}
+
 // The OnMount method is run once component is mounted
-func (c *Exercises) OnMount(ctx app.Context) {
+func (c *Exercises) OnMount(_ app.Context) {
 	u := app.Window().URL()
 
-	// create a service, because if go-app lib limitations it can not be injected from main
-	r := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	w := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	c.s = internal.NewService(r, w)
-
+	// find lesson_id in the url
 	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
 	if err != nil {
 		app.Log(fmt.Errorf("failed to convert lesson_id: %w", err))
@@ -121,7 +124,7 @@ func (c *Exercises) Render() app.UI {
 }
 
 // handleStartLearning start learning a current lesson
-func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
+func (c *Exercises) handleStartLearning(ctx app.Context, _ app.Event) {
 	u, _ := url.Parse(PathLearn)
 
 	// set lesson_id in the url
@@ -133,12 +136,12 @@ func (c *Exercises) handleStartLearning(ctx app.Context, e app.Event) {
 }
 
 // handleAddExercise display add exercise form
-func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
+func (c *Exercises) handleAddExercise(_ app.Context, _ app.Event) {
 	c.formVisible = true
 }
 
 // handleCsvUpload upload exercises from a CSV file
-func (c *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
+func (c *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
 	file := e.Get("target").Get("files").Index(0)
 
 	// validate file type which can be changed by the user in the file picker
@@ -214,7 +217,7 @@ func readFile(file app.Value) (data []byte, err error) {
 }
 
 // handleSave create new or update existing exercise
-func (c *Exercises) handleSave(ctx app.Context, e app.Event) {
+func (c *Exercises) handleSave(_ app.Context, e app.Event) {
 	e.PreventDefault()
 
 	// exercise to be saved
@@ -266,11 +269,13 @@ func (c *Exercises) handleSave(ctx app.Context, e app.Event) {
 	c.displayExercisesOfLesson()
 }
 
-func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
+// handleCancel handle cancel button click
+func (c *Exercises) handleCancel(_ app.Context, _ app.Event) {
 	c.resetForm()
 	c.formVisible = false
 }
 
+// resetForm reset form fields
 func (c *Exercises) resetForm() {
 	c.inputId = 0
 	c.inputQuestion = ""
@@ -279,6 +284,7 @@ func (c *Exercises) resetForm() {
 	c.saveButtonDisabled = false
 }
 
+// displayExercisesOfLesson fetch exercises from the database and display them
 func (c *Exercises) displayExercisesOfLesson() {
 	exercises, err := c.s.FetchExercises(c.lesson)
 	if err != nil {

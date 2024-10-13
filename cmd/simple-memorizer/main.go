@@ -8,6 +8,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/components"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/http/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
@@ -54,16 +55,23 @@ func main() {
 func run(ctx context.Context) error {
 	log.Println("application starting")
 
+	u := app.Window().URL()
+
+	// create a service to be injected into components
+	restReader := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	restWriter := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
+	s := internal.NewService(restReader, restWriter)
+
 	// The first thing to do is to associate the home component with a path.
 	//
-	// This is done by calling the Route() function,  which tells go-app what
+	// This is done by calling the Route() function, which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route(components.PathHome, func() app.Composer { return &components.Home{} })
+	app.Route(components.PathHome, func() app.Composer { return components.NewHome() })
 
 	// Associate other frontend routes
-	app.Route(components.PathLessons, func() app.Composer { return &components.Lessons{} })
-	app.Route(components.PathExercises, func() app.Composer { return &components.Exercises{} })
-	app.Route(components.PathLearn, func() app.Composer { return &components.Learn{} })
+	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(s) })
+	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(s) })
+	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(s) })
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.

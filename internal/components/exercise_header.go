@@ -4,6 +4,7 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
+// ExerciseHeader is a component that displays the header of the exercises table
 type ExerciseHeader struct {
 	app.Compo
 }
