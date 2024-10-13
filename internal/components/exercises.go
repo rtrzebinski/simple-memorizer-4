@@ -53,14 +53,12 @@ func (c *Exercises) OnMount(ctx app.Context) {
 	c.displayExercisesOfLesson()
 }
 
-// HydrateLesson in go routine
+// hydrateLesson fetch lesson details from the database
 func (c *Exercises) hydrateLesson() {
-	go func() {
-		err := c.s.HydrateLesson(&c.lesson)
-		if err != nil {
-			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
-		}
-	}()
+	err := c.s.HydrateLesson(&c.lesson)
+	if err != nil {
+		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
+	}
 }
 
 // The Render method is where the component appearance is defined.
@@ -139,6 +137,7 @@ func (c *Exercises) handleAddExercise(ctx app.Context, e app.Event) {
 	c.formVisible = true
 }
 
+// handleCsvUpload upload exercises from a CSV file
 func (c *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	file := e.Get("target").Get("files").Index(0)
 
