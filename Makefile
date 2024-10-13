@@ -25,6 +25,11 @@ help: ## Show this help
         printf "%s\n" $$help_info; \
     done
 
+deps: ## Install local environment dependencies
+	@echo "$(OK_COLOR)==> Install dev dependencies for $(SERVICE_NAME)... $(NO_COLOR)"
+	@brew install go
+	@brew install golang-migrate
+
 dev: ## Prepare local dev environment (stop + start + migrate + seed)
 	@echo "$(OK_COLOR)==> Prepare dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
 	@make stop
@@ -92,13 +97,18 @@ run: ## Build and run locally
 
 test: ## Test all
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"
-	@go test -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
+	@go test -failfast -race -covermode=atomic -coverprofile=coverage.out -ldflags=-extldflags=-Wl,-ld_classic ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 test-short: ## Test short (unit)
 	@echo "$(OK_COLOR)==> Running short tests for $(SERVICE_NAME)... $(NO_COLOR)"
-	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out ./...
+	@go test -short -failfast -race -covermode=atomic -coverprofile=coverage.out -ldflags=-extldflags=-Wl,-ld_classic ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
+
+go-deps-update: ## Update GO dependencies
+	@echo "$(OK_COLOR)==> Updating GO dependencies $(SERVICE_NAME)... $(NO_COLOR)"
+	@go get -u ./...
+	@go vet ./...
 
 k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@kubectl create namespace sm4
