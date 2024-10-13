@@ -26,12 +26,11 @@ help: ## Show this help
     done
 
 deps: ## Install local environment dependencies
-	@echo "$(OK_COLOR)==> Install dev dependencies for $(SERVICE_NAME)... $(NO_COLOR)"
-	@brew install go
+	@echo "$(OK_COLOR)==> Installing local environment dependencies for $(SERVICE_NAME)... $(NO_COLOR)"
 	@brew install golang-migrate
 
 dev: ## Prepare local dev environment (stop + start + migrate + seed)
-	@echo "$(OK_COLOR)==> Prepare dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Preparing dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
 	@make stop
 	@make start
 	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
