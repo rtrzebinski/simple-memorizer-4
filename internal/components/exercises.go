@@ -182,6 +182,7 @@ func (c *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	e.Get("target").Set("value", "")
 
 	// reload the UI
+	c.hydrateLesson()
 	c.displayExercisesOfLesson()
 }
 
@@ -260,11 +261,9 @@ func (c *Exercises) handleSave(ctx app.Context, e app.Event) {
 	// reset form
 	c.resetForm()
 
-	// refresh exercises list
-	c.displayExercisesOfLesson()
-
-	// refresh lesson details (exercises counter)
+	// reload the UI
 	c.hydrateLesson()
+	c.displayExercisesOfLesson()
 }
 
 func (c *Exercises) handleCancel(ctx app.Context, e app.Event) {
