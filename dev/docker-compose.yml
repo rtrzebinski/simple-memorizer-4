@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   sm-db:
     image: postgres:17.0-alpine
