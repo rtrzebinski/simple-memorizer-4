@@ -2,7 +2,7 @@ version: '3'
 
 services:
   sm-db:
-    image: postgres:15.4-alpine
+    image: postgres:17.0-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
