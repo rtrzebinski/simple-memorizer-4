@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -14,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestExportLessonCsv(t *testing.T) {
+func TestFetchExercisesOfLesson(t *testing.T) {
 	exercise := models.Exercise{
 		Id:       1,
 		Question: "question",
@@ -22,19 +21,16 @@ func TestExportLessonCsv(t *testing.T) {
 	}
 	exercises := models.Exercises{exercise}
 
-	lesson := models.Lesson{Id: 2}
+	lessonId := 10
 
 	reader := storage.NewReaderMock()
-	reader.On("FetchExercises", lesson).Return(exercises)
-	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
-		args.Get(0).(*models.Lesson).Name = "lesson name"
-	})
+	reader.On("FetchExercises", models.Lesson{Id: lessonId}).Return(exercises)
 
-	route := NewExportLessonCsv(reader)
+	route := NewFetchExercisesOfLesson(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
+	params.Add("lesson_id", strconv.Itoa(lessonId))
 	u.RawQuery = params.Encode()
 
 	req := &http.Request{}
@@ -45,16 +41,17 @@ func TestExportLessonCsv(t *testing.T) {
 	route.ServeHTTP(res, req)
 
 	assert.Equal(t, http.StatusOK, res.Code)
-	assert.Equal(t, "question,answer\n", string(res.Body.Bytes()))
-	assert.Equal(t, "attachment; filename=lesson name.csv", res.Header().Get("Content-Disposition"))
-	assert.Equal(t, "application/octet-stream", res.Header().Get("Content-Type"))
-	assert.Equal(t, "16", res.Header().Get("Content-Length"))
+
+	var result models.Exercises
+	json.Unmarshal(res.Body.Bytes(), &result)
+
+	assert.Equal(t, exercises, result)
 }
 
-func TestExportLessonCsv_invalidInput(t *testing.T) {
+func TestFetchExercisesOfLesson_invalidInput(t *testing.T) {
 	reader := storage.NewReaderMock()
 
-	route := NewExportLessonCsv(reader)
+	route := NewFetchExercisesOfLesson(reader)
 
 	u, _ := url.Parse("/")
 

@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"encoding/json"
@@ -13,10 +13,9 @@ import (
 	"testing"
 )
 
-func TestUpsertLesson(t *testing.T) {
-	input := models.Lesson{
-		Name:        "name",
-		Description: "description",
+func TestDeleteExercise(t *testing.T) {
+	input := models.Exercise{
+		Id: 123,
 	}
 
 	body, err := json.Marshal(input)
@@ -25,9 +24,9 @@ func TestUpsertLesson(t *testing.T) {
 	}
 
 	writer := storage.NewWriterMock()
-	writer.On("UpsertLesson", &input)
+	writer.On("DeleteExercise", input)
 
-	route := NewUpsertLesson(writer)
+	route := NewDeleteExercise(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -37,8 +36,8 @@ func TestUpsertLesson(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestUsertLesson_invalidInput(t *testing.T) {
-	input := models.Lesson{}
+func TestDeleteExercise_invalidInput(t *testing.T) {
+	input := models.Exercise{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -47,7 +46,7 @@ func TestUsertLesson_invalidInput(t *testing.T) {
 
 	writer := storage.NewWriterMock()
 
-	route := NewUpsertLesson(writer)
+	route := NewDeleteExercise(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -60,5 +59,5 @@ func TestUsertLesson_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
 }
