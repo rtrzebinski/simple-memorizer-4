@@ -9,15 +9,15 @@ import (
 	"strconv"
 )
 
-type Service struct {
+type Client struct {
 	c Caller
 }
 
-func NewService(c Caller) *Service {
-	return &Service{c: c}
+func NewClient(c Caller) *Client {
+	return &Client{c: c}
 }
 
-func (s *Service) FetchLessons() (models.Lessons, error) {
+func (s *Client) FetchLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
 	respBody, err := s.c.Call("GET", routes.FetchLessons, nil, nil)
@@ -32,7 +32,7 @@ func (s *Service) FetchLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
-func (s *Service) HydrateLesson(lesson *models.Lesson) error {
+func (s *Client) HydrateLesson(lesson *models.Lesson) error {
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
@@ -49,7 +49,7 @@ func (s *Service) HydrateLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (s *Service) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
+func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
 	var params = map[string]string{
@@ -72,7 +72,7 @@ func (s *Service) FetchExercises(lesson models.Lesson) (models.Exercises, error)
 	return exercises, nil
 }
 
-func (s *Service) UpsertLesson(lesson *models.Lesson) error {
+func (s *Client) UpsertLesson(lesson *models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -86,7 +86,7 @@ func (s *Service) UpsertLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (s *Service) DeleteLesson(lesson models.Lesson) error {
+func (s *Client) DeleteLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -100,7 +100,7 @@ func (s *Service) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (s *Service) UpsertExercise(exercise *models.Exercise) error {
+func (s *Client) UpsertExercise(exercise *models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
@@ -114,7 +114,7 @@ func (s *Service) UpsertExercise(exercise *models.Exercise) error {
 	return nil
 }
 
-func (s *Service) StoreExercises(exercises models.Exercises) error {
+func (s *Client) StoreExercises(exercises models.Exercises) error {
 	body, err := json.Marshal(exercises)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercises: %w", err)
@@ -128,7 +128,7 @@ func (s *Service) StoreExercises(exercises models.Exercises) error {
 	return nil
 }
 
-func (s *Service) DeleteExercise(exercise models.Exercise) error {
+func (s *Client) DeleteExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
@@ -142,7 +142,7 @@ func (s *Service) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (s *Service) StoreResult(result *models.Result) error {
+func (s *Client) StoreResult(result *models.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {
 		return fmt.Errorf("failed to encode result: %w", err)

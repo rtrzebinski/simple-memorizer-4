@@ -13,7 +13,7 @@ const PathLessons = "/lessons"
 // Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
-	s *api.Service
+	s *api.Client
 
 	// component vars
 	rows []*LessonRow
@@ -28,7 +28,7 @@ type Lessons struct {
 }
 
 // NewLessons creates a new Lessons component
-func NewLessons(s *api.Service) *Lessons {
+func NewLessons(s *api.Client) *Lessons {
 	return &Lessons{
 		s: s,
 	}

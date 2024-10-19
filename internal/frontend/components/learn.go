@@ -15,7 +15,7 @@ const PathLearn = "/learn"
 // Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
-	s         *api.Service
+	s         *api.Client
 	memorizer memorizer.Service
 
 	// component vars
@@ -29,7 +29,7 @@ type Learn struct {
 }
 
 // NewLearn creates a new Learn component
-func NewLearn(s *api.Service) *Learn {
+func NewLearn(s *api.Client) *Learn {
 	return &Learn{
 		s: s,
 	}

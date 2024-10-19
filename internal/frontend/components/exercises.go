@@ -17,7 +17,7 @@ const PathExercises = "/exercises"
 // Exercises is a component that displays all exercises of a lesson
 type Exercises struct {
 	app.Compo
-	s *api.Service
+	s *api.Client
 
 	// component vars
 	lesson models.Lesson
@@ -33,7 +33,7 @@ type Exercises struct {
 }
 
 // NewExercises creates a new Exercises component
-func NewExercises(s *api.Service) *Exercises {
+func NewExercises(s *api.Client) *Exercises {
 	return &Exercises{
 		s: s,
 	}

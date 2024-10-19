@@ -9,22 +9,22 @@ import (
 	"testing"
 )
 
-type ServiceSuite struct {
+type ClientSuite struct {
 	suite.Suite
-	s *Service
+	s *Client
 	c *CallerMock
 }
 
-func (suite *ServiceSuite) SetupTest() {
+func (suite *ClientSuite) SetupTest() {
 	suite.c = NewCallerMock()
-	suite.s = NewService(suite.c)
+	suite.s = NewClient(suite.c)
 }
 
-func TestServiceSuite(t *testing.T) {
-	suite.Run(t, new(ServiceSuite))
+func TestClientSuite(t *testing.T) {
+	suite.Run(t, new(ClientSuite))
 }
 
-func (suite *ServiceSuite) TestFetchLessons() {
+func (suite *ClientSuite) TestFetchLessons() {
 	lessons := models.Lessons{models.Lesson{Name: "name"}}
 
 	responseBody, err := json.Marshal(lessons)
@@ -42,7 +42,7 @@ func (suite *ServiceSuite) TestFetchLessons() {
 	suite.Assert().Equal(lessons, result)
 }
 
-func (suite *ServiceSuite) TestHydrateLesson() {
+func (suite *ClientSuite) TestHydrateLesson() {
 	lesson := &models.Lesson{Id: 10}
 
 	responseBody, err := json.Marshal(lesson)
@@ -59,7 +59,7 @@ func (suite *ServiceSuite) TestHydrateLesson() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestFetchExercises() {
+func (suite *ClientSuite) TestFetchExercises() {
 	lesson := models.Lesson{Id: 1}
 	exercises := models.Exercises{
 		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}}},
@@ -92,7 +92,7 @@ func (suite *ServiceSuite) TestFetchExercises() {
 	suite.c.AssertExpectations(suite.T())
 }
 
-func (suite *ServiceSuite) TestUpsertLesson() {
+func (suite *ClientSuite) TestUpsertLesson() {
 	lesson := models.Lesson{}
 
 	method := "POST"
@@ -107,7 +107,7 @@ func (suite *ServiceSuite) TestUpsertLesson() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestDeleteLesson() {
+func (suite *ClientSuite) TestDeleteLesson() {
 	lesson := models.Lesson{}
 
 	method := "POST"
@@ -122,7 +122,7 @@ func (suite *ServiceSuite) TestDeleteLesson() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestUpsertExercise() {
+func (suite *ClientSuite) TestUpsertExercise() {
 	exercise := models.Exercise{}
 
 	method := "POST"
@@ -137,7 +137,7 @@ func (suite *ServiceSuite) TestUpsertExercise() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestStoreExercises() {
+func (suite *ClientSuite) TestStoreExercises() {
 	exercises := models.Exercises{}
 
 	method := "POST"
@@ -152,7 +152,7 @@ func (suite *ServiceSuite) TestStoreExercises() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestDeleteExercise() {
+func (suite *ClientSuite) TestDeleteExercise() {
 	exercise := models.Exercise{}
 
 	method := "POST"
@@ -167,7 +167,7 @@ func (suite *ServiceSuite) TestDeleteExercise() {
 	suite.Assert().NoError(err)
 }
 
-func (suite *ServiceSuite) TestStoreResult() {
+func (suite *ClientSuite) TestStoreResult() {
 	result := models.Result{}
 
 	method := "POST"

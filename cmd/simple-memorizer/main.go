@@ -58,7 +58,7 @@ func run(ctx context.Context) error {
 	u := app.Window().URL()
 
 	// create a service to be injected into components
-	s := api.NewService(api.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
+	s := api.NewClient(api.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
 
 	// The first thing to do is to associate the home component with a path.
 	//
