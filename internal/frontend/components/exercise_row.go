@@ -45,7 +45,7 @@ func (c *ExerciseRow) Render() app.UI {
 func (c *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise
-		err := c.parent.s.DeleteExercise(models.Exercise{Id: id})
+		err := c.parent.c.DeleteExercise(models.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}

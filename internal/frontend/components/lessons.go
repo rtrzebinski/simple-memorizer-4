@@ -3,7 +3,6 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/validation"
 )
@@ -13,7 +12,7 @@ const PathLessons = "/lessons"
 // Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
-	s *api.Client
+	c APIClient
 
 	// component vars
 	rows []*LessonRow
@@ -28,50 +27,50 @@ type Lessons struct {
 }
 
 // NewLessons creates a new Lessons component
-func NewLessons(s *api.Client) *Lessons {
+func NewLessons(c APIClient) *Lessons {
 	return &Lessons{
-		s: s,
+		c: c,
 	}
 }
 
 // The OnMount method is run once component is mounted
-func (c *Lessons) OnMount(_ app.Context) {
-	c.displayAllLessons()
+func (compo *Lessons) OnMount(_ app.Context) {
+	compo.displayAllLessons()
 }
 
 // The Render method is where the component appearance is defined.
-func (c *Lessons) Render() app.UI {
+func (compo *Lessons) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.P().Body(
-			app.Button().Text("Add a new lesson").OnClick(c.handleAddLesson).Hidden(c.formVisible),
+			app.Button().Text("Add a new lesson").OnClick(compo.handleAddLesson).Hidden(compo.formVisible),
 		),
 		app.Div().Body(
 			app.H3().Text("Add a new lesson"),
 			app.P().Body(
-				app.Range(c.validationErrors).Slice(func(i int) app.UI {
+				app.Range(compo.validationErrors).Slice(func(i int) app.UI {
 					return app.Div().Body(
-						app.Text(c.validationErrors[i].Error()),
+						app.Text(compo.validationErrors[i].Error()),
 						app.Br(),
 					).Style("color", "red")
 				}),
 			),
 			app.Textarea().Cols(30).Rows(3).Placeholder("Name").
-				Required(true).OnInput(c.ValueTo(&c.inputName)).Text(c.inputName),
+				Required(true).OnInput(compo.ValueTo(&compo.inputName)).Text(compo.inputName),
 			app.Br(),
 			app.Textarea().Cols(30).Rows(3).Placeholder("Description").
-				Required(true).OnInput(c.ValueTo(&c.inputDescription)).Text(c.inputDescription),
+				Required(true).OnInput(compo.ValueTo(&compo.inputDescription)).Text(compo.inputDescription),
 			app.Br(),
-			app.Button().Text("Save").OnClick(c.handleSave).Disabled(c.saveButtonDisabled),
-			app.Button().Text("Cancel").OnClick(c.handleCancel),
-		).Hidden(!c.formVisible),
+			app.Button().Text("Save").OnClick(compo.handleSave).Disabled(compo.saveButtonDisabled),
+			app.Button().Text("Cancel").OnClick(compo.handleCancel),
+		).Hidden(!compo.formVisible),
 		app.Div().Body(
 			app.H3().Text("Lessons"),
 			app.Table().Style("border", "1px solid black").Body(
 				&LessonHeader{},
-				app.Range(c.rows).Slice(func(i int) app.UI {
-					if c.rows[i] != nil {
-						return c.rows[i].Render()
+				app.Range(compo.rows).Slice(func(i int) app.UI {
+					if compo.rows[i] != nil {
+						return compo.rows[i].Render()
 					}
 					return nil
 				}),
@@ -81,74 +80,74 @@ func (c *Lessons) Render() app.UI {
 }
 
 // handleAddLesson display add lesson form
-func (c *Lessons) handleAddLesson(_ app.Context, e app.Event) {
-	c.formVisible = true
-	c.inputId = 0
+func (compo *Lessons) handleAddLesson(_ app.Context, e app.Event) {
+	compo.formVisible = true
+	compo.inputId = 0
 }
 
 // handleSave create new or update existing lesson
-func (c *Lessons) handleSave(_ app.Context, e app.Event) {
+func (compo *Lessons) handleSave(_ app.Context, e app.Event) {
 	e.PreventDefault()
 
 	var err error
 
 	// lesson to be saved
 	lesson := models.Lesson{
-		Id:          c.inputId,
-		Name:        c.inputName,
-		Description: c.inputDescription,
+		Id:          compo.inputId,
+		Name:        compo.inputName,
+		Description: compo.inputDescription,
 	}
 
 	// extract other names to validate against
 	var names []string
-	for i, row := range c.rows {
-		if row != nil && c.rows[i].lesson.Id != c.inputId {
-			names = append(names, c.rows[i].lesson.Name)
+	for i, row := range compo.rows {
+		if row != nil && compo.rows[i].lesson.Id != compo.inputId {
+			names = append(names, compo.rows[i].lesson.Name)
 		}
 	}
 
 	// validate input
 	validator := validation.ValidateUpsertLesson(lesson, names)
 	if validator.Failed() {
-		c.validationErrors = validator.Errors()
+		compo.validationErrors = validator.Errors()
 
 		return
 	}
 
 	// disable submit button to avoid duplicated requests
-	c.saveButtonDisabled = true
+	compo.saveButtonDisabled = true
 
 	// save lesson
-	err = c.s.UpsertLesson(&lesson)
+	err = compo.c.UpsertLesson(&lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}
 
 	// reset form
-	c.resetForm()
+	compo.resetForm()
 
 	// refresh lessons list
-	c.displayAllLessons()
+	compo.displayAllLessons()
 }
 
 // handleCancel handle cancel button click
-func (c *Lessons) handleCancel(_ app.Context, _ app.Event) {
-	c.resetForm()
+func (compo *Lessons) handleCancel(_ app.Context, _ app.Event) {
+	compo.resetForm()
 }
 
 // resetForm reset form fields
-func (c *Lessons) resetForm() {
-	c.inputId = 0
-	c.inputName = ""
-	c.inputDescription = ""
-	c.validationErrors = nil
-	c.saveButtonDisabled = false
-	c.formVisible = false
+func (compo *Lessons) resetForm() {
+	compo.inputId = 0
+	compo.inputName = ""
+	compo.inputDescription = ""
+	compo.validationErrors = nil
+	compo.saveButtonDisabled = false
+	compo.formVisible = false
 }
 
 // displayAllLessons fetch all lessons from the database and display them
-func (c *Lessons) displayAllLessons() {
-	lessons, err := c.s.FetchLessons()
+func (compo *Lessons) displayAllLessons() {
+	lessons, err := compo.c.FetchLessons()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}
@@ -168,9 +167,9 @@ func (c *Lessons) displayAllLessons() {
 
 	// add +1 to len as IDs from the DB are 1 indexed, while slices are 0 indexed,
 	// so we need to shift by one to have space for the latest row
-	c.rows = make([]*LessonRow, maxId+1)
+	compo.rows = make([]*LessonRow, maxId+1)
 
 	for _, row := range lessons {
-		c.rows[row.Id] = &LessonRow{lesson: row, parent: c}
+		compo.rows[row.Id] = &LessonRow{lesson: row, parent: compo}
 	}
 }

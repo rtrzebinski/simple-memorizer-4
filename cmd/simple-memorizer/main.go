@@ -58,7 +58,7 @@ func run(ctx context.Context) error {
 	u := app.Window().URL()
 
 	// create a service to be injected into components
-	s := api.NewClient(api.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
+	apiClient := api.NewClient(api.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
 
 	// The first thing to do is to associate the home component with a path.
 	//
@@ -67,9 +67,9 @@ func run(ctx context.Context) error {
 	app.Route(components.PathHome, func() app.Composer { return components.NewHome() })
 
 	// Associate other frontend routes
-	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(s) })
-	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(s) })
-	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(s) })
+	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient) })
+	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient) })
+	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient) })
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -148,13 +148,13 @@ func run(ctx context.Context) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		log.Printf("initializing probe server on host: %s", cfg.Web.ProbeAddr)
+		log.Printf("initializing probe server on host: %apiClient", cfg.Web.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
 	// Start API server and send errors to the channel
 	go func() {
-		log.Printf("initializing API server on port: %s", cfg.Api.Port)
+		log.Printf("initializing API server on port: %apiClient", cfg.Api.Port)
 		serverErrors <- server.ListenAndServe(r, w, cfg.Api.Port, cfg.Api.CertFile, cfg.Api.KeyFile)
 	}()
 

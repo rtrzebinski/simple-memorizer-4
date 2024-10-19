@@ -56,7 +56,7 @@ func (c *LessonRow) onEdit() app.EventHandler {
 func (c *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
-		err := c.parent.s.DeleteLesson(models.Lesson{Id: id})
+		err := c.parent.c.DeleteLesson(models.Lesson{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}
