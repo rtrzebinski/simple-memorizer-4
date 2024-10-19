@@ -35,7 +35,7 @@ dev: ## Prepare local dev environment (stop + start + migrate + seed)
 	@make start
 	@echo "$(OK_COLOR)==> Waiting for the db to be ready... $(NO_COLOR)"
 	@until docker exec dev-sm-db-1 pg_isready 2>&1 | grep -q "accepting connections"; do \
-          sleep 0.2; \
+          sleep 1; \
           echo "still waiting..."; \
          done
 	@make migrate
@@ -74,7 +74,7 @@ migrate-drop: ## Drop db without confirmation (migrate drop)
 
 seed: ## Seed the database with some example data
 	@echo "$(OK_COLOR)==> Seeding the db for $(SERVICE_NAME)... $(NO_COLOR)"
-	@go run seeds/seeder.go
+	@go run dev/seeder.go
 
 reseed: ## Destroy, recreate and seed the database (no confirmation)
 	@make migrate-down

@@ -8,12 +8,13 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/components"
-	probes "github.com/rtrzebinski/simple-memorizer-4/internal/http/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/http/rest"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/rest"
+	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"log"
 	"net/http"
 	"os"
@@ -27,8 +28,8 @@ type config struct {
 	}
 	Api struct {
 		Port     string `envconfig:"API_PORT" default:":8000"`
-		CertFile string `envconfig:"API_CERT_FILE" default:"dev/localhost-cert.pem"`
-		KeyFile  string `envconfig:"API_KEY_FILE" default:"dev/localhost-key.pem"`
+		CertFile string `envconfig:"API_CERT_FILE" default:"ssl/localhost-cert.pem"`
+		KeyFile  string `envconfig:"API_KEY_FILE" default:"ssl/localhost-key.pem"`
 	}
 	Web struct {
 		ProbeAddr       string        `envconfig:"WEB_PROBE_HOST" default:"0.0.0.0:9090"`
@@ -60,7 +61,7 @@ func run(ctx context.Context) error {
 	// create a service to be injected into components
 	restReader := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
 	restWriter := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	s := internal.NewService(restReader, restWriter)
+	s := frontend.NewService(restReader, restWriter)
 
 	// The first thing to do is to associate the home component with a path.
 	//
@@ -157,7 +158,7 @@ func run(ctx context.Context) error {
 	// Start API server and send errors to the channel
 	go func() {
 		log.Printf("initializing API server on port: %s", cfg.Api.Port)
-		serverErrors <- rest.ListenAndServe(r, w, cfg.Api.Port, cfg.Api.CertFile, cfg.Api.KeyFile)
+		serverErrors <- routes.ListenAndServe(r, w, cfg.Api.Port, cfg.Api.CertFile, cfg.Api.KeyFile)
 	}()
 
 	// Signal notifier

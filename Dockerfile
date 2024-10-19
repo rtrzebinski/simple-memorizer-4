@@ -26,8 +26,8 @@ COPY --from=builder /app/web ./web
 COPY --from=builder /go/bin/migrate ./migrate
 COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/version ./version
-COPY --from=builder /app/dev/localhost-cert.pem ./dev/localhost-cert.pem
-COPY --from=builder /app/dev/localhost-key.pem ./dev/localhost-key.pem
+COPY --from=builder /app/ssl/localhost-cert.pem ./ssl/localhost-cert.pem
+COPY --from=builder /app/ssl/localhost-key.pem ./ssl/localhost-key.pem
 
 # Ensure migrate is executable
 RUN chmod +x ./migrate
