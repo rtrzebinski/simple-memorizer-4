@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestExportLessonCsv(t *testing.T) {
+func TestExportLessonCsvHandler(t *testing.T) {
 	exercise := models.Exercise{
 		Id:       1,
 		Question: "question",
@@ -25,11 +25,11 @@ func TestExportLessonCsv(t *testing.T) {
 
 	reader := NewReaderMock()
 	reader.On("FetchExercises", lesson).Return(exercises)
-	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
+	reader.On("HydrateLessonHandler", &lesson).Run(func(args mock.Arguments) {
 		args.Get(0).(*models.Lesson).Name = "lesson name"
 	})
 
-	route := NewExportLessonCsv(reader)
+	route := NewExportLessonCsvHandler(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -50,10 +50,10 @@ func TestExportLessonCsv(t *testing.T) {
 	assert.Equal(t, "16", res.Header().Get("Content-Length"))
 }
 
-func TestExportLessonCsv_invalidInput(t *testing.T) {
+func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
 	reader := NewReaderMock()
 
-	route := NewExportLessonCsv(reader)
+	route := NewExportLessonCsvHandler(reader)
 
 	u, _ := url.Parse("/")
 

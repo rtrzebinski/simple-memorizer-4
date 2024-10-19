@@ -3,7 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/validation"
@@ -70,7 +70,7 @@ func (compo *Exercises) Render() app.UI {
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(compo.handleStartLearning).Disabled(compo.lesson.ExerciseCount < 2),
 			app.Button().Text("Add a new exercise").OnClick(compo.handleAddExercise).Hidden(compo.formVisible),
-			app.A().Href(routes.ExportLessonCsv+"?lesson_id="+strconv.Itoa(compo.lesson.Id)).Download("").Body(
+			app.A().Href(server.ExportLessonCsv+"?lesson_id="+strconv.Itoa(compo.lesson.Id)).Download("").Body(
 				app.Button().Text("CSV export"),
 			),
 			//app.Label().For("csv-upload-button").Text("CSV import"), todo style with bootstrap

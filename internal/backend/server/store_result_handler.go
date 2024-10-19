@@ -9,25 +9,25 @@ import (
 	"net/http"
 )
 
-type DeleteLesson struct {
+type StoreResultHandler struct {
 	w      Writer
-	lesson models.Lesson
+	result models.Result
 }
 
-func NewDeleteLesson(w Writer) *DeleteLesson {
-	return &DeleteLesson{w: w}
+func NewStoreResultHandler(w Writer) *StoreResultHandler {
+	return &StoreResultHandler{w: w}
 }
 
-func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.lesson)
+func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.result)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode DeleteLesson HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode StoreResultHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateLessonIdentified(h.lesson)
+	validator := validation.ValidateStoreResult(h.result)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -35,7 +35,7 @@ func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode DeleteLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode StoreResultHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -43,7 +43,7 @@ func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write DeleteLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write StoreResultHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -52,9 +52,9 @@ func (h *DeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.DeleteLesson(h.lesson)
+	err = h.w.StoreResult(&h.result)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
+		log.Print(fmt.Errorf("failed to store result: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

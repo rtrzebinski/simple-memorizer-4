@@ -9,25 +9,25 @@ import (
 	"net/http"
 )
 
-type UpsertExercise struct {
-	w        Writer
-	exercise models.Exercise
+type DeleteLessonHandler struct {
+	w      Writer
+	lesson models.Lesson
 }
 
-func NewUpsertExercise(w Writer) *UpsertExercise {
-	return &UpsertExercise{w: w}
+func NewDeleteLessonHandler(w Writer) *DeleteLessonHandler {
+	return &DeleteLessonHandler{w: w}
 }
 
-func (h *UpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.exercise)
+func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode UpsertExercise HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode DeleteLessonHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateUpsertExercise(h.exercise, nil)
+	validator := validation.ValidateLessonIdentified(h.lesson)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -35,7 +35,7 @@ func (h *UpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode UpsertExercise HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode DeleteLessonHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -43,7 +43,7 @@ func (h *UpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write UpsertExercise HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write DeleteLessonHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -52,9 +52,9 @@ func (h *UpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.UpsertExercise(&h.exercise)
+	err = h.w.DeleteLesson(h.lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
+		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

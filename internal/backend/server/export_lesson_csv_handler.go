@@ -11,15 +11,15 @@ import (
 	"strconv"
 )
 
-type ExportLessonCsv struct {
+type ExportLessonCsvHandler struct {
 	r Reader
 }
 
-func NewExportLessonCsv(r Reader) *ExportLessonCsv {
-	return &ExportLessonCsv{r: r}
+func NewExportLessonCsvHandler(r Reader) *ExportLessonCsvHandler {
+	return &ExportLessonCsvHandler{r: r}
 }
 
-func (h *ExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
@@ -34,7 +34,7 @@ func (h *ExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 
 			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
-				log.Print(fmt.Errorf("failed to encode ExportLessonCsv HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to encode ExportLessonCsvHandler HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -42,7 +42,7 @@ func (h *ExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 
 			_, err = res.Write(encoded)
 			if err != nil {
-				log.Print(fmt.Errorf("failed to write ExportLessonCsv HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to write ExportLessonCsvHandler HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -97,7 +97,7 @@ func (h *ExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	// Write the file content to the response
 	_, err = res.Write(fileContent)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write ExportLessonCsv HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write ExportLessonCsvHandler HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

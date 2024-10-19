@@ -12,10 +12,12 @@ import (
 	"testing"
 )
 
-func TestUpsertLesson(t *testing.T) {
-	input := models.Lesson{
-		Name:        "name",
-		Description: "description",
+func TestStoreExercises(t *testing.T) {
+	input := models.Exercises{
+		models.Exercise{
+			Question: "question",
+			Answer:   "answer",
+		},
 	}
 
 	body, err := json.Marshal(input)
@@ -24,9 +26,9 @@ func TestUpsertLesson(t *testing.T) {
 	}
 
 	writer := NewWriterMock()
-	writer.On("UpsertLesson", &input)
+	writer.On("StoreExercisesHandler", input)
 
-	route := NewUpsertLesson(writer)
+	route := NewStoreExercisesHandler(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -36,8 +38,10 @@ func TestUpsertLesson(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestUsertLesson_invalidInput(t *testing.T) {
-	input := models.Lesson{}
+func TestStoreExercisesHandler_invalidInput(t *testing.T) {
+	input := models.Exercises{
+		models.Exercise{},
+	}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -46,7 +50,7 @@ func TestUsertLesson_invalidInput(t *testing.T) {
 
 	writer := NewWriterMock()
 
-	route := NewUpsertLesson(writer)
+	route := NewStoreExercisesHandler(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -59,5 +63,5 @@ func TestUsertLesson_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateStoreExercises(input).Error(), result)
 }

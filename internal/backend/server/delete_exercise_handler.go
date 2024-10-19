@@ -9,25 +9,25 @@ import (
 	"net/http"
 )
 
-type StoreExercises struct {
-	w         Writer
-	exercises models.Exercises
+type DeleteExerciseHandler struct {
+	w        Writer
+	exercise models.Exercise
 }
 
-func NewStoreExercises(w Writer) *StoreExercises {
-	return &StoreExercises{w: w}
+func NewDeleteExerciseHandler(w Writer) *DeleteExerciseHandler {
+	return &DeleteExerciseHandler{w: w}
 }
 
-func (h *StoreExercises) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.exercises)
+func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreExercises HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode DeleteExerciseHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateStoreExercises(h.exercises)
+	validator := validation.ValidateExerciseIdentified(h.exercise)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -35,7 +35,7 @@ func (h *StoreExercises) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreExercises HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode DeleteExerciseHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -43,7 +43,7 @@ func (h *StoreExercises) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreExercises HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write DeleteExerciseHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -52,9 +52,9 @@ func (h *StoreExercises) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.StoreExercises(h.exercises)
+	err = h.w.DeleteExercise(h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store exercises: %w", err))
+		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

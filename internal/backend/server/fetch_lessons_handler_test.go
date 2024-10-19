@@ -9,14 +9,14 @@ import (
 	"testing"
 )
 
-func TestFetchLessons(t *testing.T) {
+func TestFetchLessonsHandler(t *testing.T) {
 	lesson := models.Lesson{}
 	lessons := models.Lessons{lesson}
 
 	reader := NewReaderMock()
-	reader.On("FetchLessons").Return(lessons)
+	reader.On("FetchLessonsHandler").Return(lessons)
 
-	route := NewFetchLessons(reader)
+	route := NewFetchLessonsHandler(reader)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}

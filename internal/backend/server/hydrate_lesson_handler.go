@@ -10,15 +10,15 @@ import (
 	"strconv"
 )
 
-type FetchExercisesOfLesson struct {
+type HydrateLessonHandler struct {
 	r Reader
 }
 
-func NewFetchExercisesOfLesson(r Reader) *FetchExercisesOfLesson {
-	return &FetchExercisesOfLesson{r: r}
+func NewHydrateLessonHandler(r Reader) *HydrateLessonHandler {
+	return &HydrateLessonHandler{r: r}
 }
 
-func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
@@ -32,7 +32,7 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
-				log.Print(fmt.Errorf("failed to encode FetchExercises HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to encode HydrateLessonHandler HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -40,7 +40,7 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			_, err = res.Write(encoded)
 			if err != nil {
-				log.Print(fmt.Errorf("failed to write FetchExercises HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to write HydrateLessonHandler HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -50,17 +50,19 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 		}
 	}
 
-	exercises, err := h.r.FetchExercises(models.Lesson{Id: lessonId})
+	lesson := &models.Lesson{Id: lessonId}
+
+	err = h.r.HydrateLesson(lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
+		log.Print(fmt.Errorf("failed to hydrate a lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
 	}
 
-	encoded, err := json.Marshal(exercises)
+	encoded, err := json.Marshal(lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode FetchExercises HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode HydrateLessonHandler HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -68,7 +70,7 @@ func (h *FetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write FetchExercises HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write HydrateLessonHandler HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

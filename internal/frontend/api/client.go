@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
 	"strconv"
@@ -20,7 +20,7 @@ func NewClient(c Caller) *Client {
 func (s *Client) FetchLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
-	respBody, err := s.c.Call("GET", routes.FetchLessons, nil, nil)
+	respBody, err := s.c.Call("GET", server.FetchLessons, nil, nil)
 	if err != nil {
 		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -37,7 +37,7 @@ func (s *Client) HydrateLesson(lesson *models.Lesson) error {
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := s.c.Call("GET", routes.HydrateLesson, params, nil)
+	respBody, err := s.c.Call("GET", server.HydrateLesson, params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -56,7 +56,7 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := s.c.Call("GET", routes.FetchExercises, params, nil)
+	respBody, err := s.c.Call("GET", server.FetchExercises, params, nil)
 	if err != nil {
 		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -78,7 +78,7 @@ func (s *Client) UpsertLesson(lesson *models.Lesson) error {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.UpsertLesson, nil, body)
+	_, err = s.c.Call("POST", server.UpsertLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -92,7 +92,7 @@ func (s *Client) DeleteLesson(lesson models.Lesson) error {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.DeleteLesson, nil, body)
+	_, err = s.c.Call("POST", server.DeleteLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -106,7 +106,7 @@ func (s *Client) UpsertExercise(exercise *models.Exercise) error {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.UpsertExercise, nil, body)
+	_, err = s.c.Call("POST", server.UpsertExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -120,7 +120,7 @@ func (s *Client) StoreExercises(exercises models.Exercises) error {
 		return fmt.Errorf("failed to encode exercises: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.StoreExercises, nil, body)
+	_, err = s.c.Call("POST", server.StoreExercises, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -134,7 +134,7 @@ func (s *Client) DeleteExercise(exercise models.Exercise) error {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.DeleteExercise, nil, body)
+	_, err = s.c.Call("POST", server.DeleteExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -148,7 +148,7 @@ func (s *Client) StoreResult(result *models.Result) error {
 		return fmt.Errorf("failed to encode result: %w", err)
 	}
 
-	_, err = s.c.Call("POST", routes.StoreResult, nil, body)
+	_, err = s.c.Call("POST", server.StoreResult, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

@@ -9,25 +9,25 @@ import (
 	"net/http"
 )
 
-type UpsertLesson struct {
-	w      Writer
-	lesson models.Lesson
+type UpsertExerciseHandler struct {
+	w        Writer
+	exercise models.Exercise
 }
 
-func NewUpsertLesson(w Writer) *UpsertLesson {
-	return &UpsertLesson{w: w}
+func NewUpsertExerciseHandler(w Writer) *UpsertExerciseHandler {
+	return &UpsertExerciseHandler{w: w}
 }
 
-func (h *UpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.lesson)
+func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := json.NewDecoder(req.Body).Decode(&h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode UpsertLesson HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode UpsertExerciseHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateUpsertLesson(h.lesson, nil)
+	validator := validation.ValidateUpsertExercise(h.exercise, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -35,7 +35,7 @@ func (h *UpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode UpsertLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode UpsertExerciseHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -43,7 +43,7 @@ func (h *UpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write UpsertLesson HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write UpsertExerciseHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -52,9 +52,9 @@ func (h *UpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = h.w.UpsertLesson(&h.lesson)
+	err = h.w.UpsertExercise(&h.exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
+		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

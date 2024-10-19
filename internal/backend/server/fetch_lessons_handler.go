@@ -7,15 +7,15 @@ import (
 	"net/http"
 )
 
-type FetchLessons struct {
+type FetchLessonsHandler struct {
 	r Reader
 }
 
-func NewFetchLessons(r Reader) *FetchLessons {
-	return &FetchLessons{r: r}
+func NewFetchLessonsHandler(r Reader) *FetchLessonsHandler {
+	return &FetchLessonsHandler{r: r}
 }
 
-func (h *FetchLessons) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	lessons, err := h.r.FetchLessons()
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch lessons: %w", err))
@@ -26,7 +26,7 @@ func (h *FetchLessons) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	encoded, err := json.Marshal(lessons)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode FetchLessons HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode FetchLessonsHandler HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -34,7 +34,7 @@ func (h *FetchLessons) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write FetchLessons HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write FetchLessonsHandler HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

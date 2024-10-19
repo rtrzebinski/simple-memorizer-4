@@ -12,9 +12,12 @@ import (
 	"testing"
 )
 
-func TestDeleteLesson(t *testing.T) {
-	input := models.Lesson{
-		Id: 123,
+func TestStoreResultHandler(t *testing.T) {
+	input := models.Result{
+		Exercise: &models.Exercise{
+			Id: 10,
+		},
+		Type: models.Good,
 	}
 
 	body, err := json.Marshal(input)
@@ -23,9 +26,9 @@ func TestDeleteLesson(t *testing.T) {
 	}
 
 	writer := NewWriterMock()
-	writer.On("DeleteLesson", input)
+	writer.On("StoreResultHandler", &input)
 
-	route := NewDeleteLesson(writer)
+	route := NewStoreResultHandler(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -35,8 +38,8 @@ func TestDeleteLesson(t *testing.T) {
 	writer.AssertExpectations(t)
 }
 
-func TestDeleteLesson_invalidInput(t *testing.T) {
-	input := models.Lesson{}
+func TestStoreResultHandler_invalidInput(t *testing.T) {
+	input := models.Result{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -45,7 +48,7 @@ func TestDeleteLesson_invalidInput(t *testing.T) {
 
 	writer := NewWriterMock()
 
-	route := NewDeleteLesson(writer)
+	route := NewStoreResultHandler(writer)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -58,5 +61,5 @@ func TestDeleteLesson_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateLessonIdentified(input).Error(), result)
+	assert.Equal(t, validation.ValidateStoreResult(input).Error(), result)
 }

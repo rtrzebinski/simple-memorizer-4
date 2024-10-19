@@ -12,19 +12,24 @@ import (
 	"testing"
 )
 
-func TestHydrateLesson(t *testing.T) {
-	lesson := &models.Lesson{
-		Id: 1,
+func TestFetchExercisesOfLessonHandler(t *testing.T) {
+	exercise := models.Exercise{
+		Id:       1,
+		Question: "question",
+		Answer:   "answer",
 	}
+	exercises := models.Exercises{exercise}
+
+	lessonId := 10
 
 	reader := NewReaderMock()
-	reader.On("HydrateLesson", lesson)
+	reader.On("FetchExercises", models.Lesson{Id: lessonId}).Return(exercises)
 
-	route := NewHydrateLesson(reader)
+	route := NewFetchExercisesOfLessonHandler(reader)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
-	params.Add("lesson_id", strconv.Itoa(lesson.Id))
+	params.Add("lesson_id", strconv.Itoa(lessonId))
 	u.RawQuery = params.Encode()
 
 	req := &http.Request{}
@@ -35,12 +40,17 @@ func TestHydrateLesson(t *testing.T) {
 	route.ServeHTTP(res, req)
 
 	assert.Equal(t, http.StatusOK, res.Code)
+
+	var result models.Exercises
+	json.Unmarshal(res.Body.Bytes(), &result)
+
+	assert.Equal(t, exercises, result)
 }
 
-func TestHydrateLesson_invalidInput(t *testing.T) {
+func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
 	reader := NewReaderMock()
 
-	route := NewHydrateLesson(reader)
+	route := NewFetchExercisesOfLessonHandler(reader)
 
 	u, _ := url.Parse("/")
 
