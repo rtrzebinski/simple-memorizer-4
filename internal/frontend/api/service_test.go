@@ -1,6 +1,7 @@
-package frontend
+package api
 
 import (
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
 	"github.com/stretchr/testify/assert"
@@ -11,13 +12,13 @@ import (
 type ServiceSuite struct {
 	suite.Suite
 	service *Service
-	reader  *ReaderMock
-	writer  *WriterMock
+	reader  *frontend.ReaderMock
+	writer  *frontend.WriterMock
 }
 
 func (suite *ServiceSuite) SetupTest() {
-	suite.reader = NewReaderMock()
-	suite.writer = NewWriterMock()
+	suite.reader = frontend.NewReaderMock()
+	suite.writer = frontend.NewWriterMock()
 	suite.service = NewService(suite.reader, suite.writer)
 }
 

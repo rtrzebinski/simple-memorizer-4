@@ -1,16 +1,17 @@
-package frontend
+package api
 
 import (
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
 )
 
 type Service struct {
-	r Reader
-	w Writer
+	r frontend.Reader
+	w frontend.Writer
 }
 
-func NewService(r Reader, w Writer) *Service {
+func NewService(r frontend.Reader, w frontend.Writer) *Service {
 	return &Service{r: r, w: w}
 }
 

@@ -1,18 +1,17 @@
-package rest
+package api
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 )
 
 type Writer struct {
-	c frontend.Client
+	c Caller
 }
 
-func NewWriter(c frontend.Client) *Writer {
+func NewWriter(c Caller) *Writer {
 	return &Writer{c: c}
 }
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/validation"
@@ -17,7 +17,7 @@ const PathExercises = "/exercises"
 // Exercises is a component that displays all exercises of a lesson
 type Exercises struct {
 	app.Compo
-	s *frontend.Service
+	s *api.Service
 
 	// component vars
 	lesson models.Lesson
@@ -33,7 +33,7 @@ type Exercises struct {
 }
 
 // NewExercises creates a new Exercises component
-func NewExercises(s *frontend.Service) *Exercises {
+func NewExercises(s *api.Service) *Exercises {
 	return &Exercises{
 		s: s,
 	}

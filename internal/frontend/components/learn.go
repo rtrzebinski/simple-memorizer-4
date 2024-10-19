@@ -3,7 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/memorizer"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"net/url"
@@ -15,7 +15,7 @@ const PathLearn = "/learn"
 // Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
-	s         *frontend.Service
+	s         *api.Service
 	memorizer memorizer.Service
 
 	// component vars
@@ -29,7 +29,7 @@ type Learn struct {
 }
 
 // NewLearn creates a new Learn component
-func NewLearn(s *frontend.Service) *Learn {
+func NewLearn(s *api.Service) *Learn {
 	return &Learn{
 		s: s,
 	}

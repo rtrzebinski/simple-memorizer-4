@@ -10,9 +10,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/rest"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"log"
@@ -59,9 +58,9 @@ func run(ctx context.Context) error {
 	u := app.Window().URL()
 
 	// create a service to be injected into components
-	restReader := rest.NewReader(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	restWriter := rest.NewWriter(rest.NewClient(&http.Client{}, u.Host, u.Scheme))
-	s := frontend.NewService(restReader, restWriter)
+	restReader := api.NewReader(api.NewClient(&http.Client{}, u.Host, u.Scheme))
+	restWriter := api.NewWriter(api.NewClient(&http.Client{}, u.Host, u.Scheme))
+	s := api.NewService(restReader, restWriter)
 
 	// The first thing to do is to associate the home component with a path.
 	//

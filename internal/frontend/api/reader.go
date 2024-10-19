@@ -1,19 +1,18 @@
-package rest
+package api
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"strconv"
 )
 
 type Reader struct {
-	c frontend.Client
+	c Caller
 }
 
-func NewReader(c frontend.Client) *Reader {
+func NewReader(c Caller) *Reader {
 	return &Reader{c: c}
 }
 

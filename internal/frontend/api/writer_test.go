@@ -1,9 +1,8 @@
-package rest
+package api
 
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -12,12 +11,12 @@ import (
 type WriterSuite struct {
 	suite.Suite
 
-	client *frontend.ClientMock
+	client *CallerMock
 	writer *Writer
 }
 
 func (suite *WriterSuite) SetupTest() {
-	suite.client = frontend.NewClientMock()
+	suite.client = NewCallerMock()
 	suite.writer = NewWriter(suite.client)
 }
 
