@@ -25,15 +25,13 @@ type config struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
 		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable"`
 	}
-	Api struct {
-		Port     string `envconfig:"API_PORT" default:":8000"`
-		CertFile string `envconfig:"API_CERT_FILE" default:"ssl/localhost-cert.pem"`
-		KeyFile  string `envconfig:"API_KEY_FILE" default:"ssl/localhost-key.pem"`
+	Server struct {
+		Port     string `envconfig:"SERVER_PORT" default:":8000"`
+		CertFile string `envconfig:"SERVER_CERT_FILE" default:"ssl/localhost-cert.pem"`
+		KeyFile  string `envconfig:"SERVER_KEY_FILE" default:"ssl/localhost-key.pem"`
 	}
-	Web struct {
-		ProbeAddr       string        `envconfig:"WEB_PROBE_HOST" default:"0.0.0.0:9090"`
-		ShutdownTimeout time.Duration `envconfig:"WEB_SHUTDOWN_TIMEOUT" default:"30s"`
-	}
+	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9090"`
+	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
 }
 
 func init() {
@@ -144,18 +142,18 @@ func run(ctx context.Context) error {
 	// buffered channel so the goroutine can exit if we don't collect this error.
 	serverErrors := make(chan error, 1)
 
-	probeServer := probes.SetupProbeServer(cfg.Web.ProbeAddr, db)
+	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db)
 
 	// Start probe server and send errors to the channel
 	go func() {
-		log.Printf("initializing probe server on host: %apiClient", cfg.Web.ProbeAddr)
+		log.Printf("initializing probe server on host: %apiClient", cfg.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
 	// Start API server and send errors to the channel
 	go func() {
-		log.Printf("initializing API server on port: %apiClient", cfg.Api.Port)
-		serverErrors <- server.ListenAndServe(r, w, cfg.Api.Port, cfg.Api.CertFile, cfg.Api.KeyFile)
+		log.Printf("initializing API server on port: %apiClient", cfg.Server.Port)
+		serverErrors <- server.ListenAndServe(r, w, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
 	}()
 
 	// Signal notifier
@@ -171,7 +169,7 @@ func run(ctx context.Context) error {
 		log.Print("start shutdown")
 
 		// Give outstanding requests a deadline for completion.
-		ctx, cancel := context.WithTimeout(ctx, cfg.Web.ShutdownTimeout)
+		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
 		defer cancel()
 
 		// Shutdown gracefully on signal received
