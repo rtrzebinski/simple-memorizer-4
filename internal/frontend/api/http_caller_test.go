@@ -29,7 +29,7 @@ func TestCall(t *testing.T) {
 	u, err := url.Parse(server.URL)
 	assert.NoError(t, err)
 
-	c := NewClient(server.Client(), u.Host, u.Scheme)
+	c := NewHttpCaller(server.Client(), u.Host, u.Scheme)
 
 	respBody, err := c.Call("method", "/route", map[string]string{"foo": "bar"}, []byte("request body"))
 

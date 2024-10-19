@@ -9,17 +9,17 @@ import (
 	"net/url"
 )
 
-type Client struct {
+type HttpCaller struct {
 	http   *http.Client
 	host   string
 	scheme string
 }
 
-func NewClient(http *http.Client, host string, scheme string) *Client {
-	return &Client{http: http, host: host, scheme: scheme}
+func NewHttpCaller(http *http.Client, host string, scheme string) *HttpCaller {
+	return &HttpCaller{http: http, host: host, scheme: scheme}
 }
 
-func (c *Client) Call(method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
+func (c *HttpCaller) Call(method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
 	if err != nil {
