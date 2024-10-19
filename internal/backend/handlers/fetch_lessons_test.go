@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +14,7 @@ func TestFetchLessons(t *testing.T) {
 	lesson := models.Lesson{}
 	lessons := models.Lessons{lesson}
 
-	reader := backend.NewReaderMock()
+	reader := storage.NewReaderMock()
 	reader.On("FetchLessons").Return(lessons)
 
 	route := NewFetchLessons(reader)

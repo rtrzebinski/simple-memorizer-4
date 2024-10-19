@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -25,7 +25,7 @@ func TestUpsertExercise(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := backend.NewWriterMock()
+	writer := storage.NewWriterMock()
 	writer.On("UpsertExercise", &input)
 
 	route := NewUpsertExercise(writer)
@@ -46,7 +46,7 @@ func TestUpsertExercise_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := backend.NewWriterMock()
+	writer := storage.NewWriterMock()
 
 	route := NewUpsertExercise(writer)
 

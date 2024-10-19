@@ -3,19 +3,19 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
 )
 
 type StoreExercises struct {
-	w         backend.Writer
+	w         storage.Writer
 	exercises models.Exercises
 }
 
-func NewStoreExercises(w backend.Writer) *StoreExercises {
+func NewStoreExercises(w storage.Writer) *StoreExercises {
 	return &StoreExercises{w: w}
 }
 

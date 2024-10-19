@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/handlers"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ const (
 	ExportLessonCsv = "/export-lesson-csv"
 )
 
-func ListenAndServe(r backend.Reader, w backend.Writer, port, certFile, keyFile string) error {
+func ListenAndServe(r storage.Reader, w storage.Writer, port, certFile, keyFile string) error {
 	// read
 
 	http.Handle(FetchLessons, handlers.NewFetchLessons(r))

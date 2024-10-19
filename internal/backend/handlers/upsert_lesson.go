@@ -3,19 +3,19 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
 )
 
 type UpsertLesson struct {
-	w      backend.Writer
+	w      storage.Writer
 	lesson models.Lesson
 }
 
-func NewUpsertLesson(w backend.Writer) *UpsertLesson {
+func NewUpsertLesson(w storage.Writer) *UpsertLesson {
 	return &UpsertLesson{w: w}
 }
 

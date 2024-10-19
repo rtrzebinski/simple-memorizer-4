@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -23,7 +23,7 @@ func TestDeleteLesson(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := backend.NewWriterMock()
+	writer := storage.NewWriterMock()
 	writer.On("DeleteLesson", input)
 
 	route := NewDeleteLesson(writer)
@@ -44,7 +44,7 @@ func TestDeleteLesson_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := backend.NewWriterMock()
+	writer := storage.NewWriterMock()
 
 	route := NewDeleteLesson(writer)
 

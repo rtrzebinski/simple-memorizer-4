@@ -3,16 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"log"
 	"net/http"
 )
 
 type FetchLessons struct {
-	r backend.Reader
+	r storage.Reader
 }
 
-func NewFetchLessons(r backend.Reader) *FetchLessons {
+func NewFetchLessons(r storage.Reader) *FetchLessons {
 	return &FetchLessons{r: r}
 }
 
