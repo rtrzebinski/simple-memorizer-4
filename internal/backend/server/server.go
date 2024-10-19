@@ -2,11 +2,10 @@ package server
 
 import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"net/http"
 )
 
-func ListenAndServe(r storage.Reader, w storage.Writer, port, certFile, keyFile string) error {
+func ListenAndServe(r Reader, w Writer, port, certFile, keyFile string) error {
 	// read
 
 	http.Handle(routes.FetchLessons, NewFetchLessons(r))

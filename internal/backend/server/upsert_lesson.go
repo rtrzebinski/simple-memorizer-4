@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
 )
 
 type UpsertLesson struct {
-	w      storage.Writer
+	w      Writer
 	lesson models.Lesson
 }
 
-func NewUpsertLesson(w storage.Writer) *UpsertLesson {
+func NewUpsertLesson(w Writer) *UpsertLesson {
 	return &UpsertLesson{w: w}
 }
 

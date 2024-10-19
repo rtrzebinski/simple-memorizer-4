@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -24,7 +23,7 @@ func TestExportLessonCsv(t *testing.T) {
 
 	lesson := models.Lesson{Id: 2}
 
-	reader := storage.NewReaderMock()
+	reader := NewReaderMock()
 	reader.On("FetchExercises", lesson).Return(exercises)
 	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
 		args.Get(0).(*models.Lesson).Name = "lesson name"
@@ -52,7 +51,7 @@ func TestExportLessonCsv(t *testing.T) {
 }
 
 func TestExportLessonCsv_invalidInput(t *testing.T) {
-	reader := storage.NewReaderMock()
+	reader := NewReaderMock()
 
 	route := NewExportLessonCsv(reader)
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
@@ -13,10 +12,10 @@ import (
 )
 
 type ExportLessonCsv struct {
-	r storage.Reader
+	r Reader
 }
 
-func NewExportLessonCsv(r storage.Reader) *ExportLessonCsv {
+func NewExportLessonCsv(r Reader) *ExportLessonCsv {
 	return &ExportLessonCsv{r: r}
 }
 

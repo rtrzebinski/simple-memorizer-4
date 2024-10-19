@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -18,7 +17,7 @@ func TestHydrateLesson(t *testing.T) {
 		Id: 1,
 	}
 
-	reader := storage.NewReaderMock()
+	reader := NewReaderMock()
 	reader.On("HydrateLesson", lesson)
 
 	route := NewHydrateLesson(reader)
@@ -39,7 +38,7 @@ func TestHydrateLesson(t *testing.T) {
 }
 
 func TestHydrateLesson_invalidInput(t *testing.T) {
-	reader := storage.NewReaderMock()
+	reader := NewReaderMock()
 
 	route := NewHydrateLesson(reader)
 

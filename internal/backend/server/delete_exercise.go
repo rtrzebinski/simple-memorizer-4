@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
 )
 
 type DeleteExercise struct {
-	w        storage.Writer
+	w        Writer
 	exercise models.Exercise
 }
 
-func NewDeleteExercise(w storage.Writer) *DeleteExercise {
+func NewDeleteExercise(w Writer) *DeleteExercise {
 	return &DeleteExercise{w: w}
 }
 

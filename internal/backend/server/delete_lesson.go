@@ -4,18 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"
 )
 
 type DeleteLesson struct {
-	w      storage.Writer
+	w      Writer
 	lesson models.Lesson
 }
 
-func NewDeleteLesson(w storage.Writer) *DeleteLesson {
+func NewDeleteLesson(w Writer) *DeleteLesson {
 	return &DeleteLesson{w: w}
 }
 
