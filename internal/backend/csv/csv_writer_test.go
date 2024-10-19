@@ -1,4 +1,4 @@
-package backend
+package csv
 
 import (
 	"github.com/stretchr/testify/assert"

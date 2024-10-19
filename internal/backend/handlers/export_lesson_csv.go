@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
@@ -81,7 +82,7 @@ func (h *ExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	}
 
 	// Create CSV file content from records
-	fileContent, err := backend.WriteAll(records)
+	fileContent, err := csv.WriteAll(records)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to create a CSV from exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

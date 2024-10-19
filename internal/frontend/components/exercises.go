@@ -5,6 +5,7 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/validation"
 	"net/url"
@@ -157,7 +158,7 @@ func (c *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
 	}
 
 	// extract records from bytes slice
-	records, err := frontend.ReadAll(data)
+	records, err := csv.ReadAll(data)
 	if err != nil {
 		app.Log(err)
 		return
