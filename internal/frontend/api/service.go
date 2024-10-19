@@ -1,32 +1,68 @@
 package api
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"encoding/json"
+	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
+	"strconv"
 )
 
 type Service struct {
-	r frontend.Reader
-	w frontend.Writer
+	c Caller
 }
 
-func NewService(r frontend.Reader, w frontend.Writer) *Service {
-	return &Service{r: r, w: w}
+func NewService(c Caller) *Service {
+	return &Service{c: c}
 }
 
 func (s *Service) FetchLessons() (models.Lessons, error) {
-	return s.r.FetchLessons()
+	var lessons models.Lessons
+
+	respBody, err := s.c.Call("GET", routes.FetchLessons, nil, nil)
+	if err != nil {
+		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	if err := json.Unmarshal(respBody, &lessons); err != nil {
+		return lessons, fmt.Errorf("failed to decode lessons: %w", err)
+	}
+
+	return lessons, nil
 }
 
 func (s *Service) HydrateLesson(lesson *models.Lesson) error {
-	return s.r.HydrateLesson(lesson)
+	var params = map[string]string{
+		"lesson_id": strconv.Itoa(lesson.Id),
+	}
+
+	respBody, err := s.c.Call("GET", routes.HydrateLesson, params, nil)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	if err := json.Unmarshal(respBody, lesson); err != nil {
+		return fmt.Errorf("failed to decode lesson: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
-	exercises, err := s.r.FetchExercises(lesson)
+	var exercises models.Exercises
+
+	var params = map[string]string{
+		"lesson_id": strconv.Itoa(lesson.Id),
+	}
+
+	respBody, err := s.c.Call("GET", routes.FetchExercises, params, nil)
 	if err != nil {
-		return exercises, err
+		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	if err := json.Unmarshal(respBody, &exercises); err != nil {
+		return exercises, fmt.Errorf("failed to decode exercises: %w", err)
 	}
 
 	for i := range exercises {
@@ -37,25 +73,85 @@ func (s *Service) FetchExercises(lesson models.Lesson) (models.Exercises, error)
 }
 
 func (s *Service) UpsertLesson(lesson *models.Lesson) error {
-	return s.w.UpsertLesson(lesson)
+	body, err := json.Marshal(lesson)
+	if err != nil {
+		return fmt.Errorf("failed to encode lesson: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.UpsertLesson, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) DeleteLesson(lesson models.Lesson) error {
-	return s.w.DeleteLesson(lesson)
+	body, err := json.Marshal(lesson)
+	if err != nil {
+		return fmt.Errorf("failed to encode lesson: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.DeleteLesson, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) UpsertExercise(exercise *models.Exercise) error {
-	return s.w.UpsertExercise(exercise)
+	body, err := json.Marshal(exercise)
+	if err != nil {
+		return fmt.Errorf("failed to encode exercise: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.UpsertExercise, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) StoreExercises(exercises models.Exercises) error {
-	return s.w.StoreExercises(exercises)
+	body, err := json.Marshal(exercises)
+	if err != nil {
+		return fmt.Errorf("failed to encode exercises: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.StoreExercises, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) DeleteExercise(exercise models.Exercise) error {
-	return s.w.DeleteExercise(exercise)
+	body, err := json.Marshal(exercise)
+	if err != nil {
+		return fmt.Errorf("failed to encode exercise: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.DeleteExercise, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) StoreResult(result *models.Result) error {
-	return s.w.StoreResult(result)
+	body, err := json.Marshal(result)
+	if err != nil {
+		return fmt.Errorf("failed to encode result: %w", err)
+	}
+
+	_, err = s.c.Call("POST", routes.StoreResult, nil, body)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	return nil
 }

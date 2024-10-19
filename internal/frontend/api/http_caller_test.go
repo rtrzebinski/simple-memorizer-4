@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestCall(t *testing.T) {
+func TestHTTPCaller_Call(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		_, err := buf.ReadFrom(r.Body)
@@ -29,7 +29,7 @@ func TestCall(t *testing.T) {
 	u, err := url.Parse(server.URL)
 	assert.NoError(t, err)
 
-	c := NewHttpCaller(server.Client(), u.Host, u.Scheme)
+	c := NewHTTPCaller(server.Client(), u.Host, u.Scheme)
 
 	respBody, err := c.Call("method", "/route", map[string]string{"foo": "bar"}, []byte("request body"))
 

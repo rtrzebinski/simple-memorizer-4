@@ -1,25 +1,23 @@
 package api
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"encoding/json"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/routes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
 type ServiceSuite struct {
 	suite.Suite
-	service *Service
-	reader  *frontend.ReaderMock
-	writer  *frontend.WriterMock
+	s *Service
+	c *CallerMock
 }
 
 func (suite *ServiceSuite) SetupTest() {
-	suite.reader = frontend.NewReaderMock()
-	suite.writer = frontend.NewWriterMock()
-	suite.service = NewService(suite.reader, suite.writer)
+	suite.c = NewCallerMock()
+	suite.s = NewService(suite.c)
 }
 
 func TestServiceSuite(t *testing.T) {
@@ -27,24 +25,38 @@ func TestServiceSuite(t *testing.T) {
 }
 
 func (suite *ServiceSuite) TestFetchLessons() {
-	expectedLessons := models.Lessons{{Id: 1, Name: "Lesson 1"}, {Id: 2, Name: "Lesson 2"}}
-	suite.reader.On("FetchLessons").Return(expectedLessons, nil)
+	lessons := models.Lessons{models.Lesson{Name: "name"}}
 
-	lessons, err := suite.service.FetchLessons()
+	responseBody, err := json.Marshal(lessons)
+	suite.Assert().NoError(err)
 
-	suite.reader.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
-	assert.Len(suite.T(), lessons, len(expectedLessons))
+	method := "GET"
+	route := routes.FetchLessons
+	params := map[string]string(nil)
+	reqBody := []byte(nil)
+
+	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+
+	result, err := suite.s.FetchLessons()
+	suite.Assert().NoError(err)
+	suite.Assert().Equal(lessons, result)
 }
 
 func (suite *ServiceSuite) TestHydrateLesson() {
-	lesson := &models.Lesson{Id: 1, Name: "Lesson 1"}
-	suite.reader.On("HydrateLesson", lesson).Return(nil)
+	lesson := &models.Lesson{Id: 10}
 
-	err := suite.service.HydrateLesson(lesson)
+	responseBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
 
-	suite.reader.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	method := "GET"
+	route := routes.HydrateLesson
+	params := map[string]string{"lesson_id": "10"}
+	reqBody := []byte(nil)
+
+	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+
+	err = suite.s.HydrateLesson(lesson)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestFetchExercises() {
@@ -61,81 +73,111 @@ func (suite *ServiceSuite) TestFetchExercises() {
 			ResultsProjection: projections.BuildResultsProjection(exercises[1].Results)},
 	}
 
-	suite.reader.On("FetchExercises", lesson).Return(exercises, nil)
+	responseBody, err := json.Marshal(exercises)
+	suite.Assert().NoError(err)
 
-	result, err := suite.service.FetchExercises(lesson)
+	method := "GET"
+	route := routes.FetchExercises
+	params := map[string]string{"lesson_id": "1"}
+	reqBody := []byte(nil)
+
+	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+
+	result, err := suite.s.FetchExercises(models.Lesson{Id: lesson.Id})
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises, result)
 	suite.Equal(expectedExercises[0].ResultsProjection, result[0].ResultsProjection)
 	suite.Equal(expectedExercises[1].ResultsProjection, result[1].ResultsProjection)
-	suite.reader.AssertExpectations(suite.T())
+	suite.c.AssertExpectations(suite.T())
 }
 
 func (suite *ServiceSuite) TestUpsertLesson() {
-	lesson := &models.Lesson{Id: 1, Name: "Lesson 1"}
+	lesson := models.Lesson{}
 
-	suite.writer.On("UpsertLesson", lesson).Return(nil)
+	method := "POST"
+	route := routes.UpsertLesson
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
 
-	err := suite.service.UpsertLesson(lesson)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.UpsertLesson(&lesson)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestDeleteLesson() {
-	lesson := models.Lesson{Id: 1, Name: "Lesson 1"}
+	lesson := models.Lesson{}
 
-	suite.writer.On("DeleteLesson", lesson).Return(nil)
+	method := "POST"
+	route := routes.DeleteLesson
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(lesson)
+	suite.Assert().NoError(err)
 
-	err := suite.service.DeleteLesson(lesson)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.DeleteLesson(lesson)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestUpsertExercise() {
-	exercise := &models.Exercise{Id: 1, Question: "Exercise 1"}
+	exercise := models.Exercise{}
 
-	suite.writer.On("UpsertExercise", exercise).Return(nil)
+	method := "POST"
+	route := routes.UpsertExercise
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-	err := suite.service.UpsertExercise(exercise)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.UpsertExercise(&exercise)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestStoreExercises() {
-	exercises := models.Exercises{
-		models.Exercise{Id: 1, Question: "Exercise 1"},
-	}
+	exercises := models.Exercises{}
 
-	suite.writer.On("StoreExercises", exercises).Return(nil)
+	method := "POST"
+	route := routes.StoreExercises
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercises)
+	suite.Assert().NoError(err)
 
-	err := suite.service.StoreExercises(exercises)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.StoreExercises(exercises)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestDeleteExercise() {
-	exercise := models.Exercise{Id: 1, Question: "Exercise 1"}
+	exercise := models.Exercise{}
 
-	suite.writer.On("DeleteExercise", exercise).Return(nil)
+	method := "POST"
+	route := routes.DeleteExercise
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(exercise)
+	suite.Assert().NoError(err)
 
-	err := suite.service.DeleteExercise(exercise)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.DeleteExercise(exercise)
+	suite.Assert().NoError(err)
 }
 
 func (suite *ServiceSuite) TestStoreResult() {
-	result := &models.Result{Id: 1, Type: models.Good}
+	result := models.Result{}
 
-	suite.writer.On("StoreResult", result).Return(nil)
+	method := "POST"
+	route := routes.StoreResult
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(result)
+	suite.Assert().NoError(err)
 
-	err := suite.service.StoreResult(result)
+	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	suite.writer.AssertExpectations(suite.T())
-	assert.NoError(suite.T(), err)
+	err = suite.s.StoreResult(&result)
+	suite.Assert().NoError(err)
 }
