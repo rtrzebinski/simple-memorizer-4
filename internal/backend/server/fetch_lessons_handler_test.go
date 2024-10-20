@@ -14,7 +14,7 @@ func TestFetchLessonsHandler(t *testing.T) {
 	lessons := models.Lessons{lesson}
 
 	reader := NewReaderMock()
-	reader.On("FetchLessonsHandler").Return(lessons)
+	reader.On("FetchLessons").Return(lessons)
 
 	route := NewFetchLessonsHandler(reader)
 

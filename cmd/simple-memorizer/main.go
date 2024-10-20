@@ -146,13 +146,13 @@ func run(ctx context.Context) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		log.Printf("initializing probe server on host: %apiClient", cfg.ProbeAddr)
+		log.Printf("initializing probe server on host: %s apiClient", cfg.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
 	// Start API server and send errors to the channel
 	go func() {
-		log.Printf("initializing API server on port: %apiClient", cfg.Server.Port)
+		log.Printf("initializing API server on port: %s apiClient", cfg.Server.Port)
 		serverErrors <- server.ListenAndServe(r, w, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
 	}()
 

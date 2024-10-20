@@ -23,7 +23,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	writer := NewWriterMock()
-	writer.On("DeleteExerciseHandler", input)
+	writer.On("DeleteExercise", input)
 
 	route := NewDeleteExerciseHandler(writer)
 

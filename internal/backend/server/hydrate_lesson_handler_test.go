@@ -18,7 +18,7 @@ func TestHydrateLessonHandler(t *testing.T) {
 	}
 
 	reader := NewReaderMock()
-	reader.On("HydrateLessonHandler", lesson)
+	reader.On("HydrateLesson", lesson)
 
 	route := NewHydrateLessonHandler(reader)
 

@@ -24,7 +24,7 @@ func TestUpsertLessonHandler(t *testing.T) {
 	}
 
 	writer := NewWriterMock()
-	writer.On("UpsertLessonHandler", &input)
+	writer.On("UpsertLesson", &input)
 
 	route := NewUpsertLessonHandler(writer)
 

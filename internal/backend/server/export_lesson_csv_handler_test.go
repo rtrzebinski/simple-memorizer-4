@@ -25,7 +25,7 @@ func TestExportLessonCsvHandler(t *testing.T) {
 
 	reader := NewReaderMock()
 	reader.On("FetchExercises", lesson).Return(exercises)
-	reader.On("HydrateLessonHandler", &lesson).Run(func(args mock.Arguments) {
+	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
 		args.Get(0).(*models.Lesson).Name = "lesson name"
 	})
 

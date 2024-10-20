@@ -205,7 +205,7 @@ func readFile(file app.Value) (data []byte, err error) {
 	readerError := reader.Get("error")
 
 	if !readerError.IsNull() {
-		err = fmt.Errorf("file reader error : %c", readerError.Get("message").String())
+		err = fmt.Errorf("file reader error : %s", readerError.Get("message").String())
 	} else {
 		uint8Array := app.Window().Get("Uint8Array").New(reader.Get("result"))
 		data = make([]byte, uint8Array.Length())

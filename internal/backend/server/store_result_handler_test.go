@@ -26,7 +26,7 @@ func TestStoreResultHandler(t *testing.T) {
 	}
 
 	writer := NewWriterMock()
-	writer.On("StoreResultHandler", &input)
+	writer.On("StoreResult", &input)
 
 	route := NewStoreResultHandler(writer)
 
