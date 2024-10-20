@@ -161,7 +161,6 @@ func (s Seeder) LargeLessonSeed() {
 	for i := range exercises {
 		for j := answersCount; j > 0; j-- {
 			answer := &models.Result{
-				Id:       0,
 				Exercise: &exercises[i],
 			}
 
