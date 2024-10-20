@@ -89,7 +89,6 @@ func createPostgresContainer(ctx context.Context, dbname string) (testcontainers
 			ExposedPorts: []string{port},
 			Cmd:          []string{"postgres", "-c", "fsync=off"},
 			Env:          env,
-			SkipReaper:   true,
 			WaitingFor: wait.ForAll(
 				wait.ForSQL(nat.Port(port), "postgres", dbURL).WithStartupTimeout(time.Second*5),
 				wait.ForLog("database system is ready to accept connections"),
