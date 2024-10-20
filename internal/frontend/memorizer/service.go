@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+// Service provides next exercise to memorize
+// points are calculated based on exercise results
+// the more points an exercise has the more chances it has to be picked
 type Service struct {
 	r         *rand.Rand
 	exercises map[int]models.Exercise
