@@ -1,16 +1,15 @@
-package projections
+package models
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"time"
 )
 
-func BuildResultsProjection(results models.Results) models.ResultsProjection {
-	projection := models.ResultsProjection{}
+func BuildResultsProjection(results Results) ResultsProjection {
+	projection := ResultsProjection{}
 
 	for _, a := range results {
 		switch a.Type {
-		case models.Good:
+		case Good:
 			projection.GoodAnswers++
 			if isToday(a.CreatedAt) {
 				projection.GoodAnswersToday++
@@ -19,7 +18,7 @@ func BuildResultsProjection(results models.Results) models.ResultsProjection {
 			if a.CreatedAt.After(projection.LatestGoodAnswer) {
 				projection.LatestGoodAnswer = a.CreatedAt
 			}
-		case models.Bad:
+		case Bad:
 			projection.BadAnswers++
 			if isToday(a.CreatedAt) {
 				projection.BadAnswersToday++

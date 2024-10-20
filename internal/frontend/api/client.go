@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
 	"strconv"
 )
 
@@ -71,7 +70,7 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 	}
 
 	for i := range exercises {
-		exercises[i].ResultsProjection = projections.BuildResultsProjection(exercises[i].Results)
+		exercises[i].ResultsProjection = models.BuildResultsProjection(exercises[i].Results)
 	}
 
 	return exercises, nil

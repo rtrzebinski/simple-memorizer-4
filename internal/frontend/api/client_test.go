@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/projections"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -68,9 +67,9 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 
 	expectedExercises := models.Exercises{
 		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}},
-			ResultsProjection: projections.BuildResultsProjection(exercises[0].Results)},
+			ResultsProjection: models.BuildResultsProjection(exercises[0].Results)},
 		{Id: 2, Results: []models.Result{{Type: models.Bad}, {Type: models.Bad}},
-			ResultsProjection: projections.BuildResultsProjection(exercises[1].Results)},
+			ResultsProjection: models.BuildResultsProjection(exercises[1].Results)},
 	}
 
 	responseBody, err := json.Marshal(exercises)

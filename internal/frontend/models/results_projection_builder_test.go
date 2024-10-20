@@ -1,7 +1,6 @@
-package projections
+package models
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -11,25 +10,25 @@ func TestBuildResultsProjection(t *testing.T) {
 	yesterday := time.Now().Add(-24 * time.Hour)
 	today := time.Now()
 
-	results := models.Results{}
+	results := Results{}
 
-	results = append(results, models.Result{
-		Type:      models.Bad,
+	results = append(results, Result{
+		Type:      Bad,
 		CreatedAt: yesterday,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Bad,
+	results = append(results, Result{
+		Type:      Bad,
 		CreatedAt: yesterday,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Bad,
+	results = append(results, Result{
+		Type:      Bad,
 		CreatedAt: yesterday,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Good,
+	results = append(results, Result{
+		Type:      Good,
 		CreatedAt: yesterday,
 	})
 
@@ -44,23 +43,23 @@ func TestBuildResultsProjection(t *testing.T) {
 	assert.Equal(t, yesterday, projection.LatestGoodAnswer)
 	assert.False(t, projection.LatestGoodAnswerWasToday)
 
-	results = append(results, models.Result{
-		Type:      models.Bad,
+	results = append(results, Result{
+		Type:      Bad,
 		CreatedAt: today,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Bad,
+	results = append(results, Result{
+		Type:      Bad,
 		CreatedAt: today,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Good,
+	results = append(results, Result{
+		Type:      Good,
 		CreatedAt: today,
 	})
 
-	results = append(results, models.Result{
-		Type:      models.Good,
+	results = append(results, Result{
+		Type:      Good,
 		CreatedAt: today,
 	})
 
