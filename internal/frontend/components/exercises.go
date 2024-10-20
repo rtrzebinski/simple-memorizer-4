@@ -55,7 +55,7 @@ func (compo *Exercises) OnMount(_ app.Context) {
 	compo.displayExercisesOfLesson()
 }
 
-// hydrateLesson fetch lesson details from the database
+// hydrateLesson fetch lesson details
 func (compo *Exercises) hydrateLesson() {
 	err := compo.c.HydrateLesson(&compo.lesson)
 	if err != nil {
@@ -283,14 +283,14 @@ func (compo *Exercises) resetForm() {
 	compo.saveButtonDisabled = false
 }
 
-// displayExercisesOfLesson fetch exercises from the database and display them
+// displayExercisesOfLesson fetch exercises and display them
 func (compo *Exercises) displayExercisesOfLesson() {
 	exercises, err := compo.c.FetchExercises(compo.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}
 
-	// no entries in the database
+	// no entries
 	if len(exercises) == 0 {
 		return
 	}

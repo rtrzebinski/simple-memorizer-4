@@ -145,14 +145,14 @@ func (compo *Lessons) resetForm() {
 	compo.formVisible = false
 }
 
-// displayAllLessons fetch all lessons from the database and display them
+// displayAllLessons fetch all lessons and display them
 func (compo *Lessons) displayAllLessons() {
 	lessons, err := compo.c.FetchLessons()
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}
 
-	// no entries in the database
+	// no entries
 	if len(lessons) == 0 {
 		return
 	}
