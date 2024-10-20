@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (suite *PostgresSuite) TestUpsertLesson_createNew() {
+func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -25,7 +25,7 @@ func (suite *PostgresSuite) TestUpsertLesson_createNew() {
 	assert.Equal(suite.T(), lesson.Id, stored.Id)
 }
 
-func (suite *PostgresSuite) TestUpsertLesson_updateExisting() {
+func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -46,7 +46,7 @@ func (suite *PostgresSuite) TestUpsertLesson_updateExisting() {
 	assert.Equal(suite.T(), "newDescription", stored.Description)
 }
 
-func (suite *PostgresSuite) TestDeleteLesson() {
+func (suite *PostgresSuite) TestWriter_DeleteLesson() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -66,7 +66,7 @@ func (suite *PostgresSuite) TestDeleteLesson() {
 	assert.Equal(suite.T(), "another", findLessonById(db, another.Id).Name)
 }
 
-func (suite *PostgresSuite) TestUpsertExercise_createNew() {
+func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -93,7 +93,7 @@ func (suite *PostgresSuite) TestUpsertExercise_createNew() {
 	assert.Equal(suite.T(), exercise.Id, stored.Id)
 }
 
-func (suite *PostgresSuite) TestUpsertExercise_updateExisting() {
+func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -118,7 +118,7 @@ func (suite *PostgresSuite) TestUpsertExercise_updateExisting() {
 	assert.Equal(suite.T(), "newAnswer", stored.Answer)
 }
 
-func (suite *PostgresSuite) TestStoreExercises() {
+func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -171,7 +171,7 @@ func (suite *PostgresSuite) TestStoreExercises() {
 	assert.Equal(suite.T(), exercise2.Answer, ex2.Answer)
 }
 
-func (suite *PostgresSuite) TestDeleteExercise() {
+func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 	db := suite.db
 
 	w := NewWriter(db)
@@ -201,7 +201,7 @@ func (suite *PostgresSuite) TestDeleteExercise() {
 	assert.Equal(suite.T(), 0, lesson.ExerciseCount)
 }
 
-func (suite *PostgresSuite) TestStoreAnswer() {
+func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 	db := suite.db
 
 	w := NewWriter(db)

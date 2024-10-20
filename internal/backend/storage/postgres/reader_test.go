@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (suite *PostgresSuite) TestFetchLessons() {
+func (suite *PostgresSuite) TestReader_FetchLessons() {
 	db := suite.db
 
 	r := NewReader(db)
@@ -26,7 +26,7 @@ func (suite *PostgresSuite) TestFetchLessons() {
 	assert.Equal(suite.T(), 1, res[0].ExerciseCount)
 }
 
-func (suite *PostgresSuite) TestHydrateLesson() {
+func (suite *PostgresSuite) TestReader_HydrateLesson() {
 	db := suite.db
 
 	r := NewReader(db)
@@ -56,7 +56,7 @@ func (suite *PostgresSuite) TestHydrateLesson() {
 	assert.Equal(suite.T(), 2, lesson.ExerciseCount)
 }
 
-func (suite *PostgresSuite) TestFetchExercises() {
+func (suite *PostgresSuite) TestReader_FetchExercises() {
 	db := suite.db
 
 	r := NewReader(db)
