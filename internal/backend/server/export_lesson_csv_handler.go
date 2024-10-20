@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
 	"log"
 	"net/http"

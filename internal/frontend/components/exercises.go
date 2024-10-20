@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/csv"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/validation"
 	"net/url"
