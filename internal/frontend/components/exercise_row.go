@@ -14,62 +14,62 @@ type ExerciseRow struct {
 }
 
 // The Render method is where the component appearance is defined.
-func (c *ExerciseRow) Render() app.UI {
+func (compo *ExerciseRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.Id),
+			app.Text(compo.exercise.Id),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.Question),
+			app.Text(compo.exercise.Question),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.Answer),
+			app.Text(compo.exercise.Answer),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.ResultsProjection.BadAnswers),
+			app.Text(compo.exercise.ResultsProjection.BadAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.ResultsProjection.GoodAnswers),
+			app.Text(compo.exercise.ResultsProjection.GoodAnswers),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.exercise.ResultsProjection.GoodAnswersPercent()),
+			app.Text(compo.exercise.ResultsProjection.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(c.onEdit(), app.EventScope(fmt.Sprintf("%p", c))),
-			app.Button().Text("Delete").OnClick(c.onDelete(c.exercise.Id), app.EventScope(fmt.Sprintf("%p", c))),
+			app.Button().Text("Edit").OnClick(compo.onEdit(), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("Delete").OnClick(compo.onDelete(compo.exercise.Id), app.EventScope(fmt.Sprintf("%p", compo))),
 		),
 	)
 }
 
 // onDelete handles delete button click
-func (c *ExerciseRow) onDelete(id int) app.EventHandler {
+func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise
-		err := c.parent.c.DeleteExercise(models.Exercise{Id: id})
+		err := compo.parent.c.DeleteExercise(models.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}
 		// create a new rows slice to be replaced in parent component
-		rows := make([]*ExerciseRow, len(c.parent.rows))
-		for i, row := range c.parent.rows {
+		rows := make([]*ExerciseRow, len(compo.parent.rows))
+		for i, row := range compo.parent.rows {
 			// add all rows but current one (which is being deleted)
 			if i != id && row != nil {
 				rows[i] = row
 			}
 		}
 		// replace parent rows slice with a new one - this will update the UI
-		c.parent.rows = rows
-		c.parent.hydrateLesson()
+		compo.parent.rows = rows
+		compo.parent.hydrateLesson()
 	}
 }
 
 // onEdit handles edit button click
-func (c *ExerciseRow) onEdit() app.EventHandler {
+func (compo *ExerciseRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		c.parent.inputId = c.exercise.Id
-		c.parent.inputQuestion = c.exercise.Question
-		c.parent.inputAnswer = c.exercise.Answer
-		c.parent.formVisible = true
-		c.parent.validationErrors = nil
+		compo.parent.inputId = compo.exercise.Id
+		compo.parent.inputQuestion = compo.exercise.Question
+		compo.parent.inputAnswer = compo.exercise.Answer
+		compo.parent.formVisible = true
+		compo.parent.validationErrors = nil
 	}
 }

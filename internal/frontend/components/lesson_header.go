@@ -10,7 +10,7 @@ type LessonHeader struct {
 }
 
 // The Render method is where the component appearance is defined.
-func (c *LessonHeader) Render() app.UI {
+func (compo *LessonHeader) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Th().Style("border", "1px solid black").Body(
 			app.Text("Id"),

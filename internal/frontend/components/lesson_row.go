@@ -16,65 +16,65 @@ type LessonRow struct {
 }
 
 // The Render method is where the component appearance is defined.
-func (c *LessonRow) Render() app.UI {
+func (compo *LessonRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.lesson.Id),
+			app.Text(compo.lesson.Id),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.lesson.Name),
+			app.Text(compo.lesson.Name),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.lesson.Description),
+			app.Text(compo.lesson.Description),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(c.lesson.ExerciseCount),
+			app.Text(compo.lesson.ExerciseCount),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(c.onEdit(), app.EventScope(fmt.Sprintf("%p", c))),
-			app.Button().Text("Delete").OnClick(c.onDelete(c.lesson.Id), app.EventScope(fmt.Sprintf("%p", c))),
-			app.Button().Text("Exercises").OnClick(c.onExercises(c.lesson.Id), app.EventScope(fmt.Sprintf("%p", c))),
-			app.Button().Text("Learn").OnClick(c.onLearn(c.lesson.Id), app.EventScope(fmt.Sprintf("%p", c))).
+			app.Button().Text("Edit").OnClick(compo.onEdit(), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("Delete").OnClick(compo.onDelete(compo.lesson.Id), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("Exercises").OnClick(compo.onExercises(compo.lesson.Id), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("Learn").OnClick(compo.onLearn(compo.lesson.Id), app.EventScope(fmt.Sprintf("%p", compo))).
 				// Learning empty lessons not allowed
-				Disabled(c.lesson.ExerciseCount < 2),
+				Disabled(compo.lesson.ExerciseCount < 2),
 		),
 	)
 }
 
 // onEdit handles edit button click
-func (c *LessonRow) onEdit() app.EventHandler {
+func (compo *LessonRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		c.parent.inputId = c.lesson.Id
-		c.parent.inputName = c.lesson.Name
-		c.parent.inputDescription = c.lesson.Description
-		c.parent.formVisible = true
-		c.parent.validationErrors = nil
+		compo.parent.inputId = compo.lesson.Id
+		compo.parent.inputName = compo.lesson.Name
+		compo.parent.inputDescription = compo.lesson.Description
+		compo.parent.formVisible = true
+		compo.parent.validationErrors = nil
 	}
 }
 
 // onDelete handles delete button click
-func (c *LessonRow) onDelete(id int) app.EventHandler {
+func (compo *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
-		err := c.parent.c.DeleteLesson(models.Lesson{Id: id})
+		err := compo.parent.c.DeleteLesson(models.Lesson{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}
 		// create a new rows slice to be replaced in parent component
-		rows := make([]*LessonRow, len(c.parent.rows))
-		for i, row := range c.parent.rows {
+		rows := make([]*LessonRow, len(compo.parent.rows))
+		for i, row := range compo.parent.rows {
 			// add all rows but current one (which is being deleted)
 			if i != id && row != nil {
 				rows[i] = row
 			}
 		}
 		// replace parent rows slice with a new one - this will update the UI
-		c.parent.rows = rows
+		compo.parent.rows = rows
 	}
 }
 
 // onExercises handles exercises button click
-func (c *LessonRow) onExercises(id int) app.EventHandler {
+func (compo *LessonRow) onExercises(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		u, _ := url.Parse(PathExercises)
 
@@ -88,7 +88,7 @@ func (c *LessonRow) onExercises(id int) app.EventHandler {
 }
 
 // onLearn handles learn button click
-func (c *LessonRow) onLearn(id int) app.EventHandler {
+func (compo *LessonRow) onLearn(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		u, _ := url.Parse(PathLearn)
 

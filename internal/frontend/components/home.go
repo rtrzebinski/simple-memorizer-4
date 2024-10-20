@@ -17,7 +17,7 @@ func NewHome() *Home {
 }
 
 // The Render method is where the component appearance is defined.
-func (c *Home) Render() app.UI {
+func (compo *Home) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
 		app.P().Body(

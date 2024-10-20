@@ -10,7 +10,7 @@ type Navigation struct {
 }
 
 // The Render method is where the component appearance is defined.
-func (c *Navigation) Render() app.UI {
+func (compo *Navigation) Render() app.UI {
 	return app.Div().Body(
 		app.P().Body(
 			app.A().Href(PathHome).Text("Home"),
