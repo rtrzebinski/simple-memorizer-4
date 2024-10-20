@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
