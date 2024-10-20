@@ -9,16 +9,19 @@ import (
 	"net/url"
 )
 
+// HTTPCaller is an interface for making HTTP calls
 type HTTPCaller struct {
 	http   *http.Client
 	host   string
 	scheme string
 }
 
+// NewHTTPCaller creates a new HTTPCaller
 func NewHTTPCaller(http *http.Client, host string, scheme string) *HTTPCaller {
 	return &HTTPCaller{http: http, host: host, scheme: scheme}
 }
 
+// Call makes an HTTP call
 func (c *HTTPCaller) Call(method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
