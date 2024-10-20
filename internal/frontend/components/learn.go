@@ -280,7 +280,7 @@ func (compo *Learn) handleGoodAnswer() {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(&models.Result{
+		if err := compo.c.StoreResult(models.Result{
 			Exercise: &exCopy,
 			Type:     models.Good,
 		}); err != nil {
@@ -299,7 +299,7 @@ func (compo *Learn) handleBadAnswer() {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(&models.Result{
+		if err := compo.c.StoreResult(models.Result{
 			Exercise: &exCopy,
 			Type:     models.Bad,
 		}); err != nil {

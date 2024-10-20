@@ -72,7 +72,7 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 	return exercises, nil
 }
 
-func (s *Client) UpsertLesson(lesson *models.Lesson) error {
+func (s *Client) UpsertLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -100,7 +100,7 @@ func (s *Client) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (s *Client) UpsertExercise(exercise *models.Exercise) error {
+func (s *Client) UpsertExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
@@ -142,7 +142,7 @@ func (s *Client) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
-func (s *Client) StoreResult(result *models.Result) error {
+func (s *Client) StoreResult(result models.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {
 		return fmt.Errorf("failed to encode result: %w", err)

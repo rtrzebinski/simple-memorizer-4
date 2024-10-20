@@ -103,7 +103,7 @@ func (suite *ClientSuite) TestUpsertLesson() {
 
 	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.UpsertLesson(&lesson)
+	err = suite.s.UpsertLesson(lesson)
 	suite.Assert().NoError(err)
 }
 
@@ -133,7 +133,7 @@ func (suite *ClientSuite) TestUpsertExercise() {
 
 	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.UpsertExercise(&exercise)
+	err = suite.s.UpsertExercise(exercise)
 	suite.Assert().NoError(err)
 }
 
@@ -178,6 +178,6 @@ func (suite *ClientSuite) TestStoreResult() {
 
 	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.StoreResult(&result)
+	err = suite.s.StoreResult(result)
 	suite.Assert().NoError(err)
 }

@@ -118,7 +118,7 @@ func (compo *Lessons) handleSave(_ app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save lesson
-	err = compo.c.UpsertLesson(&lesson)
+	err = compo.c.UpsertLesson(lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}

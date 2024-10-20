@@ -249,7 +249,7 @@ func (compo *Exercises) handleSave(_ app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save exercise
-	err := compo.c.UpsertExercise(&exercise)
+	err := compo.c.UpsertExercise(exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save exercise: %w", err))
 	}
