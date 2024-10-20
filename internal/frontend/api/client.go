@@ -9,14 +9,17 @@ import (
 	"strconv"
 )
 
+// Client is a client for the API
 type Client struct {
 	c Caller
 }
 
+// NewClient creates a new Client
 func NewClient(c Caller) *Client {
 	return &Client{c: c}
 }
 
+// FetchLessons fetches all lessons
 func (s *Client) FetchLessons() (models.Lessons, error) {
 	var lessons models.Lessons
 
@@ -32,6 +35,7 @@ func (s *Client) FetchLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
+// HydrateLesson hydrates a lesson
 func (s *Client) HydrateLesson(lesson *models.Lesson) error {
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
@@ -49,6 +53,7 @@ func (s *Client) HydrateLesson(lesson *models.Lesson) error {
 	return nil
 }
 
+// FetchExercises fetches exercises of a lesson
 func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
 	var exercises models.Exercises
 
@@ -72,6 +77,7 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 	return exercises, nil
 }
 
+// UpsertLesson upserts a lesson
 func (s *Client) UpsertLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
@@ -86,6 +92,7 @@ func (s *Client) UpsertLesson(lesson models.Lesson) error {
 	return nil
 }
 
+// DeleteLesson deletes a lesson
 func (s *Client) DeleteLesson(lesson models.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
@@ -100,6 +107,7 @@ func (s *Client) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
+// UpsertExercise upserts an exercise
 func (s *Client) UpsertExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
@@ -114,6 +122,7 @@ func (s *Client) UpsertExercise(exercise models.Exercise) error {
 	return nil
 }
 
+// StoreExercises stores exercises
 func (s *Client) StoreExercises(exercises models.Exercises) error {
 	body, err := json.Marshal(exercises)
 	if err != nil {
@@ -128,6 +137,7 @@ func (s *Client) StoreExercises(exercises models.Exercises) error {
 	return nil
 }
 
+// DeleteExercise deletes an exercise
 func (s *Client) DeleteExercise(exercise models.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
@@ -142,6 +152,7 @@ func (s *Client) DeleteExercise(exercise models.Exercise) error {
 	return nil
 }
 
+// StoreResult stores a result
 func (s *Client) StoreResult(result models.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {

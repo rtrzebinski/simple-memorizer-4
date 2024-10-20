@@ -11,20 +11,20 @@ import (
 
 type ClientSuite struct {
 	suite.Suite
-	s *Client
-	c *CallerMock
+	client *Client
+	caller *CallerMock
 }
 
 func (suite *ClientSuite) SetupTest() {
-	suite.c = NewCallerMock()
-	suite.s = NewClient(suite.c)
+	suite.caller = NewCallerMock()
+	suite.client = NewClient(suite.caller)
 }
 
 func TestClientSuite(t *testing.T) {
 	suite.Run(t, new(ClientSuite))
 }
 
-func (suite *ClientSuite) TestFetchLessons() {
+func (suite *ClientSuite) TestClient_FetchLessons() {
 	lessons := models.Lessons{models.Lesson{Name: "name"}}
 
 	responseBody, err := json.Marshal(lessons)
@@ -35,14 +35,14 @@ func (suite *ClientSuite) TestFetchLessons() {
 	params := map[string]string(nil)
 	reqBody := []byte(nil)
 
-	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+	suite.caller.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.s.FetchLessons()
+	result, err := suite.client.FetchLessons()
 	suite.Assert().NoError(err)
 	suite.Assert().Equal(lessons, result)
 }
 
-func (suite *ClientSuite) TestHydrateLesson() {
+func (suite *ClientSuite) TestClient_HydrateLesson() {
 	lesson := &models.Lesson{Id: 10}
 
 	responseBody, err := json.Marshal(lesson)
@@ -53,13 +53,13 @@ func (suite *ClientSuite) TestHydrateLesson() {
 	params := map[string]string{"lesson_id": "10"}
 	reqBody := []byte(nil)
 
-	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+	suite.caller.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	err = suite.s.HydrateLesson(lesson)
+	err = suite.client.HydrateLesson(lesson)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestFetchExercises() {
+func (suite *ClientSuite) TestClient_FetchExercises() {
 	lesson := models.Lesson{Id: 1}
 	exercises := models.Exercises{
 		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}}},
@@ -81,18 +81,18 @@ func (suite *ClientSuite) TestFetchExercises() {
 	params := map[string]string{"lesson_id": "1"}
 	reqBody := []byte(nil)
 
-	suite.c.On("Call", method, route, params, reqBody).Return(responseBody)
+	suite.caller.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.s.FetchExercises(models.Lesson{Id: lesson.Id})
+	result, err := suite.client.FetchExercises(models.Lesson{Id: lesson.Id})
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises, result)
 	suite.Equal(expectedExercises[0].ResultsProjection, result[0].ResultsProjection)
 	suite.Equal(expectedExercises[1].ResultsProjection, result[1].ResultsProjection)
-	suite.c.AssertExpectations(suite.T())
+	suite.caller.AssertExpectations(suite.T())
 }
 
-func (suite *ClientSuite) TestUpsertLesson() {
+func (suite *ClientSuite) TestClient_UpsertLesson() {
 	lesson := models.Lesson{}
 
 	method := "POST"
@@ -101,13 +101,13 @@ func (suite *ClientSuite) TestUpsertLesson() {
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.UpsertLesson(lesson)
+	err = suite.client.UpsertLesson(lesson)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestDeleteLesson() {
+func (suite *ClientSuite) TestClient_DeleteLesson() {
 	lesson := models.Lesson{}
 
 	method := "POST"
@@ -116,13 +116,13 @@ func (suite *ClientSuite) TestDeleteLesson() {
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.DeleteLesson(lesson)
+	err = suite.client.DeleteLesson(lesson)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestUpsertExercise() {
+func (suite *ClientSuite) TestClient_UpsertExercise() {
 	exercise := models.Exercise{}
 
 	method := "POST"
@@ -131,13 +131,13 @@ func (suite *ClientSuite) TestUpsertExercise() {
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.UpsertExercise(exercise)
+	err = suite.client.UpsertExercise(exercise)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestStoreExercises() {
+func (suite *ClientSuite) TestClient_StoreExercises() {
 	exercises := models.Exercises{}
 
 	method := "POST"
@@ -146,13 +146,13 @@ func (suite *ClientSuite) TestStoreExercises() {
 	reqBody, err := json.Marshal(exercises)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.StoreExercises(exercises)
+	err = suite.client.StoreExercises(exercises)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestDeleteExercise() {
+func (suite *ClientSuite) TestClient_DeleteExercise() {
 	exercise := models.Exercise{}
 
 	method := "POST"
@@ -161,13 +161,13 @@ func (suite *ClientSuite) TestDeleteExercise() {
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.DeleteExercise(exercise)
+	err = suite.client.DeleteExercise(exercise)
 	suite.Assert().NoError(err)
 }
 
-func (suite *ClientSuite) TestStoreResult() {
+func (suite *ClientSuite) TestClient_StoreResult() {
 	result := models.Result{}
 
 	method := "POST"
@@ -176,8 +176,8 @@ func (suite *ClientSuite) TestStoreResult() {
 	reqBody, err := json.Marshal(result)
 	suite.Assert().NoError(err)
 
-	suite.c.On("Call", method, route, params, reqBody).Return([]byte(""))
+	suite.caller.On("Call", method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.s.StoreResult(result)
+	err = suite.client.StoreResult(result)
 	suite.Assert().NoError(err)
 }
