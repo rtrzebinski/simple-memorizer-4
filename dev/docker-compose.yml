@@ -7,3 +7,9 @@ services:
       POSTGRES_DB: postgres
     ports:
       - '5430:5432'
+
+  sm-pubsub:
+    image: google/cloud-sdk:404.0.0-emulators
+    ports:
+      - "8085:8085"
+    entrypoint: gcloud beta emulators pubsub start --project project-dev --host-port 0.0.0.0:8085

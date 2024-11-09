@@ -3,11 +3,12 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 )
 
 type FetchExercisesOfLessonHandler struct {
@@ -24,7 +25,7 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
 
 		// validate empty lesson if lesson_id is not present, this is for error messages consistency
-		validator := validation.ValidateLessonIdentified(models.Lesson{})
+		validator := validation.ValidateLessonIdentified(backend.Lesson{})
 		if validator.Failed() {
 			log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -50,7 +51,7 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		}
 	}
 
-	exercises, err := h.r.FetchExercises(models.Lesson{Id: lessonId})
+	exercises, err := h.r.FetchExercises(backend.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

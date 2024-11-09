@@ -2,13 +2,14 @@ package components
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
+
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/validation"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"net/url"
-	"strconv"
 )
 
 const PathExercises = "/exercises"
@@ -205,7 +206,7 @@ func readFile(file app.Value) (data []byte, err error) {
 	readerError := reader.Get("error")
 
 	if !readerError.IsNull() {
-		err = fmt.Errorf("file reader error : %s", readerError.Get("message").String())
+		err = fmt.Errorf("file reader error : %p", readerError.Get("message"))
 	} else {
 		uint8Array := app.Window().Get("Uint8Array").New(reader.Get("result"))
 		data = make([]byte, uint8Array.Length())

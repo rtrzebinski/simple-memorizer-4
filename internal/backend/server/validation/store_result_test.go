@@ -1,15 +1,16 @@
 package validation
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateStoreResult_valid(t *testing.T) {
-	result := models.Result{
-		Type: models.Good,
-		Exercise: &models.Exercise{
+	result := backend.Result{
+		Type: backend.Good,
+		Exercise: &backend.Exercise{
 			Id: 10,
 		},
 	}
@@ -22,19 +23,19 @@ func TestValidateStoreResult_valid(t *testing.T) {
 func TestValidateStoreResult_invalid(t *testing.T) {
 	var tests = []struct {
 		name    string
-		result  models.Result
+		result  backend.Result
 		message string
 	}{
 		{
 			"empty",
-			models.Result{},
+			backend.Result{},
 			"result.type is required\nexercise.id is required",
 		},
 		{
 			"missing exercise id",
-			models.Result{
-				Exercise: &models.Exercise{},
-				Type:     models.Good,
+			backend.Result{
+				Exercise: &backend.Exercise{},
+				Type:     backend.Good,
 			},
 			"exercise.id is required",
 		},

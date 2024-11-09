@@ -1,6 +1,4 @@
-package models
-
-import "time"
+package worker
 
 type ResultType string
 
@@ -10,8 +8,7 @@ const (
 )
 
 type Result struct {
-	Id        int
-	Exercise  *Exercise
-	Type      ResultType
-	CreatedAt time.Time
+	Id         int
+	ExerciseId int
+	Type       ResultType
 }

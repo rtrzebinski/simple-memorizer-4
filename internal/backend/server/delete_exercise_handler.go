@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"log"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 
 type DeleteExerciseHandler struct {
 	w        Writer
-	exercise models.Exercise
+	exercise backend.Exercise
 }
 
 func NewDeleteExerciseHandler(w Writer) *DeleteExerciseHandler {

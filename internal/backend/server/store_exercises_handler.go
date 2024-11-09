@@ -3,15 +3,16 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"log"
 	"net/http"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 )
 
 type StoreExercisesHandler struct {
 	w         Writer
-	exercises models.Exercises
+	exercises backend.Exercises
 }
 
 func NewStoreExercisesHandler(w Writer) *StoreExercisesHandler {

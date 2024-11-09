@@ -2,11 +2,12 @@ package components
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
+
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/memorizer"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"net/url"
-	"strconv"
 )
 
 const PathLearn = "/learn"

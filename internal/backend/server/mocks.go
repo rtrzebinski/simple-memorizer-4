@@ -1,7 +1,9 @@
 package server
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"context"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -11,18 +13,18 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) FetchLessons() (models.Lessons, error) {
-	return mock.Called().Get(0).(models.Lessons), nil
+func (mock *ReaderMock) FetchLessons() (backend.Lessons, error) {
+	return mock.Called().Get(0).(backend.Lessons), nil
 }
 
-func (mock *ReaderMock) HydrateLesson(lesson *models.Lesson) error {
+func (mock *ReaderMock) HydrateLesson(lesson *backend.Lesson) error {
 	mock.Called(lesson)
 
 	return nil
 }
 
-func (mock *ReaderMock) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
-	return mock.Called(lesson).Get(0).(models.Exercises), nil
+func (mock *ReaderMock) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
+	return mock.Called(lesson).Get(0).(backend.Exercises), nil
 }
 
 type WriterMock struct{ mock.Mock }
@@ -31,38 +33,50 @@ func NewWriterMock() *WriterMock {
 	return &WriterMock{}
 }
 
-func (mock *WriterMock) UpsertLesson(lesson *models.Lesson) error {
+func (mock *WriterMock) UpsertLesson(lesson *backend.Lesson) error {
 	mock.Called(lesson)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteLesson(lesson models.Lesson) error {
+func (mock *WriterMock) DeleteLesson(lesson backend.Lesson) error {
 	mock.Called(lesson)
 
 	return nil
 }
 
-func (mock *WriterMock) UpsertExercise(exercise *models.Exercise) error {
+func (mock *WriterMock) UpsertExercise(exercise *backend.Exercise) error {
 	mock.Called(exercise)
 
 	return nil
 }
 
-func (mock *WriterMock) StoreExercises(exercises models.Exercises) error {
+func (mock *WriterMock) StoreExercises(exercises backend.Exercises) error {
 	mock.Called(exercises)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteExercise(exercise models.Exercise) error {
+func (mock *WriterMock) DeleteExercise(exercise backend.Exercise) error {
 	mock.Called(exercise)
 
 	return nil
 }
 
-func (mock *WriterMock) StoreResult(result *models.Result) error {
-	mock.Called(result)
+type PublisherMock struct{ mock.Mock }
+
+func NewPublisherMock() *PublisherMock {
+	return &PublisherMock{}
+}
+
+func (mock *PublisherMock) PublishGoodAnswer(ctx context.Context, exerciseId int) error {
+	mock.Called(ctx, exerciseId)
+
+	return nil
+}
+
+func (mock *PublisherMock) PublishBadAnswer(ctx context.Context, exerciseId int) error {
+	mock.Called(ctx, exerciseId)
 
 	return nil
 }

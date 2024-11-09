@@ -2,31 +2,32 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strconv"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestExportLessonCsvHandler(t *testing.T) {
-	exercise := models.Exercise{
+	exercise := backend.Exercise{
 		Id:       1,
 		Question: "question",
 		Answer:   "answer",
 	}
-	exercises := models.Exercises{exercise}
+	exercises := backend.Exercises{exercise}
 
-	lesson := models.Lesson{Id: 2}
+	lesson := backend.Lesson{Id: 2}
 
 	reader := NewReaderMock()
 	reader.On("FetchExercises", lesson).Return(exercises)
 	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
-		args.Get(0).(*models.Lesson).Name = "lesson name"
+		args.Get(0).(*backend.Lesson).Name = "lesson name"
 	})
 
 	route := NewExportLessonCsvHandler(reader)
@@ -70,5 +71,5 @@ func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
 
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateLessonIdentified(models.Lesson{}).Error(), result)
+	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
 }

@@ -2,16 +2,17 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFetchLessonsHandler(t *testing.T) {
-	lesson := models.Lesson{}
-	lessons := models.Lessons{lesson}
+	lesson := backend.Lesson{}
+	lessons := backend.Lessons{lesson}
 
 	reader := NewReaderMock()
 	reader.On("FetchLessons").Return(lessons)
@@ -25,8 +26,9 @@ func TestFetchLessonsHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.Code)
 
-	var result models.Lessons
-	json.Unmarshal(res.Body.Bytes(), &result)
+	var result backend.Lessons
+	err := json.Unmarshal(res.Body.Bytes(), &result)
+	assert.NoError(t, err)
 
 	assert.Equal(t, lessons, result)
 }

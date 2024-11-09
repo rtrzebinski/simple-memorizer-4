@@ -2,18 +2,19 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDeleteExerciseHandler(t *testing.T) {
-	input := models.Exercise{
+	input := backend.Exercise{
 		Id: 123,
 	}
 
@@ -36,7 +37,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 }
 
 func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
-	input := models.Exercise{}
+	input := backend.Exercise{}
 
 	body, err := json.Marshal(input)
 	if err != nil {

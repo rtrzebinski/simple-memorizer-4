@@ -1,13 +1,14 @@
 package validation
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateLessonIdentified_valid(t *testing.T) {
-	lesson := models.Lesson{
+	lesson := backend.Lesson{
 		Id: 10,
 	}
 
@@ -17,7 +18,7 @@ func TestValidateLessonIdentified_valid(t *testing.T) {
 }
 
 func TestValidateLessonIdentified_invalid(t *testing.T) {
-	lesson := models.Lesson{}
+	lesson := backend.Lesson{}
 
 	validator := ValidateLessonIdentified(lesson)
 

@@ -1,14 +1,15 @@
 package validation
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateStoreExercise_valid(t *testing.T) {
-	exercises := models.Exercises{
-		models.Exercise{
+	exercises := backend.Exercises{
+		backend.Exercise{
 			Question: "question",
 			Answer:   "answer",
 		},
@@ -22,14 +23,14 @@ func TestValidateStoreExercise_valid(t *testing.T) {
 func TestValidateStoreExercise_invalid(t *testing.T) {
 	var tests = []struct {
 		name      string
-		exercises models.Exercises
+		exercises backend.Exercises
 		questions []string
 		message   string
 	}{
 		{
 			"missing question",
-			models.Exercises{
-				models.Exercise{
+			backend.Exercises{
+				backend.Exercise{
 					Answer: "answer",
 				},
 			},
@@ -38,8 +39,8 @@ func TestValidateStoreExercise_invalid(t *testing.T) {
 		},
 		{
 			"missing answer",
-			models.Exercises{
-				models.Exercise{
+			backend.Exercises{
+				backend.Exercise{
 					Question: "question",
 				},
 			},

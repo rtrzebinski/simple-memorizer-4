@@ -3,8 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
 	"strconv"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 )
 
 type Reader struct {
@@ -15,8 +16,8 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) FetchLessons() (models.Lessons, error) {
-	var lessons models.Lessons
+func (r *Reader) FetchLessons() (backend.Lessons, error) {
+	var lessons backend.Lessons
 
 	const query = `
 		SELECT l.id, l.name, description, count(e.id) AS exercise_count
@@ -32,7 +33,7 @@ func (r *Reader) FetchLessons() (models.Lessons, error) {
 	}
 
 	for rows.Next() {
-		var lesson models.Lesson
+		var lesson backend.Lesson
 
 		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.Description, &lesson.ExerciseCount)
 		if err != nil {
@@ -45,7 +46,7 @@ func (r *Reader) FetchLessons() (models.Lessons, error) {
 	return lessons, nil
 }
 
-func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
+func (r *Reader) HydrateLesson(lesson *backend.Lesson) error {
 	query := `
 		SELECT name, description, count(e.id) AS exercise_count
 		FROM lesson l
@@ -61,8 +62,8 @@ func (r *Reader) HydrateLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
-	var exercises models.Exercises
+func (r *Reader) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
+	var exercises backend.Exercises
 
 	const query = `
 		SELECT e.id, e.question, e.answer, r.id, r.type, r.created_at 
@@ -90,7 +91,7 @@ func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 			return exercises, err
 		}
 
-		result := models.Result{}
+		result := backend.Result{}
 
 		if resultId.Valid == true {
 			numInt, err := strconv.Atoi(strconv.FormatInt(resultId.Int64, 10))
@@ -100,7 +101,7 @@ func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 			result.Id = numInt
 		}
 		if resultType.Valid == true {
-			var ans = models.ResultType(resultType.String)
+			var ans = backend.ResultType(resultType.String)
 			result.Type = ans
 		}
 		if resultCreatedAt.Valid == true {
@@ -114,7 +115,7 @@ func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 			exercises[lastIndex].Results = append(exercises[lastIndex].Results, result)
 		} else {
 			// new exercise
-			exercise := models.Exercise{
+			exercise := backend.Exercise{
 				Id:       exerciseId,
 				Question: exerciseQuestion,
 				Answer:   exerciseAnswer,
@@ -122,7 +123,7 @@ func (r *Reader) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 
 			// add result if exists (mind LEFT JOIN, it might be empty)
 			if result.Id > 0 {
-				exercise.Results = models.Results{result}
+				exercise.Results = backend.Results{result}
 			}
 
 			exercises = append(exercises, exercise)

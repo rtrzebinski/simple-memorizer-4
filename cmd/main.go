@@ -5,19 +5,29 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/kelseyhightower/envconfig"
-	_ "github.com/lib/pq"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
-	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
+
+	cepubsub "github.com/cloudevents/sdk-go/protocol/pubsub/v2"
+	ce "github.com/cloudevents/sdk-go/v2"
+	"github.com/cloudevents/sdk-go/v2/client"
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/kelseyhightower/envconfig"
+	_ "github.com/lib/pq"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	probes "github.com/rtrzebinski/simple-memorizer-4/cmd/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/cmd/signal"
+	backendcloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/backend/cloudevents"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
+	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
+	workercloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
+	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 )
 
 type config struct {
@@ -29,6 +39,11 @@ type config struct {
 		Port     string `envconfig:"SERVER_PORT" default:":8000"`
 		CertFile string `envconfig:"SERVER_CERT_FILE" default:"ssl/localhost-cert.pem"`
 		KeyFile  string `envconfig:"SERVER_KEY_FILE" default:"ssl/localhost-key.pem"`
+	}
+	PubSub struct {
+		ProjectID       string   `envconfig:"PS_PROJECT_ID" default:"project-dev"`
+		TopicID         string   `envconfig:"PS_TOPIC_ID" default:"topic-dev"`
+		SubscriptionIDs []string `envconfig:"PS_SUBSCRIPTION_IDS" default:"subscription-dev"`
 	}
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9090"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
@@ -134,13 +149,55 @@ func run(ctx context.Context) error {
 		return err
 	}
 
-	// Dependencies
-	r := postgres.NewReader(db)
-	w := postgres.NewWriter(db)
+	// CloudEvents client
+	ceClient, err := createCloudEventsClient(ctx,
+		cfg.PubSub.ProjectID,
+		cfg.PubSub.TopicID,
+		cfg.PubSub.SubscriptionIDs,
+	)
+	if err != nil {
+		return err
+	}
 
-	// Make a channel to listen for errors coming from the listener. Use a
-	// buffered channel so the goroutine can exit if we don't collect this error.
+	// Make a channel to listen for errors.
+	// Use a buffered channel so the goroutine can exit if we don't collect this error.
 	serverErrors := make(chan error, 1)
+
+	// =========================================
+	// Start server
+	// =========================================
+
+	backendReader := backendpostgres.NewReader(db)
+	backendWriter := backendpostgres.NewWriter(db)
+	backendPublisher := backendcloudevetns.NewPublisher(ceClient)
+
+	go func() {
+		log.Printf("initializing API server on port: %s apiClient", cfg.Server.Port)
+		serverErrors <- server.ListenAndServe(backendReader, backendWriter, backendPublisher, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
+	}()
+
+	// =========================================
+	// Start worker
+	// =========================================
+
+	workerWriter := workerpostgres.NewWriter(db)
+	workerService := worker.NewService(workerWriter)
+	workerHandler := workercloudevetns.NewHandler(workerService)
+
+	receiver := func(ctx context.Context, ev event.Event) error {
+		return workerHandler.Handle(ctx, ev)
+	}
+
+	go func() {
+		// Start CloudEvents receiver and send errors to the channel
+		if err = ceClient.StartReceiver(ctx, receiver); err != nil {
+			serverErrors <- fmt.Errorf("start supply cat pubsub receiver: %w", err)
+		}
+	}()
+
+	// =========================================
+	// Start probes
+	// =========================================
 
 	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db)
 
@@ -150,18 +207,14 @@ func run(ctx context.Context) error {
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	// Start API server and send errors to the channel
-	go func() {
-		log.Printf("initializing API server on port: %s apiClient", cfg.Server.Port)
-		serverErrors <- server.ListenAndServe(r, w, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
-	}()
-
-	// Signal notifier
-	done := signal.NewNotifier(ctx)
-
 	log.Println("application running")
 
+	// =========================================
 	// Blocking main and waiting for shutdown.
+	// =========================================
+
+	done := signal.NewNotifier(ctx)
+
 	select {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
@@ -183,4 +236,35 @@ func run(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func createCloudEventsClient(
+	ctx context.Context,
+	projectID string,
+	topicID string,
+	subscriptionIDs []string,
+) (client.Client, error) {
+	opts := make([]cepubsub.Option, 0)
+
+	for _, sID := range subscriptionIDs {
+		opts = append(opts, cepubsub.WithSubscriptionID(strings.Trim(sID, "\n")))
+	}
+
+	opts = append(opts,
+		cepubsub.WithProjectID(projectID),
+		cepubsub.WithTopicID(topicID),
+		cepubsub.AllowCreateTopic(true),
+	)
+
+	t, err := cepubsub.New(ctx, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("create transport for topic id (%q): %w", topicID, err)
+	}
+
+	c, err := ce.NewClient(t, ce.WithTimeNow(), ce.WithUUIDs())
+	if err != nil {
+		return nil, fmt.Errorf("create client for topic id (%q): %w", topicID, err)
+	}
+
+	return c, nil
 }
