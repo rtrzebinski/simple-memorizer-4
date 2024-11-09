@@ -6,12 +6,16 @@ import (
 )
 
 type Service struct {
-	w Writer
+	r  Reader
+	w  Writer
+	pb ProjectionBuilder
 }
 
-func NewService(w Writer) *Service {
+func NewService(r Reader, w Writer, pb ProjectionBuilder) *Service {
 	return &Service{
-		w: w,
+		r:  r,
+		w:  w,
+		pb: pb,
 	}
 }
 
@@ -21,9 +25,9 @@ func (s *Service) ProcessGoodAnswer(_ context.Context, exerciseID int) error {
 		ExerciseId: exerciseID,
 	}
 
-	err := s.w.StoreResult(result)
+	err := s.processAnswer(context.Background(), result)
 	if err != nil {
-		return fmt.Errorf("store good result: %w", err)
+		return fmt.Errorf("process good answer: %w", err)
 	}
 
 	fmt.Printf("good answer processed %d\n", exerciseID)
@@ -37,12 +41,33 @@ func (s *Service) ProcessBadAnswer(_ context.Context, exerciseID int) error {
 		ExerciseId: exerciseID,
 	}
 
-	err := s.w.StoreResult(result)
+	err := s.processAnswer(context.Background(), result)
 	if err != nil {
-		return fmt.Errorf("store bad result: %w", err)
+		return fmt.Errorf("process bad answer: %w", err)
 	}
 
 	fmt.Printf("bad answer processed %d\n", exerciseID)
+
+	return nil
+}
+
+func (s *Service) processAnswer(_ context.Context, result *Result) error {
+	err := s.w.StoreResult(result)
+	if err != nil {
+		return fmt.Errorf("store result: %w", err)
+	}
+
+	results, err := s.r.FetchResults(result.ExerciseId)
+	if err != nil {
+		return fmt.Errorf("fetch results: %w", err)
+	}
+
+	projection := s.pb.Projection(results)
+
+	err = s.w.UpdateExerciseProjection(result.ExerciseId, projection)
+	if err != nil {
+		return fmt.Errorf("update exercise projection: %w", err)
+	}
 
 	return nil
 }

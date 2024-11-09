@@ -27,6 +27,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
 	workercloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
 	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 )
 
@@ -180,8 +181,9 @@ func run(ctx context.Context) error {
 	// Start worker
 	// =========================================
 
+	workerReader := workerpostgres.NewReader(db)
 	workerWriter := workerpostgres.NewWriter(db)
-	workerService := worker.NewService(workerWriter)
+	workerService := worker.NewService(workerReader, workerWriter, result.NewProjectionBuilder())
 	workerHandler := workercloudevetns.NewHandler(workerService)
 
 	receiver := func(ctx context.Context, ev event.Event) error {
