@@ -1,10 +1,8 @@
 package validation
 
-import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-)
+import "github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 
-func ValidateStoreExercises(exercises models.Exercises) *Validator {
+func ValidateStoreExercises(exercises backend.Exercises) *Validator {
 	validator := NewValidator()
 
 	for _, e := range exercises {

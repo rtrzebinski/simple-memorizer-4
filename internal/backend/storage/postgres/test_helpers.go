@@ -1,19 +1,20 @@
 package postgres
 
 import (
+	"time"
+
 	"database/sql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"time"
 )
+
+// Tables
 
 type (
 	Lesson struct {
-		Id            int
-		Name          string
-		Description   string
-		ExerciseCount int
+		Id          int
+		Name        string
+		Description string
 	}
 
 	Exercise struct {
@@ -26,7 +27,7 @@ type (
 	Result struct {
 		Id         int
 		ExerciseId int
-		Type       models.ResultType
+		Type       string
 		CreatedAt  time.Time
 	}
 )
@@ -163,29 +164,13 @@ func createResult(db *sql.DB, answer *Result) {
 	}
 
 	if answer.Type == "" {
-		answer.Type = models.Good
+		answer.Type = "good"
 	}
 
 	err := db.QueryRow(query, &answer.ExerciseId, &answer.Type).Scan(&answer.Id, &answer.CreatedAt)
 	if err != nil {
 		panic(err)
 	}
-}
-
-func fetchLatestResult(db *sql.DB) Result {
-	var answer Result
-
-	const query = `
-		SELECT r.id, r.type, r.exercise_id, r.created_at
-		FROM result r
-		ORDER BY id DESC
-		LIMIT 1;`
-
-	if err := db.QueryRow(query).Scan(&answer.Id, &answer.Type, &answer.ExerciseId, &answer.CreatedAt); err != nil {
-		panic(err)
-	}
-
-	return answer
 }
 
 func randomString() string {

@@ -2,18 +2,19 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strconv"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHydrateLessonHandler(t *testing.T) {
-	lesson := &models.Lesson{
+	lesson := &backend.Lesson{
 		Id: 1,
 	}
 
@@ -57,5 +58,5 @@ func TestHydrateLessonHandler_invalidInput(t *testing.T) {
 
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateLessonIdentified(models.Lesson{}).Error(), result)
+	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
 }

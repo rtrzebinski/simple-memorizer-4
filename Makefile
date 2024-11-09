@@ -7,7 +7,7 @@ HOME ?= $(shell echo $$HOME)
 
 default: help
 
-.PHONY: all dev
+.PHONY: all dev proto
 
 help: ## Show this help
 	@IFS=$$'\n' ; \
@@ -28,6 +28,8 @@ help: ## Show this help
 deps: ## Install local environment dependencies
 	@echo "$(OK_COLOR)==> Installing local environment dependencies for $(SERVICE_NAME)... $(NO_COLOR)"
 	@brew install golang-migrate
+	@brew install protobuf
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 dev: ## Prepare local dev environment (stop + start + migrate + seed)
 	@echo "$(OK_COLOR)==> Preparing dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -40,7 +42,12 @@ dev: ## Prepare local dev environment (stop + start + migrate + seed)
          done
 	@make migrate
 	@make seed
+	@make pubsub
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
+
+pubsub: ## Create PubSub topic and subscription
+	@echo "$(OK_COLOR)==> Setting up PubSub...$(NO_COLOR)"
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run ./dev/pubsub/pubsub.go
 
 start: ## Start docker-compose containers
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -74,7 +81,7 @@ migrate-drop: ## Drop db without confirmation (migrate drop)
 
 seed: ## Seed the database with some example data
 	@echo "$(OK_COLOR)==> Seeding the db for $(SERVICE_NAME)... $(NO_COLOR)"
-	@go run dev/seeder.go
+	@go run dev/seeder/seeder.go
 
 reseed: ## Destroy, recreate and seed the database (no confirmation)
 	@make migrate-down
@@ -87,15 +94,19 @@ db: ## Db CLI client connection
 
 build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
-	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd/simple-memorizer
-	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd/simple-memorizer
+	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd
+	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd
 	@date > version
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 run: ## Build and run locally
 	@make build
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@go run cmd/simple-memorizer/main.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/main.go
+
+proto: ## Generate protobuf files
+	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"
+	@protoc --go_out=./generated --go_opt=paths=source_relative proto/events/*.proto
 
 test: ## Test all
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"

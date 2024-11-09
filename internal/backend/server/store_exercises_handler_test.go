@@ -2,19 +2,20 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStoreExercises(t *testing.T) {
-	input := models.Exercises{
-		models.Exercise{
+	input := backend.Exercises{
+		backend.Exercise{
 			Question: "question",
 			Answer:   "answer",
 		},
@@ -39,8 +40,8 @@ func TestStoreExercises(t *testing.T) {
 }
 
 func TestStoreExercisesHandler_invalidInput(t *testing.T) {
-	input := models.Exercises{
-		models.Exercise{},
+	input := backend.Exercises{
+		backend.Exercise{},
 	}
 
 	body, err := json.Marshal(input)

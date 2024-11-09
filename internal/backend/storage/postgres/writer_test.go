@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -10,7 +10,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 
 	w := NewWriter(db)
 
-	lesson := models.Lesson{
+	lesson := backend.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
@@ -33,7 +33,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	err := w.UpsertLesson(&models.Lesson{
+	err := w.UpsertLesson(&backend.Lesson{
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
@@ -59,7 +59,7 @@ func (suite *PostgresSuite) TestWriter_DeleteLesson() {
 	})
 	another := fetchLatestLesson(db)
 
-	err := w.DeleteLesson(models.Lesson{Id: stored.Id})
+	err := w.DeleteLesson(backend.Lesson{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
 	assert.Nil(suite.T(), findLessonById(db, stored.Id))
@@ -74,8 +74,8 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	exercise := models.Exercise{
-		Lesson: &models.Lesson{
+	exercise := backend.Exercise{
+		Lesson: &backend.Lesson{
 			Id: lesson.Id,
 		},
 		Question: "question",
@@ -104,7 +104,7 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 	exercise := Exercise{LessonId: lesson.Id}
 	createExercise(db, &exercise)
 
-	err := w.UpsertExercise(&models.Exercise{
+	err := w.UpsertExercise(&backend.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",
@@ -127,8 +127,8 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	createLesson(db, lesson)
 
 	// exercise1 existing
-	exercise1 := models.Exercise{
-		Lesson: &models.Lesson{
+	exercise1 := backend.Exercise{
+		Lesson: &backend.Lesson{
 			Id: lesson.Id,
 		},
 		Question: "question1",
@@ -143,15 +143,15 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	})
 
 	// exercise2 not existing
-	exercise2 := models.Exercise{
-		Lesson: &models.Lesson{
+	exercise2 := backend.Exercise{
+		Lesson: &backend.Lesson{
 			Id: lesson.Id,
 		},
 		Question: "question2",
 		Answer:   "answer2",
 	}
 
-	exercises := models.Exercises{exercise1, exercise2}
+	exercises := backend.Exercises{exercise1, exercise2}
 
 	err := w.StoreExercises(exercises)
 	assert.NoError(suite.T(), err)
@@ -176,9 +176,7 @@ func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 
 	w := NewWriter(db)
 
-	lesson := &Lesson{
-		ExerciseCount: 1,
-	}
+	lesson := &Lesson{}
 	createLesson(db, lesson)
 
 	createExercise(db, &Exercise{
@@ -191,36 +189,9 @@ func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 	})
 	another := fetchLatestExercise(db)
 
-	err := w.DeleteExercise(models.Exercise{Id: stored.Id})
+	err := w.DeleteExercise(backend.Exercise{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
 	assert.Nil(suite.T(), findExerciseById(db, stored.Id))
 	assert.Equal(suite.T(), "another", findExerciseById(db, another.Id).Question)
-
-	lesson = findLessonById(db, stored.LessonId)
-	assert.Equal(suite.T(), 0, lesson.ExerciseCount)
-}
-
-func (suite *PostgresSuite) TestWriter_StoreAnswer() {
-	db := suite.db
-
-	w := NewWriter(db)
-
-	exercise := &Exercise{}
-	createExercise(db, exercise)
-
-	answer := models.Result{
-		Type: models.Good,
-		Exercise: &models.Exercise{
-			Id: exercise.Id,
-		},
-	}
-
-	err := w.StoreResult(&answer)
-	assert.NoError(suite.T(), err)
-
-	stored := fetchLatestResult(db)
-
-	assert.Equal(suite.T(), answer.Type, stored.Type)
-	assert.Equal(suite.T(), answer.Exercise.Id, stored.ExerciseId)
 }

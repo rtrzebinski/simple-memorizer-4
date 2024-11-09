@@ -3,22 +3,28 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"log"
 	"net/http"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 )
 
 type StoreResultHandler struct {
-	w      Writer
-	result models.Result
+	p      Publisher
+	result backend.Result
 }
 
-func NewStoreResultHandler(w Writer) *StoreResultHandler {
-	return &StoreResultHandler{w: w}
+func NewStoreResultHandler(p Publisher) *StoreResultHandler {
+	return &StoreResultHandler{
+		p: p,
+	}
 }
 
 func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	// Derive ctx from the request context
+	ctx := req.Context()
+
 	err := json.NewDecoder(req.Body).Decode(&h.result)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode StoreResultHandler HTTP request: %w", err))
@@ -52,11 +58,22 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	err = h.w.StoreResult(&h.result)
-	if err != nil {
-		log.Print(fmt.Errorf("failed to store result: %w", err))
-		res.WriteHeader(http.StatusInternalServerError)
+	switch h.result.Type {
+	case backend.Good:
+		err = h.p.PublishGoodAnswer(ctx, h.result.Exercise.Id)
+		if err != nil {
+			log.Print(fmt.Errorf("failed to publish good answer event: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
 
-		return
+			return
+		}
+	case backend.Bad:
+		err = h.p.PublishBadAnswer(ctx, h.result.Exercise.Id)
+		if err != nil {
+			log.Print(fmt.Errorf("failed to publish bad answer event: %w", err))
+			res.WriteHeader(http.StatusInternalServerError)
+
+			return
+		}
 	}
 }

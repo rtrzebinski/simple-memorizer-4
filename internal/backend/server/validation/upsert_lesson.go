@@ -1,10 +1,8 @@
 package validation
 
-import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-)
+import "github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 
-func ValidateUpsertLesson(l models.Lesson, names []string) *Validator {
+func ValidateUpsertLesson(l backend.Lesson, names []string) *Validator {
 	validator := NewValidator()
 
 	if l.Name == "" {

@@ -1,14 +1,15 @@
 package validation
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateStoreExercise_validInsert(t *testing.T) {
-	exercise := models.Exercise{
-		Lesson: &models.Lesson{
+	exercise := backend.Exercise{
+		Lesson: &backend.Lesson{
 			Id: 10,
 		},
 		Question: "question",
@@ -21,7 +22,7 @@ func TestValidateStoreExercise_validInsert(t *testing.T) {
 }
 
 func TestValidateUpsertExercise_validUpdate(t *testing.T) {
-	exercise := models.Exercise{
+	exercise := backend.Exercise{
 		Id:       10,
 		Question: "question",
 		Answer:   "answer",
@@ -35,19 +36,19 @@ func TestValidateUpsertExercise_validUpdate(t *testing.T) {
 func TestValidateUpsertExercise_invalid(t *testing.T) {
 	var tests = []struct {
 		name      string
-		exercise  models.Exercise
+		exercise  backend.Exercise
 		questions []string
 		message   string
 	}{
 		{
 			"empty",
-			models.Exercise{},
+			backend.Exercise{},
 			nil,
 			"exercise.question is required\nexercise.answer is required\nlesson.id is required",
 		},
 		{
 			"non unique question",
-			models.Exercise{
+			backend.Exercise{
 				Question: "question",
 			},
 			[]string{"question"},
@@ -55,10 +56,10 @@ func TestValidateUpsertExercise_invalid(t *testing.T) {
 		},
 		{
 			"missing lesson id",
-			models.Exercise{
+			backend.Exercise{
 				Question: "question",
 				Answer:   "answer",
-				Lesson:   &models.Lesson{},
+				Lesson:   &backend.Lesson{},
 			},
 			nil,
 			"lesson.id is required",

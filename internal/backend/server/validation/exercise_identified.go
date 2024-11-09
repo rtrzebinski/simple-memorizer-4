@@ -1,10 +1,8 @@
 package validation
 
-import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-)
+import "github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 
-func ValidateExerciseIdentified(e models.Exercise) *Validator {
+func ValidateExerciseIdentified(e backend.Exercise) *Validator {
 	validator := NewValidator()
 
 	if e.Id == 0 {

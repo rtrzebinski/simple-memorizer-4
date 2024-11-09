@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,7 @@ func (suite *PostgresSuite) TestReader_FetchLessons() {
 	res, err := r.FetchLessons()
 
 	assert.NoError(suite.T(), err)
-	assert.IsType(suite.T(), models.Lessons{}, res)
+	assert.IsType(suite.T(), backend.Lessons{}, res)
 	assert.Len(suite.T(), res, 1)
 	assert.Equal(suite.T(), lesson.Id, res[0].Id)
 	assert.Equal(suite.T(), lesson.Name, res[0].Name)
@@ -34,7 +34,7 @@ func (suite *PostgresSuite) TestReader_HydrateLesson() {
 	l := &Lesson{}
 	createLesson(db, l)
 
-	lesson := &models.Lesson{
+	lesson := &backend.Lesson{
 		Id: l.Id,
 	}
 
@@ -76,10 +76,10 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 	result2 := &Result{}
 	createResult(db, result2)
 
-	res, err := r.FetchExercises(models.Lesson{Id: exercise.LessonId})
+	res, err := r.FetchExercises(backend.Lesson{Id: exercise.LessonId})
 
 	assert.NoError(suite.T(), err)
-	assert.IsType(suite.T(), models.Exercises{}, res)
+	assert.IsType(suite.T(), backend.Exercises{}, res)
 	assert.Len(suite.T(), res, 2)
 	assert.Equal(suite.T(), exercise.Id, res[1].Id)
 	assert.Equal(suite.T(), exercise.Question, res[1].Question)
@@ -87,6 +87,6 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 	assert.Len(suite.T(), res[1].Results, 1)
 	assert.Empty(suite.T(), res[0].Results)
 	assert.Equal(suite.T(), result1.Id, res[1].Results[0].Id)
-	assert.Equal(suite.T(), result1.Type, res[1].Results[0].Type)
+	assert.Equal(suite.T(), backend.ResultType(result1.Type), res[1].Results[0].Type)
 	assert.Equal(suite.T(), result1.CreatedAt, res[1].Results[0].CreatedAt)
 }

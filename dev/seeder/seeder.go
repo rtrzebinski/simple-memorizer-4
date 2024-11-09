@@ -2,15 +2,18 @@ package main
 
 import (
 	"database/sql"
-	"github.com/google/uuid"
-	"github.com/kelseyhightower/envconfig"
-	_ "github.com/lib/pq"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"log"
 	"os"
 	"reflect"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/kelseyhightower/envconfig"
+	_ "github.com/lib/pq"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
+	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 )
 
 type config struct {
@@ -38,7 +41,7 @@ func main() {
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
-	s := Seeder{db, postgres.NewWriter(db)}
+	s := Seeder{db, backendpostgres.NewWriter(db), workerpostgres.NewWriter(db)}
 
 	seedType := reflect.TypeOf(s)
 
@@ -65,8 +68,9 @@ func randomString() string {
 }
 
 type Seeder struct {
-	db *sql.DB
-	w  *postgres.Writer
+	db            *sql.DB
+	backendWriter *backendpostgres.Writer
+	workerWriter  *workerpostgres.Writer
 }
 
 func seed(s Seeder, seedMethodName string) {
@@ -81,46 +85,46 @@ func seed(s Seeder, seedMethodName string) {
 }
 
 func (s Seeder) CapitalsSeed() {
-	lesson := models.Lesson{
+	lesson := backend.Lesson{
 		Name:        "Capitals",
 		Description: "What is the capital of given country?",
 	}
 
-	err := s.w.UpsertLesson(&lesson)
+	err := s.backendWriter.UpsertLesson(&lesson)
 	if err != nil {
 		panic(err)
 	}
 
-	exercises := models.Exercises{
-		models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+	exercises := backend.Exercises{
+		backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: "Poland",
 			Answer:   "Warsaw",
 		},
-		models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+		backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: "Germany",
 			Answer:   "Berlin",
 		},
-		models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+		backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: "France",
 			Answer:   "Paris",
 		},
-		models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+		backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: "Netherlands",
 			Answer:   "Amsterdam",
 		},
-		models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+		backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: "Spain",
 			Answer:   "Madrid",
 		},
 	}
 
 	for _, exercise := range exercises {
-		err := s.w.UpsertExercise(&exercise)
+		err := s.backendWriter.UpsertExercise(&exercise)
 		if err != nil {
 			panic(err)
 		}
@@ -131,28 +135,28 @@ func (s Seeder) LargeLessonSeed() {
 	exercisesCount := 100
 	answersCount := 100
 
-	lesson := models.Lesson{
+	lesson := backend.Lesson{
 		Name:        "Large lesson",
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err := s.w.UpsertLesson(&lesson)
+	err := s.backendWriter.UpsertLesson(&lesson)
 	if err != nil {
 		panic(err)
 	}
 
-	exercises := models.Exercises{}
+	exercises := backend.Exercises{}
 
 	for i := exercisesCount; i > 0; i-- {
-		exercises = append(exercises, models.Exercise{
-			Lesson:   &models.Lesson{Id: lesson.Id},
+		exercises = append(exercises, backend.Exercise{
+			Lesson:   &backend.Lesson{Id: lesson.Id},
 			Question: randomString(),
 			Answer:   randomString(),
 		})
 	}
 
 	for k := range exercises {
-		err := s.w.UpsertExercise(&exercises[k])
+		err := s.backendWriter.UpsertExercise(&exercises[k])
 		if err != nil {
 			panic(err)
 		}
@@ -160,20 +164,20 @@ func (s Seeder) LargeLessonSeed() {
 
 	for i := range exercises {
 		for j := answersCount; j > 0; j-- {
-			answer := &models.Result{
-				Exercise: &exercises[i],
+			answer := &worker.Result{
+				ExerciseId: exercises[i].Id,
 			}
 
 			currentTime := time.Now().UnixNano() / int64(time.Millisecond)
 			randomBool := currentTime%2 == 0
 
 			if randomBool == true {
-				answer.Type = models.Good
+				answer.Type = worker.Good
 			} else {
-				answer.Type = models.Bad
+				answer.Type = worker.Bad
 			}
 
-			err := s.w.StoreResult(answer)
+			err := s.workerWriter.StoreResult(answer)
 			if err != nil {
 				panic(err)
 			}

@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 )
 
 type Writer struct {
@@ -14,7 +14,7 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) UpsertLesson(lesson *models.Lesson) error {
+func (w *Writer) UpsertLesson(lesson *backend.Lesson) error {
 	var query string
 
 	if lesson.Id > 0 {
@@ -43,7 +43,7 @@ func (w *Writer) UpsertLesson(lesson *models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) DeleteLesson(lesson models.Lesson) error {
+func (w *Writer) DeleteLesson(lesson backend.Lesson) error {
 	query := `DELETE FROM lesson WHERE id = $1;`
 
 	_, err := w.db.Exec(query, lesson.Id)
@@ -54,7 +54,7 @@ func (w *Writer) DeleteLesson(lesson models.Lesson) error {
 	return nil
 }
 
-func (w *Writer) UpsertExercise(exercise *models.Exercise) error {
+func (w *Writer) UpsertExercise(exercise *backend.Exercise) error {
 	var query string
 
 	if exercise.Id > 0 {
@@ -83,7 +83,7 @@ func (w *Writer) UpsertExercise(exercise *models.Exercise) error {
 	return nil
 }
 
-func (w *Writer) StoreExercises(exercises models.Exercises) error {
+func (w *Writer) StoreExercises(exercises backend.Exercises) error {
 	const query = `
 		INSERT INTO exercise (lesson_id, question, answer)
 		VALUES ($1, $2, $3)
@@ -99,33 +99,13 @@ func (w *Writer) StoreExercises(exercises models.Exercises) error {
 	return nil
 }
 
-func (w *Writer) DeleteExercise(exercise models.Exercise) error {
+func (w *Writer) DeleteExercise(exercise backend.Exercise) error {
 
 	query := `DELETE FROM exercise WHERE id = $1;`
 
 	_, err := w.db.Exec(query, exercise.Id)
 	if err != nil {
 		return fmt.Errorf("failed to execute 'DELETE FROM exercise' query: %w", err)
-	}
-
-	return nil
-}
-
-func (w *Writer) StoreResult(result *models.Result) error {
-	var query string
-
-	query = `INSERT INTO result (type, exercise_id) VALUES ($1, $2) RETURNING id;`
-
-	rows, err := w.db.Query(query, result.Type, result.Exercise.Id)
-	if err != nil {
-		return fmt.Errorf("failed to execute 'INSERT INTO result' query: %w", err)
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&result.Id)
-		if err != nil {
-			return fmt.Errorf("failed to scan result insert id: %w", err)
-		}
 	}
 
 	return nil

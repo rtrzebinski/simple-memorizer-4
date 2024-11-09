@@ -3,15 +3,16 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 	"log"
 	"net/http"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server/validation"
 )
 
 type DeleteLessonHandler struct {
 	w      Writer
-	lesson models.Lesson
+	lesson backend.Lesson
 }
 
 func NewDeleteLessonHandler(w Writer) *DeleteLessonHandler {

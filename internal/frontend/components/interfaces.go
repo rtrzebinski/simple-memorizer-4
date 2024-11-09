@@ -1,6 +1,8 @@
 package components
 
-import "github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
+import (
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
+)
 
 type APIClient interface {
 	FetchLessons() (models.Lessons, error)

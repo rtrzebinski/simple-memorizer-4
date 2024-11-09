@@ -1,18 +1,26 @@
 package server
 
-import "github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
+import (
+	"context"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
+)
 
 type Reader interface {
-	FetchLessons() (models.Lessons, error)
-	HydrateLesson(*models.Lesson) error
-	FetchExercises(models.Lesson) (models.Exercises, error)
+	FetchLessons() (backend.Lessons, error)
+	HydrateLesson(*backend.Lesson) error
+	FetchExercises(backend.Lesson) (backend.Exercises, error)
 }
 
 type Writer interface {
-	UpsertLesson(*models.Lesson) error
-	DeleteLesson(models.Lesson) error
-	UpsertExercise(*models.Exercise) error
-	StoreExercises(models.Exercises) error
-	DeleteExercise(models.Exercise) error
-	StoreResult(*models.Result) error
+	UpsertLesson(*backend.Lesson) error
+	DeleteLesson(backend.Lesson) error
+	UpsertExercise(*backend.Exercise) error
+	StoreExercises(backend.Exercises) error
+	DeleteExercise(backend.Exercise) error
+}
+
+type Publisher interface {
+	PublishGoodAnswer(ctx context.Context, exerciseID int) error
+	PublishBadAnswer(ctx context.Context, exerciseID int) error
 }

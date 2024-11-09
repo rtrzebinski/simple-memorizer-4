@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func ListenAndServe(r Reader, w Writer, port, certFile, keyFile string) error {
+func ListenAndServe(r Reader, w Writer, p Publisher, port, certFile, keyFile string) error {
 	// read
 
 	http.Handle(FetchLessons, NewFetchLessonsHandler(r))
@@ -18,7 +18,7 @@ func ListenAndServe(r Reader, w Writer, port, certFile, keyFile string) error {
 	http.Handle(UpsertExercise, NewUpsertExerciseHandler(w))
 	http.Handle(StoreExercises, NewStoreExercisesHandler(w))
 	http.Handle(DeleteExercise, NewDeleteExerciseHandler(w))
-	http.Handle(StoreResult, NewStoreResultHandler(w))
+	http.Handle(StoreResult, NewStoreResultHandler(p))
 
 	// download
 

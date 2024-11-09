@@ -1,10 +1,8 @@
 package validation
 
-import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/models"
-)
+import "github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 
-func ValidateStoreResult(a models.Result) *Validator {
+func ValidateStoreResult(a backend.Result) *Validator {
 	validator := NewValidator()
 
 	if a.Type == "" {
