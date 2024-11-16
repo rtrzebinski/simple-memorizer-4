@@ -164,7 +164,7 @@ func (s Seeder) LargeLessonSeed() {
 
 	for i := range exercises {
 		for j := answersCount; j > 0; j-- {
-			answer := &worker.Result{
+			r := &worker.Result{
 				ExerciseId: exercises[i].Id,
 			}
 
@@ -172,12 +172,12 @@ func (s Seeder) LargeLessonSeed() {
 			randomBool := currentTime%2 == 0
 
 			if randomBool == true {
-				answer.Type = worker.Good
+				r.Type = worker.Good
 			} else {
-				answer.Type = worker.Bad
+				r.Type = worker.Bad
 			}
 
-			err := s.workerWriter.StoreResult(answer)
+			err := s.workerWriter.StoreResult(r)
 			if err != nil {
 				panic(err)
 			}
