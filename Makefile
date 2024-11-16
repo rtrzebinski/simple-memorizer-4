@@ -49,7 +49,9 @@ pubsub: ## Create PubSub topic and subscription
 	@echo "$(OK_COLOR)==> Setting up PubSub...$(NO_COLOR)"
 	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run ./dev/pubsub/pubsub.go
 
-start: ## Start docker-compose containers
+start: ## Stop all running containers and start docker-compose containers
+	@echo "$(OK_COLOR)==> Stopping all running containers... $(NO_COLOR)"
+	@docker ps -q | xargs -r docker stop
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml up -d --remove-orphans
 
