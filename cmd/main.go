@@ -18,8 +18,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	probes "github.com/rtrzebinski/simple-memorizer-4/cmd/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/cmd/signal"
 	backendcloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/backend/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
@@ -29,6 +27,8 @@ import (
 	workercloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
 	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
+	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
 )
 
 type config struct {
