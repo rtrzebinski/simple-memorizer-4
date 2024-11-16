@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/memorizer"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 )
 
 const PathLearn = "/learn"
@@ -19,8 +19,8 @@ type Learn struct {
 	memorizer memorizer.Service
 
 	// component vars
-	lesson          models.Lesson
-	exercise        models.Exercise
+	lesson          frontend.Lesson
+	exercise        frontend.Exercise
 	isAnswerVisible bool
 
 	// Window events unsubscribers, to be called on component dismount
@@ -46,7 +46,7 @@ func (compo *Learn) OnMount(ctx app.Context) {
 		return
 	}
 
-	compo.lesson = models.Lesson{Id: lessonId}
+	compo.lesson = frontend.Lesson{Id: lessonId}
 	compo.hydrateLesson()
 
 	exercisesOfLesson, err := compo.c.FetchExercises(compo.lesson)
@@ -57,7 +57,7 @@ func (compo *Learn) OnMount(ctx app.Context) {
 	}
 
 	// convert into map that is needed for a memorizer service
-	var exercises = make(map[int]models.Exercise)
+	var exercises = make(map[int]frontend.Exercise)
 	for _, e := range exercisesOfLesson {
 		exercises[e.Id] = e
 	}
@@ -281,9 +281,9 @@ func (compo *Learn) handleGoodAnswer() {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(models.Result{
+		if err := compo.c.StoreResult(frontend.Result{
 			Exercise: &exCopy,
-			Type:     models.Good,
+			Type:     frontend.Good,
 		}); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
@@ -300,9 +300,9 @@ func (compo *Learn) handleBadAnswer() {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(models.Result{
+		if err := compo.c.StoreResult(frontend.Result{
 			Exercise: &exCopy,
-			Type:     models.Bad,
+			Type:     frontend.Bad,
 		}); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}

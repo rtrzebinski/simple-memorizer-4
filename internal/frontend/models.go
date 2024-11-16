@@ -1,9 +1,16 @@
-package models
+package frontend
 
 import (
 	"github.com/guregu/null/v5"
 	"time"
 )
+
+type Lesson struct {
+	Id            int
+	Name          string
+	Description   string
+	ExerciseCount int
+}
 
 type Exercise struct {
 	Id                       int
@@ -42,4 +49,17 @@ func (e *Exercise) RegisterBadAnswer() {
 	e.BadAnswersToday++
 	e.LatestBadAnswerWasToday = true
 	e.LatestBadAnswer = null.TimeFrom(time.Now())
+}
+
+type ResultType string
+
+const (
+	Good ResultType = "good"
+	Bad  ResultType = "bad"
+)
+
+type Result struct {
+	Id       int
+	Exercise *Exercise
+	Type     ResultType
 }

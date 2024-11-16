@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"strconv"
 )
 
@@ -19,8 +19,8 @@ func NewClient(c Caller) *Client {
 }
 
 // FetchLessons fetches all lessons
-func (s *Client) FetchLessons() (models.Lessons, error) {
-	var lessons models.Lessons
+func (s *Client) FetchLessons() ([]frontend.Lesson, error) {
+	var lessons []frontend.Lesson
 
 	respBody, err := s.c.Call("GET", server.FetchLessons, nil, nil)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s *Client) FetchLessons() (models.Lessons, error) {
 }
 
 // HydrateLesson hydrates a lesson
-func (s *Client) HydrateLesson(lesson *models.Lesson) error {
+func (s *Client) HydrateLesson(lesson *frontend.Lesson) error {
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
@@ -53,8 +53,8 @@ func (s *Client) HydrateLesson(lesson *models.Lesson) error {
 }
 
 // FetchExercises fetches exercises of a lesson
-func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) {
-	var exercises models.Exercises
+func (s *Client) FetchExercises(lesson frontend.Lesson) ([]frontend.Exercise, error) {
+	var exercises []frontend.Exercise
 
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
@@ -73,7 +73,7 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 }
 
 // UpsertLesson upserts a lesson
-func (s *Client) UpsertLesson(lesson models.Lesson) error {
+func (s *Client) UpsertLesson(lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -88,7 +88,7 @@ func (s *Client) UpsertLesson(lesson models.Lesson) error {
 }
 
 // DeleteLesson deletes a lesson
-func (s *Client) DeleteLesson(lesson models.Lesson) error {
+func (s *Client) DeleteLesson(lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
@@ -103,7 +103,7 @@ func (s *Client) DeleteLesson(lesson models.Lesson) error {
 }
 
 // UpsertExercise upserts an exercise
-func (s *Client) UpsertExercise(exercise models.Exercise) error {
+func (s *Client) UpsertExercise(exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
@@ -118,7 +118,7 @@ func (s *Client) UpsertExercise(exercise models.Exercise) error {
 }
 
 // StoreExercises stores exercises
-func (s *Client) StoreExercises(exercises models.Exercises) error {
+func (s *Client) StoreExercises(exercises []frontend.Exercise) error {
 	body, err := json.Marshal(exercises)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercises: %w", err)
@@ -133,7 +133,7 @@ func (s *Client) StoreExercises(exercises models.Exercises) error {
 }
 
 // DeleteExercise deletes an exercise
-func (s *Client) DeleteExercise(exercise models.Exercise) error {
+func (s *Client) DeleteExercise(exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
@@ -148,7 +148,7 @@ func (s *Client) DeleteExercise(exercise models.Exercise) error {
 }
 
 // StoreResult stores a result
-func (s *Client) StoreResult(result models.Result) error {
+func (s *Client) StoreResult(result frontend.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {
 		return fmt.Errorf("failed to encode result: %w", err)

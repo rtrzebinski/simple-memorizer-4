@@ -7,9 +7,9 @@ import (
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components/validation"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 )
 
 const PathExercises = "/exercises"
@@ -20,7 +20,7 @@ type Exercises struct {
 	c APIClient
 
 	// component vars
-	lesson models.Lesson
+	lesson frontend.Lesson
 	rows   []*ExerciseRow
 
 	// upsert exercise form
@@ -50,7 +50,7 @@ func (compo *Exercises) OnMount(_ app.Context) {
 		return
 	}
 
-	compo.lesson = models.Lesson{Id: lessonId}
+	compo.lesson = frontend.Lesson{Id: lessonId}
 
 	compo.hydrateLesson()
 	compo.displayExercisesOfLesson()
@@ -165,9 +165,9 @@ func (compo *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
 	}
 
 	// prepare exercises to be stored
-	var exercises models.Exercises
+	var exercises []frontend.Exercise
 	for _, rec := range records {
-		exercises = append(exercises, models.Exercise{
+		exercises = append(exercises, frontend.Exercise{
 			Lesson:   &compo.lesson,
 			Question: rec[0],
 			Answer:   rec[1],
@@ -221,11 +221,11 @@ func (compo *Exercises) handleSave(_ app.Context, e app.Event) {
 	e.PreventDefault()
 
 	// exercise to be saved
-	exercise := models.Exercise{
+	exercise := frontend.Exercise{
 		Id:       compo.inputId,
 		Question: compo.inputQuestion,
 		Answer:   compo.inputAnswer,
-		Lesson: &models.Lesson{
+		Lesson: &frontend.Lesson{
 			Id: compo.lesson.Id,
 		},
 	}

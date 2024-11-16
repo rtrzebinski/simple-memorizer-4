@@ -1,10 +1,11 @@
 package memorizer
 
 import (
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"math/rand"
 	"time"
+
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 )
 
 // Service provides next exercise to memorize
@@ -12,17 +13,17 @@ import (
 // the more points an exercise has the more chances it has to be picked
 type Service struct {
 	r         *rand.Rand
-	exercises map[int]models.Exercise
+	exercises map[int]frontend.Exercise
 }
 
 // Init the service with exercises to memorize
-func (s *Service) Init(exercises map[int]models.Exercise) {
+func (s *Service) Init(exercises map[int]frontend.Exercise) {
 	s.r = rand.New(rand.NewSource(time.Now().Unix()))
 	s.exercises = exercises
 }
 
 // Next exercise to memorize
-func (s *Service) Next(previous models.Exercise) models.Exercise {
+func (s *Service) Next(previous frontend.Exercise) frontend.Exercise {
 	// update previous if provided
 	if previous.Id > 0 {
 		s.exercises[previous.Id] = previous
@@ -58,7 +59,7 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 }
 
 // converts results projection to points
-func points(e models.Exercise) int {
+func points(e frontend.Exercise) int {
 	// only good answers today
 	if e.LatestGoodAnswerWasToday && !e.LatestBadAnswerWasToday {
 		return 1

@@ -2,15 +2,16 @@ package components
 
 import (
 	"fmt"
+
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 )
 
 // ExerciseRow is a component that displays a single row of the exercises table
 type ExerciseRow struct {
 	app.Compo
 	parent   *Exercises
-	exercise models.Exercise
+	exercise frontend.Exercise
 }
 
 // The Render method is where the component appearance is defined.
@@ -45,7 +46,7 @@ func (compo *ExerciseRow) Render() app.UI {
 func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise
-		err := compo.parent.c.DeleteExercise(models.Exercise{Id: id})
+		err := compo.parent.c.DeleteExercise(frontend.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}

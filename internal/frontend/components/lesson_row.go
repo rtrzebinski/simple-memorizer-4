@@ -2,17 +2,18 @@ package components
 
 import (
 	"fmt"
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"net/url"
 	"strconv"
+
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 )
 
 // LessonRow is a component that displays a row in the lessons table
 type LessonRow struct {
 	app.Compo
 	parent *Lessons
-	lesson models.Lesson
+	lesson frontend.Lesson
 }
 
 // The Render method is where the component appearance is defined.
@@ -56,7 +57,7 @@ func (compo *LessonRow) onEdit() app.EventHandler {
 func (compo *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
-		err := compo.parent.c.DeleteLesson(models.Lesson{Id: id})
+		err := compo.parent.c.DeleteLesson(frontend.Lesson{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}

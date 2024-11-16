@@ -1,37 +1,38 @@
 package memorizer
 
 import (
-	"github.com/guregu/null/v5"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/guregu/null/v5"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMemorizer_simpleRandomization(t *testing.T) {
-	e1 := models.Exercise{Id: 1}
-	e2 := models.Exercise{Id: 2}
+	e1 := frontend.Exercise{Id: 1}
+	e2 := frontend.Exercise{Id: 2}
 
-	var exercises = make(map[int]models.Exercise)
+	var exercises = make(map[int]frontend.Exercise)
 	exercises[e1.Id] = e1
 	exercises[e2.Id] = e2
 
 	s := Service{}
 	s.Init(exercises)
 
-	res := s.Next(models.Exercise{})
+	res := s.Next(frontend.Exercise{})
 
 	assert.True(t, res.Question == e1.Question || res.Question == e2.Question)
 }
 
 func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
-	e1 := models.Exercise{Id: 1}
-	e2 := models.Exercise{
+	e1 := frontend.Exercise{Id: 1}
+	e2 := frontend.Exercise{
 		Id:          2,
 		GoodAnswers: 10,
 	}
 
-	var exercises = make(map[int]models.Exercise)
+	var exercises = make(map[int]frontend.Exercise)
 	exercises[e1.Id] = e1
 	exercises[e2.Id] = e2
 
@@ -49,12 +50,12 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 func TestPoints(t *testing.T) {
 	var tests = []struct {
 		name           string
-		exercise       models.Exercise
+		exercise       frontend.Exercise
 		expectedResult int
 	}{
 		{
 			name: "Only good answers today",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: true,
 				LatestBadAnswerWasToday:  false,
 			},
@@ -62,7 +63,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Good and bad answers today, good answer most recent",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: true,
 				LatestBadAnswerWasToday:  true,
 				LatestGoodAnswer:         null.TimeFrom(time.Now()),
@@ -72,7 +73,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 1)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          1,
@@ -81,7 +82,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 2)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          2,
@@ -90,7 +91,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 3)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          3,
@@ -99,7 +100,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 4)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          4,
@@ -108,7 +109,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 5)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          5,
@@ -117,7 +118,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 1)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              1,
@@ -126,7 +127,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 2)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              2,
@@ -135,7 +136,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 3)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              3,
@@ -144,7 +145,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 4)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              4,
@@ -153,7 +154,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 5)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              5,
@@ -162,7 +163,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 1)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				BadAnswers:               0,
 				GoodAnswers:              1,
@@ -171,7 +172,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Other cases (GoodAnswersPercent = 66)",
-			exercise: models.Exercise{
+			exercise: frontend.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				BadAnswers:               1,

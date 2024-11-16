@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
 	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
@@ -26,7 +26,7 @@ func TestClientSuite(t *testing.T) {
 }
 
 func (suite *ClientSuite) TestClient_FetchLessons() {
-	lessons := models.Lessons{models.Lesson{Name: "name"}}
+	lessons := []frontend.Lesson{{Name: "name"}}
 
 	responseBody, err := json.Marshal(lessons)
 	suite.Assert().NoError(err)
@@ -44,7 +44,7 @@ func (suite *ClientSuite) TestClient_FetchLessons() {
 }
 
 func (suite *ClientSuite) TestClient_HydrateLesson() {
-	lesson := &models.Lesson{Id: 10}
+	lesson := &frontend.Lesson{Id: 10}
 
 	responseBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
@@ -61,8 +61,8 @@ func (suite *ClientSuite) TestClient_HydrateLesson() {
 }
 
 func (suite *ClientSuite) TestClient_FetchExercises() {
-	lesson := models.Lesson{Id: 1}
-	exercises := models.Exercises{
+	lesson := frontend.Lesson{Id: 1}
+	exercises := []frontend.Exercise{
 		{
 			Id:                       1,
 			Question:                 "question",
@@ -78,7 +78,7 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 		},
 	}
 
-	expectedExercises := models.Exercises{
+	expectedExercises := []frontend.Exercise{
 		{
 			Id:                       1,
 			Question:                 "question",
@@ -104,7 +104,7 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 
 	suite.caller.On("Call", method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.client.FetchExercises(models.Lesson{Id: lesson.Id})
+	result, err := suite.client.FetchExercises(frontend.Lesson{Id: lesson.Id})
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises[0].Id, result[0].Id)
@@ -122,7 +122,7 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 }
 
 func (suite *ClientSuite) TestClient_UpsertLesson() {
-	lesson := models.Lesson{}
+	lesson := frontend.Lesson{}
 
 	method := "POST"
 	route := server.UpsertLesson
@@ -137,7 +137,7 @@ func (suite *ClientSuite) TestClient_UpsertLesson() {
 }
 
 func (suite *ClientSuite) TestClient_DeleteLesson() {
-	lesson := models.Lesson{}
+	lesson := frontend.Lesson{}
 
 	method := "POST"
 	route := server.DeleteLesson
@@ -152,7 +152,7 @@ func (suite *ClientSuite) TestClient_DeleteLesson() {
 }
 
 func (suite *ClientSuite) TestClient_UpsertExercise() {
-	exercise := models.Exercise{}
+	exercise := frontend.Exercise{}
 
 	method := "POST"
 	route := server.UpsertExercise
@@ -167,7 +167,7 @@ func (suite *ClientSuite) TestClient_UpsertExercise() {
 }
 
 func (suite *ClientSuite) TestClient_StoreExercises() {
-	exercises := models.Exercises{}
+	var exercises []frontend.Exercise
 
 	method := "POST"
 	route := server.StoreExercises
@@ -182,7 +182,7 @@ func (suite *ClientSuite) TestClient_StoreExercises() {
 }
 
 func (suite *ClientSuite) TestClient_DeleteExercise() {
-	exercise := models.Exercise{}
+	exercise := frontend.Exercise{}
 
 	method := "POST"
 	route := server.DeleteExercise
@@ -197,7 +197,7 @@ func (suite *ClientSuite) TestClient_DeleteExercise() {
 }
 
 func (suite *ClientSuite) TestClient_StoreResult() {
-	result := models.Result{}
+	result := frontend.Result{}
 
 	method := "POST"
 	route := server.StoreResult

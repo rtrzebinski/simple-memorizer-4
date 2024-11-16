@@ -1,4 +1,4 @@
-package models
+package frontend
 
 import (
 	"github.com/stretchr/testify/assert"

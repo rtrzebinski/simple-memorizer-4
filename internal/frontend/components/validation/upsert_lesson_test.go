@@ -1,13 +1,14 @@
 package validation
 
 import (
-	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateUpsertLesson_valid(t *testing.T) {
-	lesson := models.Lesson{
+	lesson := frontend.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
@@ -20,19 +21,19 @@ func TestValidateUpsertLesson_valid(t *testing.T) {
 func TestValidateUpsertLesson_invalid(t *testing.T) {
 	var tests = []struct {
 		name    string
-		lesson  models.Lesson
+		lesson  frontend.Lesson
 		names   []string
 		message string
 	}{
 		{
 			"empty",
-			models.Lesson{},
+			frontend.Lesson{},
 			nil,
 			"lesson.name is required",
 		},
 		{
 			"non unique name",
-			models.Lesson{
+			frontend.Lesson{
 				Name: "name",
 			},
 			[]string{"name"},
