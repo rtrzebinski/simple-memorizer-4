@@ -3,6 +3,7 @@ package result
 import (
 	"time"
 
+	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
 )
 
@@ -24,7 +25,7 @@ func (ProjectionBuilder) Projection(results []worker.Result) worker.ResultsProje
 				projection.LatestGoodAnswerWasToday = true
 			}
 			if a.CreatedAt.After(projection.LatestGoodAnswer.Time) {
-				projection.LatestGoodAnswer.Time = a.CreatedAt
+				projection.LatestGoodAnswer = null.TimeFrom(a.CreatedAt)
 			}
 		case worker.Bad:
 			projection.BadAnswers++
@@ -33,7 +34,7 @@ func (ProjectionBuilder) Projection(results []worker.Result) worker.ResultsProje
 				projection.LatestBadAnswerWasToday = true
 			}
 			if a.CreatedAt.After(projection.LatestBadAnswer.Time) {
-				projection.LatestBadAnswer.Time = a.CreatedAt
+				projection.LatestBadAnswer = null.TimeFrom(a.CreatedAt)
 			}
 		}
 	}
