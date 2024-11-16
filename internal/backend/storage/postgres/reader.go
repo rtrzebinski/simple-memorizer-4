@@ -3,8 +3,6 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"strconv"
-
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 )
 
@@ -63,71 +61,33 @@ func (r *Reader) HydrateLesson(lesson *backend.Lesson) error {
 }
 
 func (r *Reader) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
-	var exercises backend.Exercises
-
 	const query = `
-		SELECT e.id, e.question, e.answer, r.id, r.type, r.created_at 
-		FROM exercise e
-		LEFT JOIN result r ON r.exercise_id = e.id 
-		WHERE lesson_id = $1
-		ORDER BY e.id DESC
-		`
+SELECT e.id, e.question, e.answer,
+       e.bad_answers, e.bad_answers_today, e.latest_bad_answer, e.latest_bad_answer_was_today,
+       e.good_answers, e.good_answers_today, e.latest_good_answer, e.latest_good_answer_was_today
+FROM exercise e
+WHERE lesson_id = $1
+ORDER BY e.id DESC
+`
 
 	rows, err := r.db.Query(query, lesson.Id)
 	if err != nil {
-		return exercises, err
+		return nil, err
 	}
 
+	var exercises backend.Exercises
+
 	for rows.Next() {
-		var exerciseId int
-		var exerciseQuestion string
-		var exerciseAnswer string
-		var resultId sql.NullInt64
-		var resultType sql.NullString
-		var resultCreatedAt sql.NullTime
+		var exercise backend.Exercise
 
-		err = rows.Scan(&exerciseId, &exerciseQuestion, &exerciseAnswer, &resultId, &resultType, &resultCreatedAt)
+		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.BadAnswers, &exercise.BadAnswersToday,
+			&exercise.LatestBadAnswer, &exercise.LatestBadAnswerWasToday, &exercise.GoodAnswers, &exercise.GoodAnswersToday,
+			&exercise.LatestGoodAnswer, &exercise.LatestGoodAnswerWasToday)
 		if err != nil {
-			return exercises, err
+			return nil, err
 		}
 
-		result := backend.Result{}
-
-		if resultId.Valid == true {
-			numInt, err := strconv.Atoi(strconv.FormatInt(resultId.Int64, 10))
-			if err != nil {
-				return exercises, err
-			}
-			result.Id = numInt
-		}
-		if resultType.Valid == true {
-			var ans = backend.ResultType(resultType.String)
-			result.Type = ans
-		}
-		if resultCreatedAt.Valid == true {
-			result.CreatedAt = resultCreatedAt.Time
-		}
-
-		lastIndex := len(exercises) - 1
-
-		if lastIndex >= 0 && exercises[lastIndex].Id == exerciseId {
-			// existing exercise (if exists it will always have result at this point)
-			exercises[lastIndex].Results = append(exercises[lastIndex].Results, result)
-		} else {
-			// new exercise
-			exercise := backend.Exercise{
-				Id:       exerciseId,
-				Question: exerciseQuestion,
-				Answer:   exerciseAnswer,
-			}
-
-			// add result if exists (mind LEFT JOIN, it might be empty)
-			if result.Id > 0 {
-				exercise.Results = backend.Results{result}
-			}
-
-			exercises = append(exercises, exercise)
-		}
+		exercises = append(exercises, exercise)
 	}
 
 	return exercises, nil

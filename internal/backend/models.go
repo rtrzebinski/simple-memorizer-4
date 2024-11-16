@@ -1,18 +1,30 @@
 package backend
 
-import "time"
+import (
+	"github.com/guregu/null/v5"
+	"time"
+)
 
 const (
 	Good ResultType = "good"
 	Bad  ResultType = "bad"
 )
 
+type ResultType string
+
 type Exercise struct {
-	Id       int
-	Lesson   *Lesson
-	Question string
-	Answer   string
-	Results  Results
+	Id                       int
+	Lesson                   *Lesson
+	Question                 string
+	Answer                   string
+	BadAnswers               int
+	BadAnswersToday          int
+	LatestBadAnswer          null.Time
+	LatestBadAnswerWasToday  bool
+	GoodAnswers              int
+	GoodAnswersToday         int
+	LatestGoodAnswer         null.Time
+	LatestGoodAnswerWasToday bool
 }
 
 type Exercises []Exercise
@@ -25,8 +37,6 @@ type Lesson struct {
 }
 
 type Lessons []Lesson
-
-type ResultType string
 
 type Result struct {
 	Id        int

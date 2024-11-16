@@ -1,8 +1,10 @@
 package postgres
 
 import (
+	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/assert"
+	"time"
 )
 
 func (suite *PostgresSuite) TestReader_FetchLessons() {
@@ -61,32 +63,44 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 
 	r := NewReader(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise1 := &Exercise{
+		BadAnswers:               1,
+		BadAnswersToday:          2,
+		LatestBadAnswer:          null.TimeFrom(time.Now()),
+		GoodAnswers:              3,
+		GoodAnswersToday:         4,
+		LatestGoodAnswer:         null.Time{},
+		LatestGoodAnswerWasToday: true,
+	}
+	createExercise(db, exercise1)
 
 	// to check of exercise without results will also be fetched
-	exercise2 := &Exercise{LessonId: exercise.LessonId}
+	exercise2 := &Exercise{LessonId: exercise1.LessonId}
 	createExercise(db, exercise2)
 
-	// belongs to exercise, to be included
-	result1 := &Result{ExerciseId: exercise.Id}
-	createResult(db, result1)
-
-	// does not belong to exercise, to be excluded
-	result2 := &Result{}
-	createResult(db, result2)
-
-	res, err := r.FetchExercises(backend.Lesson{Id: exercise.LessonId})
+	res, err := r.FetchExercises(backend.Lesson{Id: exercise1.LessonId})
 
 	assert.NoError(suite.T(), err)
 	assert.IsType(suite.T(), backend.Exercises{}, res)
 	assert.Len(suite.T(), res, 2)
-	assert.Equal(suite.T(), exercise.Id, res[1].Id)
-	assert.Equal(suite.T(), exercise.Question, res[1].Question)
-	assert.Equal(suite.T(), exercise.Answer, res[1].Answer)
-	assert.Len(suite.T(), res[1].Results, 1)
-	assert.Empty(suite.T(), res[0].Results)
-	assert.Equal(suite.T(), result1.Id, res[1].Results[0].Id)
-	assert.Equal(suite.T(), backend.ResultType(result1.Type), res[1].Results[0].Type)
-	assert.Equal(suite.T(), result1.CreatedAt, res[1].Results[0].CreatedAt)
+	assert.Equal(suite.T(), exercise1.Id, res[1].Id)
+	assert.Equal(suite.T(), exercise1.Question, res[1].Question)
+	assert.Equal(suite.T(), exercise1.Answer, res[1].Answer)
+	assert.Equal(suite.T(), exercise1.BadAnswers, res[1].BadAnswers)
+	assert.Equal(suite.T(), exercise1.BadAnswersToday, res[1].BadAnswersToday)
+	assert.Equal(suite.T(), exercise1.LatestBadAnswer.Time.Format("Mon Jan 2 15:04:05"), res[1].LatestBadAnswer.Time.Format("Mon Jan 2 15:04:05"))
+	assert.Equal(suite.T(), exercise1.GoodAnswers, res[1].GoodAnswers)
+	assert.Equal(suite.T(), exercise1.GoodAnswersToday, res[1].GoodAnswersToday)
+	assert.Equal(suite.T(), exercise1.LatestGoodAnswer, res[1].LatestGoodAnswer)
+	assert.Equal(suite.T(), exercise1.LatestGoodAnswerWasToday, res[1].LatestGoodAnswerWasToday)
+	assert.Equal(suite.T(), exercise2.Id, res[0].Id)
+	assert.Equal(suite.T(), exercise2.Question, res[0].Question)
+	assert.Equal(suite.T(), exercise2.Answer, res[0].Answer)
+	assert.Equal(suite.T(), 0, res[0].BadAnswers)
+	assert.Equal(suite.T(), 0, res[0].BadAnswersToday)
+	assert.Equal(suite.T(), null.Time{}, res[0].LatestBadAnswer)
+	assert.Equal(suite.T(), 0, res[0].GoodAnswers)
+	assert.Equal(suite.T(), 0, res[0].GoodAnswersToday)
+	assert.Equal(suite.T(), null.Time{}, res[0].LatestGoodAnswer)
+	assert.Equal(suite.T(), false, res[0].LatestGoodAnswerWasToday)
 }
