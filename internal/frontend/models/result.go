@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 type ResultType string
 
 const (
@@ -10,8 +8,7 @@ const (
 )
 
 type Result struct {
-	Id        int
-	Exercise  *Exercise
-	Type      ResultType
-	CreatedAt time.Time
+	Id       int
+	Exercise *Exercise
+	Type     ResultType
 }

@@ -69,10 +69,6 @@ func (s *Client) FetchExercises(lesson models.Lesson) (models.Exercises, error) 
 		return exercises, fmt.Errorf("failed to decode exercises: %w", err)
 	}
 
-	for i := range exercises {
-		exercises[i].ResultsProjection = models.BuildResultsProjection(exercises[i].Results)
-	}
-
 	return exercises, nil
 }
 

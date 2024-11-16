@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
 )
 
 type ClientSuite struct {
@@ -61,15 +63,35 @@ func (suite *ClientSuite) TestClient_HydrateLesson() {
 func (suite *ClientSuite) TestClient_FetchExercises() {
 	lesson := models.Lesson{Id: 1}
 	exercises := models.Exercises{
-		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}}},
-		{Id: 2, Results: []models.Result{{Type: models.Bad}, {Type: models.Bad}}},
+		{
+			Id:                       1,
+			Question:                 "question",
+			Answer:                   "answer",
+			BadAnswers:               2,
+			BadAnswersToday:          1,
+			LatestBadAnswer:          null.TimeFrom(time.Now()),
+			LatestBadAnswerWasToday:  true,
+			GoodAnswers:              0,
+			GoodAnswersToday:         0,
+			LatestGoodAnswer:         null.Time{},
+			LatestGoodAnswerWasToday: false,
+		},
 	}
 
 	expectedExercises := models.Exercises{
-		{Id: 1, Results: []models.Result{{Type: models.Good}, {Type: models.Good}},
-			ResultsProjection: models.BuildResultsProjection(exercises[0].Results)},
-		{Id: 2, Results: []models.Result{{Type: models.Bad}, {Type: models.Bad}},
-			ResultsProjection: models.BuildResultsProjection(exercises[1].Results)},
+		{
+			Id:                       1,
+			Question:                 "question",
+			Answer:                   "answer",
+			BadAnswers:               2,
+			BadAnswersToday:          1,
+			LatestBadAnswer:          null.TimeFrom(time.Now()),
+			LatestBadAnswerWasToday:  true,
+			GoodAnswers:              0,
+			GoodAnswersToday:         0,
+			LatestGoodAnswer:         null.Time{},
+			LatestGoodAnswerWasToday: false,
+		},
 	}
 
 	responseBody, err := json.Marshal(exercises)
@@ -85,9 +107,17 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 	result, err := suite.client.FetchExercises(models.Lesson{Id: lesson.Id})
 
 	suite.Nil(err)
-	suite.Equal(expectedExercises, result)
-	suite.Equal(expectedExercises[0].ResultsProjection, result[0].ResultsProjection)
-	suite.Equal(expectedExercises[1].ResultsProjection, result[1].ResultsProjection)
+	suite.Equal(expectedExercises[0].Id, result[0].Id)
+	suite.Equal(expectedExercises[0].Question, result[0].Question)
+	suite.Equal(expectedExercises[0].Answer, result[0].Answer)
+	suite.Equal(expectedExercises[0].BadAnswers, result[0].BadAnswers)
+	suite.Equal(expectedExercises[0].BadAnswersToday, result[0].BadAnswersToday)
+	suite.Equal(expectedExercises[0].LatestBadAnswer.Time.Local().Format("Mon Jan 2 15:04:05"), result[0].LatestBadAnswer.Time.Local().Format("Mon Jan 2 15:04:05"))
+	suite.Equal(expectedExercises[0].LatestBadAnswerWasToday, result[0].LatestBadAnswerWasToday)
+	suite.Equal(expectedExercises[0].GoodAnswers, result[0].GoodAnswers)
+	suite.Equal(expectedExercises[0].GoodAnswersToday, result[0].GoodAnswersToday)
+	suite.Equal(expectedExercises[0].LatestGoodAnswer.Time.Local().Format("Mon Jan 2 15:04:05"), result[0].LatestGoodAnswer.Time.Local().Format("Mon Jan 2 15:04:05"))
+	suite.Equal(expectedExercises[0].LatestGoodAnswerWasToday, result[0].LatestGoodAnswerWasToday)
 	suite.caller.AssertExpectations(suite.T())
 }
 

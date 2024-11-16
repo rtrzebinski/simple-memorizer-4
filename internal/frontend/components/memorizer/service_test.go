@@ -1,6 +1,7 @@
 package memorizer
 
 import (
+	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -26,10 +27,8 @@ func TestMemorizer_simpleRandomization(t *testing.T) {
 func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 	e1 := models.Exercise{Id: 1}
 	e2 := models.Exercise{
-		Id: 2,
-		ResultsProjection: models.ResultsProjection{
-			GoodAnswers: 10,
-		},
+		Id:          2,
+		GoodAnswers: 10,
 	}
 
 	var exercises = make(map[int]models.Exercise)
@@ -44,18 +43,18 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 
 	res = s.Next(e1)
 	assert.Equal(t, e2.Question, res.Question)
-	assert.Equal(t, e2.ResultsProjection.GoodAnswers, res.ResultsProjection.GoodAnswers)
+	assert.Equal(t, e2.GoodAnswers, res.GoodAnswers)
 }
 
 func TestPoints(t *testing.T) {
 	var tests = []struct {
 		name           string
-		projection     models.ResultsProjection
+		exercise       models.Exercise
 		expectedResult int
 	}{
 		{
 			name: "Only good answers today",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: true,
 				LatestBadAnswerWasToday:  false,
 			},
@@ -63,17 +62,17 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Good and bad answers today, good answer most recent",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: true,
 				LatestBadAnswerWasToday:  true,
-				LatestGoodAnswer:         time.Now(),
-				LatestBadAnswer:          time.Now().Add(-time.Hour),
+				LatestGoodAnswer:         null.TimeFrom(time.Now()),
+				LatestBadAnswer:          null.TimeFrom(time.Now().Add(-time.Hour)),
 			},
 			expectedResult: 1,
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 1)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          1,
@@ -82,7 +81,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 2)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          2,
@@ -91,7 +90,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 3)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          3,
@@ -100,7 +99,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 4)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          4,
@@ -109,7 +108,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Bad answers today (BadAnswersToday = 5)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  true,
 				BadAnswersToday:          5,
@@ -118,7 +117,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 1)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              1,
@@ -127,7 +126,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 2)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              2,
@@ -136,7 +135,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 3)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              3,
@@ -145,7 +144,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 4)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              4,
@@ -154,7 +153,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 5)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				GoodAnswers:              5,
@@ -163,7 +162,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Only good answers before today (GoodAnswers = 1)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				BadAnswers:               0,
 				GoodAnswers:              1,
@@ -172,7 +171,7 @@ func TestPoints(t *testing.T) {
 		},
 		{
 			name: "Other cases (GoodAnswersPercent = 66)",
-			projection: models.ResultsProjection{
+			exercise: models.Exercise{
 				LatestGoodAnswerWasToday: false,
 				LatestBadAnswerWasToday:  false,
 				BadAnswers:               1,
@@ -184,7 +183,7 @@ func TestPoints(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expectedResult, points(tt.projection))
+			assert.Equal(t, tt.expectedResult, points(tt.exercise))
 		})
 	}
 }

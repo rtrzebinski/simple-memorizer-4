@@ -117,26 +117,26 @@ func (compo *Learn) Render() app.UI {
 			}),
 		).Hidden(!compo.isAnswerVisible),
 		app.P().Body(
-			app.Text(compo.exercise.ResultsProjection.BadAnswers),
+			app.Text(compo.exercise.BadAnswers),
 			app.Text(" bad answers"),
-			app.If(compo.exercise.ResultsProjection.BadAnswers > 0 && compo.exercise.ResultsProjection.BadAnswersToday > 0, func() app.UI {
-				return app.Text(" (today: " + strconv.Itoa(compo.exercise.ResultsProjection.BadAnswersToday) + ")")
+			app.If(compo.exercise.BadAnswers > 0 && compo.exercise.BadAnswersToday > 0, func() app.UI {
+				return app.Text(" (today: " + strconv.Itoa(compo.exercise.BadAnswersToday) + ")")
 			}).Else(func() app.UI {
-				return app.Text(" (latest: " + compo.exercise.ResultsProjection.LatestBadAnswer.Format("2 Jan 2006 15:04") + ")")
+				return app.Text(" (latest: " + compo.exercise.LatestBadAnswer.Time.Format("2 Jan 2006 15:04") + ")")
 			}),
 		),
 		app.P().Body(
-			app.Text(compo.exercise.ResultsProjection.GoodAnswers),
+			app.Text(compo.exercise.GoodAnswers),
 			app.Text(" good answers"),
 
-			app.If(compo.exercise.ResultsProjection.GoodAnswers > 0 && compo.exercise.ResultsProjection.GoodAnswersToday > 0, func() app.UI {
-				return app.Text(" (today: " + strconv.Itoa(compo.exercise.ResultsProjection.GoodAnswersToday) + ")")
+			app.If(compo.exercise.GoodAnswers > 0 && compo.exercise.GoodAnswersToday > 0, func() app.UI {
+				return app.Text(" (today: " + strconv.Itoa(compo.exercise.GoodAnswersToday) + ")")
 			}).Else(func() app.UI {
-				return app.Text(" (latest: " + compo.exercise.ResultsProjection.LatestGoodAnswer.Format("2 Jan 2006 15:04") + ")")
+				return app.Text(" (latest: " + compo.exercise.LatestGoodAnswer.Time.Format("2 Jan 2006 15:04") + ")")
 			}),
 		),
 		app.P().Body(
-			app.Text(compo.exercise.ResultsProjection.GoodAnswersPercent()),
+			app.Text(compo.exercise.GoodAnswersPercent()),
 			app.Text("% of good answers"),
 		),
 		app.P().Body(
@@ -289,7 +289,7 @@ func (compo *Learn) handleGoodAnswer() {
 		}
 	}()
 	// exercise will be passed back to memorizer, needs the updated projection
-	compo.exercise.ResultsProjection.RegisterGoodAnswer()
+	compo.exercise.RegisterGoodAnswer()
 	compo.handleNextExercise()
 }
 
@@ -308,6 +308,6 @@ func (compo *Learn) handleBadAnswer() {
 		}
 	}()
 	// exercise will be passed back to memorizer, needs the updated projection
-	compo.exercise.ResultsProjection.RegisterBadAnswer()
+	compo.exercise.RegisterBadAnswer()
 	compo.handleNextExercise()
 }

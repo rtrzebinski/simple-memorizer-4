@@ -37,7 +37,7 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 			continue
 		}
 
-		p := points(e.ResultsProjection)
+		p := points(e)
 
 		app.Log(e.Question, p)
 
@@ -58,33 +58,33 @@ func (s *Service) Next(previous models.Exercise) models.Exercise {
 }
 
 // converts results projection to points
-func points(p models.ResultsProjection) int {
+func points(e models.Exercise) int {
 	// only good answers today
-	if p.LatestGoodAnswerWasToday && !p.LatestBadAnswerWasToday {
+	if e.LatestGoodAnswerWasToday && !e.LatestBadAnswerWasToday {
 		return 1
 	}
 
 	// good and bad answers today, good answer most recent
-	if p.LatestGoodAnswerWasToday && p.LatestBadAnswerWasToday && p.LatestGoodAnswer.After(p.LatestBadAnswer) {
+	if e.LatestGoodAnswerWasToday && e.LatestBadAnswerWasToday && e.LatestGoodAnswer.Time.After(e.LatestBadAnswer.Time) {
 		return 1
 	}
 
 	// bad answers today
-	if p.LatestBadAnswerWasToday {
+	if e.LatestBadAnswerWasToday {
 		// decrease points with increasing bad answers
-		if p.BadAnswersToday == 1 {
+		if e.BadAnswersToday == 1 {
 			return 80
 		}
 
-		if p.BadAnswersToday == 2 {
+		if e.BadAnswersToday == 2 {
 			return 60
 		}
 
-		if p.BadAnswersToday == 3 {
+		if e.BadAnswersToday == 3 {
 			return 40
 		}
 
-		if p.BadAnswersToday == 4 {
+		if e.BadAnswersToday == 4 {
 			return 20
 		}
 
@@ -92,21 +92,21 @@ func points(p models.ResultsProjection) int {
 	}
 
 	// only good answers before today
-	if !p.LatestGoodAnswerWasToday && !p.LatestBadAnswerWasToday && p.BadAnswers == 0 && p.GoodAnswers > 0 {
+	if !e.LatestGoodAnswerWasToday && !e.LatestBadAnswerWasToday && e.BadAnswers == 0 && e.GoodAnswers > 0 {
 		// decrease points with increasing good answers
-		if p.GoodAnswers == 1 {
+		if e.GoodAnswers == 1 {
 			return 80
 		}
 
-		if p.GoodAnswers == 2 {
+		if e.GoodAnswers == 2 {
 			return 60
 		}
 
-		if p.GoodAnswers == 3 {
+		if e.GoodAnswers == 3 {
 			return 40
 		}
 
-		if p.GoodAnswers == 4 {
+		if e.GoodAnswers == 4 {
 			return 20
 		}
 
@@ -115,7 +115,7 @@ func points(p models.ResultsProjection) int {
 
 	// other cases
 
-	percent := p.GoodAnswersPercent()
+	percent := e.GoodAnswersPercent()
 
 	if percent == 100 {
 		return 1
