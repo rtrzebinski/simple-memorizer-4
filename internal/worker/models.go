@@ -1,6 +1,10 @@
 package worker
 
-import "time"
+import (
+	"time"
+
+	"github.com/guregu/null/v5"
+)
 
 type ResultType string
 
@@ -19,10 +23,10 @@ type Result struct {
 type ResultsProjection struct {
 	BadAnswers               int
 	BadAnswersToday          int
-	LatestBadAnswer          time.Time
+	LatestBadAnswer          null.Time
 	LatestBadAnswerWasToday  bool
 	GoodAnswers              int
 	GoodAnswersToday         int
-	LatestGoodAnswer         time.Time
+	LatestGoodAnswer         null.Time
 	LatestGoodAnswerWasToday bool
 }

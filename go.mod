@@ -10,6 +10,7 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/google/uuid v1.6.0
+	github.com/guregu/null/v5 v5.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/maxence-charriere/go-app/v10 v10.0.8

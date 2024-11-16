@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/google/uuid"
+	"github.com/guregu/null/v5"
 )
 
 // Tables
@@ -24,11 +25,11 @@ type (
 		Answer                   string
 		BadAnswers               int
 		BadAnswersToday          int
-		LatestBadAnswer          time.Time
+		LatestBadAnswer          null.Time
 		LatestBadAnswerWasToday  bool
 		GoodAnswers              int
 		GoodAnswersToday         int
-		LatestGoodAnswer         time.Time
+		LatestGoodAnswer         null.Time
 		LatestGoodAnswerWasToday bool
 	}
 

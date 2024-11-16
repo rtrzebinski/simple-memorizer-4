@@ -23,8 +23,8 @@ func (ProjectionBuilder) Projection(results []worker.Result) worker.ResultsProje
 				projection.GoodAnswersToday++
 				projection.LatestGoodAnswerWasToday = true
 			}
-			if a.CreatedAt.After(projection.LatestGoodAnswer) {
-				projection.LatestGoodAnswer = a.CreatedAt
+			if a.CreatedAt.After(projection.LatestGoodAnswer.Time) {
+				projection.LatestGoodAnswer.Time = a.CreatedAt
 			}
 		case worker.Bad:
 			projection.BadAnswers++
@@ -32,8 +32,8 @@ func (ProjectionBuilder) Projection(results []worker.Result) worker.ResultsProje
 				projection.BadAnswersToday++
 				projection.LatestBadAnswerWasToday = true
 			}
-			if a.CreatedAt.After(projection.LatestBadAnswer) {
-				projection.LatestBadAnswer = a.CreatedAt
+			if a.CreatedAt.After(projection.LatestBadAnswer.Time) {
+				projection.LatestBadAnswer.Time = a.CreatedAt
 			}
 		}
 	}

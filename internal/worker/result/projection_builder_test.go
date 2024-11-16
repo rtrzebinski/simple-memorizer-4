@@ -40,11 +40,11 @@ func TestBuildProjection(t *testing.T) {
 
 	assert.Equal(t, 3, projection.BadAnswers)
 	assert.Equal(t, 0, projection.BadAnswersToday)
-	assert.Equal(t, yesterday, projection.LatestBadAnswer)
+	assert.Equal(t, yesterday, projection.LatestBadAnswer.Time)
 	assert.False(t, projection.LatestBadAnswerWasToday)
 	assert.Equal(t, 1, projection.GoodAnswers)
 	assert.Equal(t, 0, projection.GoodAnswersToday)
-	assert.Equal(t, yesterday, projection.LatestGoodAnswer)
+	assert.Equal(t, yesterday, projection.LatestGoodAnswer.Time)
 	assert.False(t, projection.LatestGoodAnswerWasToday)
 
 	results = append(results, worker.Result{
@@ -71,10 +71,10 @@ func TestBuildProjection(t *testing.T) {
 
 	assert.Equal(t, 5, projection.BadAnswers)
 	assert.Equal(t, 2, projection.BadAnswersToday)
-	assert.Equal(t, today, projection.LatestBadAnswer)
+	assert.Equal(t, today, projection.LatestBadAnswer.Time)
 	assert.True(t, projection.LatestBadAnswerWasToday)
 	assert.Equal(t, 3, projection.GoodAnswers)
 	assert.Equal(t, 2, projection.GoodAnswersToday)
-	assert.Equal(t, today, projection.LatestGoodAnswer)
+	assert.Equal(t, today, projection.LatestGoodAnswer.Time)
 	assert.True(t, projection.LatestGoodAnswerWasToday)
 }
