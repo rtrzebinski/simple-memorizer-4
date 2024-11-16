@@ -34,7 +34,7 @@ import (
 type config struct {
 	Db struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
-		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable"`
+		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=Europe/Warsaw"`
 	}
 	Server struct {
 		Port     string `envconfig:"SERVER_PORT" default:":8000"`

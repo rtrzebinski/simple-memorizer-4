@@ -3,6 +3,7 @@ OK_COLOR=\033[32;01m
 ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
 SERVICE_NAME=sm
+TIMEZONE=Europe/Warsaw
 HOME ?= $(shell echo $$HOME)
 
 default: help
@@ -69,15 +70,15 @@ destroy: ## Stop containers and remove volumes
 
 migrate: ## Run db migrations (migrate up)
 	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
-	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" up
+	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" up
 
 migrate-down: ## Revert db migrations (migrate down)
 	@echo "$(OK_COLOR)==> Reverting db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
-	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" down
+	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" down
 
 migrate-drop: ## Drop db without confirmation (migrate drop)
 	@echo "$(OK_COLOR)==> Dropping db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
-	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable" drop -f
+	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" drop -f
 
 seed: ## Seed the database with some example data
 	@echo "$(OK_COLOR)==> Seeding the db for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -90,7 +91,7 @@ reseed: ## Destroy, recreate and seed the database (no confirmation)
 
 db: ## Db CLI client connection
 	@echo "$(OK_COLOR)==> Connecting to the db of $(SERVICE_NAME)... $(NO_COLOR)"
-	@PGPASSWORD=postgres PGTZ='Europe/Warsaw' psql -U postgres -d postgres --port 5430 --host localhost
+	@PGPASSWORD=postgres PGTZ="$(TIMEZONE)" psql -U postgres -d postgres --port 5430 --host localhost
 
 build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
