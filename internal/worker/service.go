@@ -20,7 +20,7 @@ func NewService(r Reader, w Writer, pb ProjectionBuilder) *Service {
 }
 
 func (s *Service) ProcessGoodAnswer(_ context.Context, exerciseID int) error {
-	result := &Result{
+	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
@@ -36,7 +36,7 @@ func (s *Service) ProcessGoodAnswer(_ context.Context, exerciseID int) error {
 }
 
 func (s *Service) ProcessBadAnswer(_ context.Context, exerciseID int) error {
-	result := &Result{
+	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
@@ -51,7 +51,7 @@ func (s *Service) ProcessBadAnswer(_ context.Context, exerciseID int) error {
 	return nil
 }
 
-func (s *Service) processAnswer(_ context.Context, result *Result) error {
+func (s *Service) processAnswer(_ context.Context, result Result) error {
 	err := s.w.StoreResult(result)
 	if err != nil {
 		return fmt.Errorf("store result: %w", err)

@@ -164,7 +164,7 @@ func (s Seeder) LargeLessonSeed() {
 
 	for i := range exercises {
 		for j := answersCount; j > 0; j-- {
-			r := &worker.Result{
+			r := worker.Result{
 				ExerciseId: exercises[i].Id,
 			}
 

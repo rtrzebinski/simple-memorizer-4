@@ -5,7 +5,7 @@ type Reader interface {
 }
 
 type Writer interface {
-	StoreResult(*Result) error
+	StoreResult(Result) error
 	UpdateExerciseProjection(exerciseID int, projection ResultsProjection) error
 }
 

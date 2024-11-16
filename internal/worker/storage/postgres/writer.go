@@ -15,7 +15,7 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) StoreResult(result *worker.Result) error {
+func (w *Writer) StoreResult(result worker.Result) error {
 	const query = `INSERT INTO result (type, exercise_id) VALUES ($1, $2) RETURNING id;`
 
 	rows, err := w.db.Query(query, result.Type, result.ExerciseId)

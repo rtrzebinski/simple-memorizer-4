@@ -21,7 +21,7 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 		ExerciseId: exercise.Id,
 	}
 
-	err := w.StoreResult(&result)
+	err := w.StoreResult(result)
 	assert.NoError(suite.T(), err)
 
 	stored := fetchLatestResult(db)

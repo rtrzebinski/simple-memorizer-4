@@ -17,7 +17,7 @@ type WriterMock struct {
 	mock.Mock
 }
 
-func (m *WriterMock) StoreResult(result *Result) error {
+func (m *WriterMock) StoreResult(result Result) error {
 	args := m.Called(result)
 	return args.Error(0)
 }

@@ -28,7 +28,7 @@ func TestServiceSuite(t *testing.T) {
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 	exerciseID := 1
-	result := &Result{
+	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
@@ -59,7 +59,7 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
 	exerciseID := 1
-	result := &Result{
+	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
@@ -77,7 +77,7 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 	exerciseID := 2
-	result := &Result{
+	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
@@ -108,7 +108,7 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Error() {
 	exerciseID := 2
-	result := &Result{
+	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
