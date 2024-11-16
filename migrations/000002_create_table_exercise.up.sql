@@ -6,11 +6,11 @@ CREATE TABLE exercise
     answer                       VARCHAR NOT NULL,
     bad_answers                  INT     DEFAULT 0,
     bad_answers_today            INT     DEFAULT 0,
-    latest_bad_answer            TIMESTAMP DEFAULT NULL,
+    latest_bad_answer            TIMESTAMPTZ DEFAULT NULL,
     latest_bad_answer_was_today  BOOLEAN DEFAULT FALSE,
     good_answers                 INT     DEFAULT 0,
     good_answers_today           INT     DEFAULT 0,
-    latest_good_answer           TIMESTAMP DEFAULT NULL,
+    latest_good_answer           TIMESTAMPTZ DEFAULT NULL,
     latest_good_answer_was_today BOOLEAN DEFAULT FALSE,
     CONSTRAINT exercise_question_unique_per_lesson UNIQUE (lesson_id, question)
 );

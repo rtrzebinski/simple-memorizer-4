@@ -88,7 +88,7 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 	assert.Equal(suite.T(), exercise1.Answer, res[1].Answer)
 	assert.Equal(suite.T(), exercise1.BadAnswers, res[1].BadAnswers)
 	assert.Equal(suite.T(), exercise1.BadAnswersToday, res[1].BadAnswersToday)
-	assert.Equal(suite.T(), exercise1.LatestBadAnswer.Time.Format("Mon Jan 2 15:04:05"), res[1].LatestBadAnswer.Time.Format("Mon Jan 2 15:04:05"))
+	assert.Equal(suite.T(), exercise1.LatestBadAnswer.Time.Local().Format("Mon Jan 2 15:04:05"), res[1].LatestBadAnswer.Time.Local().Format("Mon Jan 2 15:04:05"))
 	assert.Equal(suite.T(), exercise1.GoodAnswers, res[1].GoodAnswers)
 	assert.Equal(suite.T(), exercise1.GoodAnswersToday, res[1].GoodAnswersToday)
 	assert.Equal(suite.T(), exercise1.LatestGoodAnswer, res[1].LatestGoodAnswer)

@@ -90,7 +90,7 @@ reseed: ## Destroy, recreate and seed the database (no confirmation)
 
 db: ## Db CLI client connection
 	@echo "$(OK_COLOR)==> Connecting to the db of $(SERVICE_NAME)... $(NO_COLOR)"
-	@PGPASSWORD=postgres psql -U postgres -d postgres --port 5430 --host localhost
+	@PGPASSWORD=postgres PGTZ='Europe/Warsaw' psql -U postgres -d postgres --port 5430 --host localhost
 
 build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
