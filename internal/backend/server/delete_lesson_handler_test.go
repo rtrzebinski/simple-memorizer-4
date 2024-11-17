@@ -23,17 +23,17 @@ func TestDeleteLessonHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
-	writer.On("DeleteLesson", input)
+	service := NewServiceMock()
+	service.On("DeleteLesson", input).Return(nil)
 
-	route := NewDeleteLessonHandler(writer)
+	route := NewDeleteLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	writer.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestDeleteLessonHandler_invalidInput(t *testing.T) {
@@ -44,9 +44,9 @@ func TestDeleteLessonHandler_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
+	service := NewServiceMock()
 
-	route := NewDeleteLessonHandler(writer)
+	route := NewDeleteLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}

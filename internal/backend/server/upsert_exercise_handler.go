@@ -11,12 +11,12 @@ import (
 )
 
 type UpsertExerciseHandler struct {
-	w        Writer
+	s        Service
 	exercise backend.Exercise
 }
 
-func NewUpsertExerciseHandler(w Writer) *UpsertExerciseHandler {
-	return &UpsertExerciseHandler{w: w}
+func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
+	return &UpsertExerciseHandler{s: s}
 }
 
 func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -53,7 +53,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.w.UpsertExercise(&h.exercise)
+	err = h.s.UpsertExercise(&h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

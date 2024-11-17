@@ -26,17 +26,17 @@ func TestStoreExercises(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
-	writer.On("StoreExercises", input)
+	service := NewServiceMock()
+	service.On("StoreExercises", input).Return(nil)
 
-	route := NewStoreExercisesHandler(writer)
+	route := NewStoreExercisesHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	writer.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestStoreExercisesHandler_invalidInput(t *testing.T) {
@@ -49,9 +49,9 @@ func TestStoreExercisesHandler_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
+	service := NewServiceMock()
 
-	route := NewStoreExercisesHandler(writer)
+	route := NewStoreExercisesHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}

@@ -11,12 +11,12 @@ import (
 )
 
 type DeleteLessonHandler struct {
-	w      Writer
+	s      Service
 	lesson backend.Lesson
 }
 
-func NewDeleteLessonHandler(w Writer) *DeleteLessonHandler {
-	return &DeleteLessonHandler{w: w}
+func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
+	return &DeleteLessonHandler{s: s}
 }
 
 func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -53,7 +53,7 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.w.DeleteLesson(h.lesson)
+	err = h.s.DeleteLesson(h.lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

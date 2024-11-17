@@ -18,6 +18,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	backendcloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/backend/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
 	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
@@ -171,10 +172,11 @@ func run(ctx context.Context) error {
 	backendReader := backendpostgres.NewReader(db)
 	backendWriter := backendpostgres.NewWriter(db)
 	backendPublisher := backendcloudevetns.NewPublisher(ceClient)
+	backendService := backend.NewService(backendReader, backendWriter, backendPublisher)
 
 	go func() {
 		log.Printf("initializing API server on port: %s apiClient", cfg.Server.Port)
-		serverErrors <- server.ListenAndServe(backendReader, backendWriter, backendPublisher, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
+		serverErrors <- server.ListenAndServe(backendService, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
 	}()
 
 	// =========================================

@@ -10,12 +10,12 @@ import (
 )
 
 type DeleteExerciseHandler struct {
-	w        Writer
+	s        Service
 	exercise backend.Exercise
 }
 
-func NewDeleteExerciseHandler(w Writer) *DeleteExerciseHandler {
-	return &DeleteExerciseHandler{w: w}
+func NewDeleteExerciseHandler(s Service) *DeleteExerciseHandler {
+	return &DeleteExerciseHandler{s: s}
 }
 
 func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -52,7 +52,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.w.DeleteExercise(h.exercise)
+	err = h.s.DeleteExercise(h.exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

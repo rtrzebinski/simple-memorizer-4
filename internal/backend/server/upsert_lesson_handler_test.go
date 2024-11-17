@@ -24,17 +24,17 @@ func TestUpsertLessonHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
-	writer.On("UpsertLesson", &input)
+	service := NewServiceMock()
+	service.On("UpsertLesson", &input).Return(nil)
 
-	route := NewUpsertLessonHandler(writer)
+	route := NewUpsertLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	writer.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestUpsertLessonHandler_invalidInput(t *testing.T) {
@@ -45,9 +45,9 @@ func TestUpsertLessonHandler_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
+	service := NewServiceMock()
 
-	route := NewUpsertLessonHandler(writer)
+	route := NewUpsertLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}

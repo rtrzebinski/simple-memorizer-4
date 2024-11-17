@@ -13,11 +13,11 @@ import (
 )
 
 type ExportLessonCsvHandler struct {
-	r Reader
+	s Service
 }
 
-func NewExportLessonCsvHandler(r Reader) *ExportLessonCsvHandler {
-	return &ExportLessonCsvHandler{r: r}
+func NewExportLessonCsvHandler(s Service) *ExportLessonCsvHandler {
+	return &ExportLessonCsvHandler{s: s}
 }
 
 func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -55,7 +55,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	// Hydrate lesson
 	lesson := backend.Lesson{Id: lessonId}
-	err = h.r.HydrateLesson(&lesson)
+	err = h.s.HydrateLesson(&lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
@@ -64,7 +64,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 	}
 
 	// Fetch exercises of the lesson
-	exercises, err := h.r.FetchExercises(backend.Lesson{Id: lessonId})
+	exercises, err := h.s.FetchExercises(backend.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

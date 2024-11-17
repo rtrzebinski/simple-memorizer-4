@@ -23,17 +23,17 @@ func TestDeleteExerciseHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
-	writer.On("DeleteExercise", input)
+	service := NewServiceMock()
+	service.On("DeleteExercise", input).Return(nil)
 
-	route := NewDeleteExerciseHandler(writer)
+	route := NewDeleteExerciseHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	writer.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
@@ -44,9 +44,9 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	writer := NewWriterMock()
+	service := NewServiceMock()
 
-	route := NewDeleteExerciseHandler(writer)
+	route := NewDeleteExerciseHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}

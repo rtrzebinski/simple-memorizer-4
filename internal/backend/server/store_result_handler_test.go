@@ -27,17 +27,17 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	publisher := NewPublisherMock()
-	publisher.On("PublishGoodAnswer", mock.AnythingOfType("context.backgroundCtx"), 10)
+	service := NewServiceMock()
+	service.On("PublishGoodAnswer", mock.AnythingOfType("context.backgroundCtx"), 10).Return(nil)
 
-	route := NewStoreResultHandler(publisher)
+	route := NewStoreResultHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	publisher.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestStoreResultHandler_badAnswer(t *testing.T) {
@@ -53,17 +53,17 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	publisher := NewPublisherMock()
-	publisher.On("PublishBadAnswer", mock.AnythingOfType("context.backgroundCtx"), 10)
+	service := NewServiceMock()
+	service.On("PublishBadAnswer", mock.AnythingOfType("context.backgroundCtx"), 10).Return(nil)
 
-	route := NewStoreResultHandler(publisher)
+	route := NewStoreResultHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 
 	route.ServeHTTP(res, req)
 
-	publisher.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
 
 func TestStoreResultHandler_invalidInput(t *testing.T) {
@@ -74,9 +74,9 @@ func TestStoreResultHandler_invalidInput(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	publisher := NewPublisherMock()
+	service := NewServiceMock()
 
-	route := NewStoreResultHandler(publisher)
+	route := NewStoreResultHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}

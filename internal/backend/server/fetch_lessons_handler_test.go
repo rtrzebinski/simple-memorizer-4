@@ -14,10 +14,10 @@ func TestFetchLessonsHandler(t *testing.T) {
 	lesson := backend.Lesson{}
 	lessons := backend.Lessons{lesson}
 
-	reader := NewReaderMock()
-	reader.On("FetchLessons").Return(lessons)
+	service := NewServiceMock()
+	service.On("FetchLessons").Return(lessons, nil)
 
-	route := NewFetchLessonsHandler(reader)
+	route := NewFetchLessonsHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}

@@ -33,10 +33,11 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 
 	lessonId := 10
 
-	reader := NewReaderMock()
-	reader.On("FetchExercises", backend.Lesson{Id: lessonId}).Return(exercises)
+	service := NewServiceMock()
 
-	route := NewFetchExercisesOfLessonHandler(reader)
+	service.On("FetchExercises", backend.Lesson{Id: lessonId}).Return(exercises, nil)
+
+	route := NewFetchExercisesOfLessonHandler(service)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -69,9 +70,9 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 }
 
 func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
-	reader := NewReaderMock()
+	service := NewServiceMock()
 
-	route := NewFetchExercisesOfLessonHandler(reader)
+	route := NewFetchExercisesOfLessonHandler(service)
 
 	u, _ := url.Parse("/")
 

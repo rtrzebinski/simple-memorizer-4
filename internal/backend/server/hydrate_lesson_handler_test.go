@@ -18,10 +18,10 @@ func TestHydrateLessonHandler(t *testing.T) {
 		Id: 1,
 	}
 
-	reader := NewReaderMock()
-	reader.On("HydrateLesson", lesson)
+	service := NewServiceMock()
+	service.On("HydrateLesson", lesson).Return(nil)
 
-	route := NewHydrateLessonHandler(reader)
+	route := NewHydrateLessonHandler(service)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -39,9 +39,9 @@ func TestHydrateLessonHandler(t *testing.T) {
 }
 
 func TestHydrateLessonHandler_invalidInput(t *testing.T) {
-	reader := NewReaderMock()
+	service := NewServiceMock()
 
-	route := NewHydrateLessonHandler(reader)
+	route := NewHydrateLessonHandler(service)
 
 	u, _ := url.Parse("/")
 

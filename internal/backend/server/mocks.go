@@ -7,76 +7,60 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type ReaderMock struct{ mock.Mock }
-
-func NewReaderMock() *ReaderMock {
-	return &ReaderMock{}
+type ServiceMock struct {
+	mock.Mock
 }
 
-func (mock *ReaderMock) FetchLessons() (backend.Lessons, error) {
-	return mock.Called().Get(0).(backend.Lessons), nil
+func NewServiceMock() *ServiceMock {
+	return &ServiceMock{}
 }
 
-func (mock *ReaderMock) HydrateLesson(lesson *backend.Lesson) error {
-	mock.Called(lesson)
-
-	return nil
+func (m *ServiceMock) FetchLessons() (backend.Lessons, error) {
+	args := m.Called()
+	return args.Get(0).(backend.Lessons), args.Error(1)
 }
 
-func (mock *ReaderMock) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
-	return mock.Called(lesson).Get(0).(backend.Exercises), nil
+func (m *ServiceMock) HydrateLesson(lesson *backend.Lesson) error {
+	args := m.Called(lesson)
+	return args.Error(0)
 }
 
-type WriterMock struct{ mock.Mock }
-
-func NewWriterMock() *WriterMock {
-	return &WriterMock{}
+func (m *ServiceMock) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
+	args := m.Called(lesson)
+	return args.Get(0).(backend.Exercises), args.Error(1)
 }
 
-func (mock *WriterMock) UpsertLesson(lesson *backend.Lesson) error {
-	mock.Called(lesson)
-
-	return nil
+func (m *ServiceMock) UpsertLesson(lesson *backend.Lesson) error {
+	args := m.Called(lesson)
+	return args.Error(0)
 }
 
-func (mock *WriterMock) DeleteLesson(lesson backend.Lesson) error {
-	mock.Called(lesson)
-
-	return nil
+func (m *ServiceMock) DeleteLesson(lesson backend.Lesson) error {
+	args := m.Called(lesson)
+	return args.Error(0)
 }
 
-func (mock *WriterMock) UpsertExercise(exercise *backend.Exercise) error {
-	mock.Called(exercise)
-
-	return nil
+func (m *ServiceMock) UpsertExercise(exercise *backend.Exercise) error {
+	args := m.Called(exercise)
+	return args.Error(0)
 }
 
-func (mock *WriterMock) StoreExercises(exercises backend.Exercises) error {
-	mock.Called(exercises)
-
-	return nil
+func (m *ServiceMock) StoreExercises(exercises backend.Exercises) error {
+	args := m.Called(exercises)
+	return args.Error(0)
 }
 
-func (mock *WriterMock) DeleteExercise(exercise backend.Exercise) error {
-	mock.Called(exercise)
-
-	return nil
+func (m *ServiceMock) DeleteExercise(exercise backend.Exercise) error {
+	args := m.Called(exercise)
+	return args.Error(0)
 }
 
-type PublisherMock struct{ mock.Mock }
-
-func NewPublisherMock() *PublisherMock {
-	return &PublisherMock{}
+func (m *ServiceMock) PublishGoodAnswer(ctx context.Context, exerciseID int) error {
+	args := m.Called(ctx, exerciseID)
+	return args.Error(0)
 }
 
-func (mock *PublisherMock) PublishGoodAnswer(ctx context.Context, exerciseId int) error {
-	mock.Called(ctx, exerciseId)
-
-	return nil
-}
-
-func (mock *PublisherMock) PublishBadAnswer(ctx context.Context, exerciseId int) error {
-	mock.Called(ctx, exerciseId)
-
-	return nil
+func (m *ServiceMock) PublishBadAnswer(ctx context.Context, exerciseID int) error {
+	args := m.Called(ctx, exerciseID)
+	return args.Error(0)
 }

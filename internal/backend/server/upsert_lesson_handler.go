@@ -11,12 +11,12 @@ import (
 )
 
 type UpsertLessonHandler struct {
-	w      Writer
+	s      Service
 	lesson backend.Lesson
 }
 
-func NewUpsertLessonHandler(w Writer) *UpsertLessonHandler {
-	return &UpsertLessonHandler{w: w}
+func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
+	return &UpsertLessonHandler{s: s}
 }
 
 func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -53,7 +53,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.w.UpsertLesson(&h.lesson)
+	err = h.s.UpsertLesson(&h.lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

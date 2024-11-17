@@ -8,15 +8,15 @@ import (
 )
 
 type FetchLessonsHandler struct {
-	r Reader
+	s Service
 }
 
-func NewFetchLessonsHandler(r Reader) *FetchLessonsHandler {
-	return &FetchLessonsHandler{r: r}
+func NewFetchLessonsHandler(s Service) *FetchLessonsHandler {
+	return &FetchLessonsHandler{s: s}
 }
 
 func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	lessons, err := h.r.FetchLessons()
+	lessons, err := h.s.FetchLessons()
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch lessons: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

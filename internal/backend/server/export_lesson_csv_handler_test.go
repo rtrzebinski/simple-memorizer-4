@@ -24,13 +24,14 @@ func TestExportLessonCsvHandler(t *testing.T) {
 
 	lesson := backend.Lesson{Id: 2}
 
-	reader := NewReaderMock()
-	reader.On("FetchExercises", lesson).Return(exercises)
-	reader.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
-		args.Get(0).(*backend.Lesson).Name = "lesson name"
-	})
+	service := NewServiceMock()
 
-	route := NewExportLessonCsvHandler(reader)
+	service.On("FetchExercises", lesson).Return(exercises, nil)
+	service.On("HydrateLesson", &lesson).Run(func(args mock.Arguments) {
+		args.Get(0).(*backend.Lesson).Name = "lesson name"
+	}).Return(nil)
+
+	route := NewExportLessonCsvHandler(service)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -52,9 +53,9 @@ func TestExportLessonCsvHandler(t *testing.T) {
 }
 
 func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
-	reader := NewReaderMock()
+	service := NewServiceMock()
 
-	route := NewExportLessonCsvHandler(reader)
+	route := NewExportLessonCsvHandler(service)
 
 	u, _ := url.Parse("/")
 

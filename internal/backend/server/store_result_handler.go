@@ -11,14 +11,12 @@ import (
 )
 
 type StoreResultHandler struct {
-	p      Publisher
+	s      Service
 	result backend.Result
 }
 
-func NewStoreResultHandler(p Publisher) *StoreResultHandler {
-	return &StoreResultHandler{
-		p: p,
-	}
+func NewStoreResultHandler(s Service) *StoreResultHandler {
+	return &StoreResultHandler{s: s}
 }
 
 func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -60,7 +58,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	switch h.result.Type {
 	case backend.Good:
-		err = h.p.PublishGoodAnswer(ctx, h.result.Exercise.Id)
+		err = h.s.PublishGoodAnswer(ctx, h.result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish good answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
@@ -68,7 +66,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 			return
 		}
 	case backend.Bad:
-		err = h.p.PublishBadAnswer(ctx, h.result.Exercise.Id)
+		err = h.s.PublishBadAnswer(ctx, h.result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish bad answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)

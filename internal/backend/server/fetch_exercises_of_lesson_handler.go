@@ -12,11 +12,11 @@ import (
 )
 
 type FetchExercisesOfLessonHandler struct {
-	r Reader
+	s Service
 }
 
-func NewFetchExercisesOfLessonHandler(r Reader) *FetchExercisesOfLessonHandler {
-	return &FetchExercisesOfLessonHandler{r: r}
+func NewFetchExercisesOfLessonHandler(s Service) *FetchExercisesOfLessonHandler {
+	return &FetchExercisesOfLessonHandler{s: s}
 }
 
 func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -51,7 +51,7 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		}
 	}
 
-	exercises, err := h.r.FetchExercises(backend.Lesson{Id: lessonId})
+	exercises, err := h.s.FetchExercises(backend.Lesson{Id: lessonId})
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

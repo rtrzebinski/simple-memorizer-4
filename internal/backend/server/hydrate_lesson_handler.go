@@ -12,11 +12,11 @@ import (
 )
 
 type HydrateLessonHandler struct {
-	r Reader
+	s Service
 }
 
-func NewHydrateLessonHandler(r Reader) *HydrateLessonHandler {
-	return &HydrateLessonHandler{r: r}
+func NewHydrateLessonHandler(s Service) *HydrateLessonHandler {
+	return &HydrateLessonHandler{s: s}
 }
 
 func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -53,7 +53,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 	lesson := &backend.Lesson{Id: lessonId}
 
-	err = h.r.HydrateLesson(lesson)
+	err = h.s.HydrateLesson(lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate a lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

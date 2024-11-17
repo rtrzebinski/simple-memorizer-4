@@ -11,12 +11,12 @@ import (
 )
 
 type StoreExercisesHandler struct {
-	w         Writer
+	s         Service
 	exercises backend.Exercises
 }
 
-func NewStoreExercisesHandler(w Writer) *StoreExercisesHandler {
-	return &StoreExercisesHandler{w: w}
+func NewStoreExercisesHandler(s Service) *StoreExercisesHandler {
+	return &StoreExercisesHandler{s: s}
 }
 
 func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -53,7 +53,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.w.StoreExercises(h.exercises)
+	err = h.s.StoreExercises(h.exercises)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to store exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
