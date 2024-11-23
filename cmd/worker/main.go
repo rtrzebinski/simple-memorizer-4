@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"strings"
 	"time"
@@ -50,11 +51,11 @@ func main() {
 	}
 }
 
-// The main function is the entry point where the app is configured and started.
-// It is executed in 2 different environments: A client (the web browser) and a
-// server.
 func run(ctx context.Context) error {
-	log.Println("application starting")
+	// Create a logger
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "worker")
+
+	logger.Info("application starting")
 
 	// Configuration
 	var cfg config
@@ -95,11 +96,10 @@ func run(ctx context.Context) error {
 		return handler.Handle(ctx, ev)
 	}
 
+	// Start CloudEvents receiver and send errors to the channel
 	go func() {
-		// Start CloudEvents receiver and send errors to the channel
-		if err = ceClient.StartReceiver(ctx, receiver); err != nil {
-			serverErrors <- fmt.Errorf("start supply cat pubsub receiver: %w", err)
-		}
+		logger.Info("initializing CloudEvents receiver")
+		serverErrors <- ceClient.StartReceiver(ctx, receiver)
 	}()
 
 	// =========================================
@@ -110,11 +110,11 @@ func run(ctx context.Context) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		log.Printf("initializing probe server on host: %s apiClient", cfg.ProbeAddr)
+		logger.Info("initializing probe server", "addr", cfg.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	log.Println("application running")
+	logger.Info("application running")
 
 	// =========================================
 	// Blocking main and waiting for shutdown.
@@ -126,7 +126,7 @@ func run(ctx context.Context) error {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
 	case <-done.Done():
-		log.Print("start shutdown")
+		logger.Info("start shutdown")
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
@@ -141,6 +141,8 @@ func run(ctx context.Context) error {
 			}
 		}
 	}
+
+	logger.Info("application completed")
 
 	return nil
 }
