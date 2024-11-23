@@ -18,9 +18,9 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
-	backendcloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/backend/cloudevents"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
-	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
 	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
@@ -163,14 +163,14 @@ func run(ctx context.Context) error {
 	// Start API server
 	// =========================================
 
-	backendReader := backendpostgres.NewReader(db)
-	backendWriter := backendpostgres.NewWriter(db)
-	backendPublisher := backendcloudevetns.NewPublisher(ceClient)
-	backendService := backend.NewService(backendReader, backendWriter, backendPublisher)
+	reader := postgres.NewReader(db)
+	writer := postgres.NewWriter(db)
+	publisher := cloudevents.NewPublisher(ceClient)
+	service := backend.NewService(reader, writer, publisher)
 
 	go func() {
 		log.Printf("initializing API server on port: %s apiClient", cfg.Web.Port)
-		serverErrors <- server.ListenAndServe(backendService, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
+		serverErrors <- server.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
 	}()
 
 	// =========================================

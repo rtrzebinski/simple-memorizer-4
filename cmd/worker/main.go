@@ -16,24 +16,22 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
-	workercloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
-	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
 )
 
 type config struct {
-	Worker struct {
-		SubscriptionIDs []string `envconfig:"WORKER_SUBSCRIPTION_IDS" default:"subscription-dev"`
-	}
 	Db struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
 		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=Europe/Warsaw"`
 	}
 	PubSub struct {
-		ProjectID string `envconfig:"PUBSUB_PROJECT_ID" default:"project-dev"`
-		TopicID   string `envconfig:"PUBSUB_TOPIC_ID" default:"topic-dev"`
+		ProjectID       string   `envconfig:"PUBSUB_PROJECT_ID" default:"project-dev"`
+		TopicID         string   `envconfig:"PUBSUB_TOPIC_ID" default:"topic-dev"`
+		SubscriptionIDs []string `envconfig:"PUBSUB_SUBSCRIPTION_IDS" default:"subscription-dev"`
 	}
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9091"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
@@ -74,7 +72,7 @@ func run(ctx context.Context) error {
 	ceClient, err := createCloudEventsClient(ctx,
 		cfg.PubSub.ProjectID,
 		cfg.PubSub.TopicID,
-		cfg.Worker.SubscriptionIDs,
+		cfg.PubSub.SubscriptionIDs,
 	)
 	if err != nil {
 		return err
@@ -88,13 +86,13 @@ func run(ctx context.Context) error {
 	// Start worker
 	// =========================================
 
-	workerReader := workerpostgres.NewReader(db)
-	workerWriter := workerpostgres.NewWriter(db)
-	workerService := worker.NewService(workerReader, workerWriter, result.NewProjectionBuilder())
-	workerHandler := workercloudevetns.NewHandler(workerService)
+	reader := postgres.NewReader(db)
+	writer := postgres.NewWriter(db)
+	service := worker.NewService(reader, writer, result.NewProjectionBuilder())
+	handler := cloudevents.NewHandler(service)
 
 	receiver := func(ctx context.Context, ev event.Event) error {
-		return workerHandler.Handle(ctx, ev)
+		return handler.Handle(ctx, ev)
 	}
 
 	go func() {
