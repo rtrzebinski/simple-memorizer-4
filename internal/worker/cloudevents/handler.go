@@ -3,6 +3,7 @@ package cloudevents
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -48,6 +49,8 @@ func (h *Handler) handleGoodAnswer(ctx context.Context, e event.Event) error {
 		return err
 	}
 
+	slog.Info("handled events.GoodAnswer", slog.Int("exerciseID", int(message.ExerciseID)), slog.String("service", "worker"))
+
 	return nil
 }
 
@@ -63,6 +66,8 @@ func (h *Handler) handleBadAnswer(ctx context.Context, e event.Event) error {
 	if err != nil {
 		return err
 	}
+
+	slog.Info("handled events.BadAnswer", slog.Int("exerciseID", int(message.ExerciseID)), slog.String("service", "worker"))
 
 	return nil
 }

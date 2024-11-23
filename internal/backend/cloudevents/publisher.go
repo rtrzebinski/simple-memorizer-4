@@ -38,7 +38,7 @@ func (p *Publisher) PublishGoodAnswer(ctx context.Context, exerciseID int) error
 		return fmt.Errorf("publish good answer: %w", err)
 	}
 
-	slog.Info("published events.GoodAnswer", slog.Int("exerciseID", exerciseID))
+	slog.Info("published events.GoodAnswer", slog.Int("exerciseID", exerciseID), slog.String("service", "web"))
 
 	return nil
 }
@@ -53,7 +53,7 @@ func (p *Publisher) PublishBadAnswer(ctx context.Context, exerciseID int) error 
 		return fmt.Errorf("publish bad answer: %w", err)
 	}
 
-	slog.Info("published events.BadAnswer", slog.Int("exerciseID", exerciseID))
+	slog.Info("published events.BadAnswer", slog.Int("exerciseID", exerciseID), slog.String("service", "web"))
 
 	return nil
 }

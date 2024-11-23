@@ -19,34 +19,30 @@ func NewService(r Reader, w Writer, pb ProjectionBuilder) *Service {
 	}
 }
 
-func (s *Service) ProcessGoodAnswer(_ context.Context, exerciseID int) error {
+func (s *Service) ProcessGoodAnswer(ctx context.Context, exerciseID int) error {
 	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
 
-	err := s.processAnswer(context.Background(), result)
+	err := s.processAnswer(ctx, result)
 	if err != nil {
 		return fmt.Errorf("process good answer: %w", err)
 	}
 
-	fmt.Printf("good answer processed %d\n", exerciseID)
-
 	return nil
 }
 
-func (s *Service) ProcessBadAnswer(_ context.Context, exerciseID int) error {
+func (s *Service) ProcessBadAnswer(ctx context.Context, exerciseID int) error {
 	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
 
-	err := s.processAnswer(context.Background(), result)
+	err := s.processAnswer(ctx, result)
 	if err != nil {
 		return fmt.Errorf("process bad answer: %w", err)
 	}
-
-	fmt.Printf("bad answer processed %d\n", exerciseID)
 
 	return nil
 }
