@@ -54,18 +54,17 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := run(ctx); err != nil {
-		log.Println(err.Error())
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "web")
+
+	if err := run(ctx, logger); err != nil {
+		logger.Error(err.Error())
 	}
 }
 
 // The main function is the entry point where the app is configured and started.
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
-func run(ctx context.Context) error {
-	// Create a logger
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "web")
-
+func run(ctx context.Context, logger *slog.Logger) error {
 	logger.Info("application starting")
 
 	u := app.Window().URL()
@@ -111,9 +110,9 @@ func run(ctx context.Context) error {
 
 	if scanner.Scan() {
 		version = scanner.Text()
-		log.Println("version", version)
+		logger.Info("version", "version", version)
 	} else {
-		log.Println("version unknown")
+		logger.Info("version unknown")
 	}
 
 	// Handle home page
@@ -173,7 +172,7 @@ func run(ctx context.Context) error {
 	service := backend.NewService(reader, writer, publisher)
 
 	go func() {
-		log.Printf("initializing server on port: %s apiClient", cfg.Web.Port)
+		logger.Info("initializing server", "port", cfg.Web.Port)
 		serverErrors <- server.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
 	}()
 

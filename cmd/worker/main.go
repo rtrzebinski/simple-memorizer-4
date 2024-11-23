@@ -38,23 +38,18 @@ type config struct {
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
 }
 
-func init() {
-	log.SetOutput(os.Stdout)
-}
-
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := run(ctx); err != nil {
-		log.Println(err.Error())
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "worker")
+
+	if err := run(ctx, logger); err != nil {
+		logger.Error(err.Error())
 	}
 }
 
-func run(ctx context.Context) error {
-	// Create a logger
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "worker")
-
+func run(ctx context.Context, logger *slog.Logger) error {
 	logger.Info("application starting")
 
 	// Configuration
