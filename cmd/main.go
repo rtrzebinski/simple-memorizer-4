@@ -33,19 +33,21 @@ import (
 )
 
 type config struct {
+	Web struct {
+		Port     string `envconfig:"WEB_PORT" default:":8000"`
+		CertFile string `envconfig:"WEB_CERT_FILE" default:"ssl/localhost-cert.pem"`
+		KeyFile  string `envconfig:"WEB_KEY_FILE" default:"ssl/localhost-key.pem"`
+	}
+	Worker struct {
+		SubscriptionIDs []string `envconfig:"WORKER_SUBSCRIPTION_IDS" default:"subscription-dev"`
+	}
 	Db struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
 		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=Europe/Warsaw"`
 	}
-	Server struct {
-		Port     string `envconfig:"SERVER_PORT" default:":8000"`
-		CertFile string `envconfig:"SERVER_CERT_FILE" default:"ssl/localhost-cert.pem"`
-		KeyFile  string `envconfig:"SERVER_KEY_FILE" default:"ssl/localhost-key.pem"`
-	}
 	PubSub struct {
-		ProjectID       string   `envconfig:"PS_PROJECT_ID" default:"project-dev"`
-		TopicID         string   `envconfig:"PS_TOPIC_ID" default:"topic-dev"`
-		SubscriptionIDs []string `envconfig:"PS_SUBSCRIPTION_IDS" default:"subscription-dev"`
+		ProjectID string `envconfig:"PUBSUB_PROJECT_ID" default:"project-dev"`
+		TopicID   string `envconfig:"PUBSUB_TOPIC_ID" default:"topic-dev"`
 	}
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9090"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
@@ -155,7 +157,7 @@ func run(ctx context.Context) error {
 	ceClient, err := createCloudEventsClient(ctx,
 		cfg.PubSub.ProjectID,
 		cfg.PubSub.TopicID,
-		cfg.PubSub.SubscriptionIDs,
+		cfg.Worker.SubscriptionIDs,
 	)
 	if err != nil {
 		return err
@@ -166,7 +168,7 @@ func run(ctx context.Context) error {
 	serverErrors := make(chan error, 1)
 
 	// =========================================
-	// Start server
+	// Start API server
 	// =========================================
 
 	backendReader := backendpostgres.NewReader(db)
@@ -175,8 +177,8 @@ func run(ctx context.Context) error {
 	backendService := backend.NewService(backendReader, backendWriter, backendPublisher)
 
 	go func() {
-		log.Printf("initializing API server on port: %s apiClient", cfg.Server.Port)
-		serverErrors <- server.ListenAndServe(backendService, cfg.Server.Port, cfg.Server.CertFile, cfg.Server.KeyFile)
+		log.Printf("initializing API server on port: %s apiClient", cfg.Web.Port)
+		serverErrors <- server.ListenAndServe(backendService, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
 	}()
 
 	// =========================================
