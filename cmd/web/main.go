@@ -14,7 +14,6 @@ import (
 	cepubsub "github.com/cloudevents/sdk-go/protocol/pubsub/v2"
 	ce "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/client"
-	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -24,10 +23,6 @@ import (
 	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
-	workercloudevetns "github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
-	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
 )
@@ -37,9 +32,6 @@ type config struct {
 		Port     string `envconfig:"WEB_PORT" default:":8000"`
 		CertFile string `envconfig:"WEB_CERT_FILE" default:"ssl/localhost-cert.pem"`
 		KeyFile  string `envconfig:"WEB_KEY_FILE" default:"ssl/localhost-key.pem"`
-	}
-	Worker struct {
-		SubscriptionIDs []string `envconfig:"WORKER_SUBSCRIPTION_IDS" default:"subscription-dev"`
 	}
 	Db struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
@@ -157,7 +149,7 @@ func run(ctx context.Context) error {
 	ceClient, err := createCloudEventsClient(ctx,
 		cfg.PubSub.ProjectID,
 		cfg.PubSub.TopicID,
-		cfg.Worker.SubscriptionIDs,
+		[]string{},
 	)
 	if err != nil {
 		return err
@@ -179,26 +171,6 @@ func run(ctx context.Context) error {
 	go func() {
 		log.Printf("initializing API server on port: %s apiClient", cfg.Web.Port)
 		serverErrors <- server.ListenAndServe(backendService, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
-	}()
-
-	// =========================================
-	// Start worker
-	// =========================================
-
-	workerReader := workerpostgres.NewReader(db)
-	workerWriter := workerpostgres.NewWriter(db)
-	workerService := worker.NewService(workerReader, workerWriter, result.NewProjectionBuilder())
-	workerHandler := workercloudevetns.NewHandler(workerService)
-
-	receiver := func(ctx context.Context, ev event.Event) error {
-		return workerHandler.Handle(ctx, ev)
-	}
-
-	go func() {
-		// Start CloudEvents receiver and send errors to the channel
-		if err = ceClient.StartReceiver(ctx, receiver); err != nil {
-			serverErrors <- fmt.Errorf("start supply cat pubsub receiver: %w", err)
-		}
 	}()
 
 	// =========================================

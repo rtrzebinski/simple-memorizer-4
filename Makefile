@@ -95,15 +95,15 @@ db: ## Db CLI client connection
 
 build: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
-	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd
-	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd
+	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd/web
+	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd/web
 	@date > version
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
 run: ## Build and run locally
 	@make build
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/main.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/worker/main.go & wait
 
 proto: ## Generate protobuf files
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"

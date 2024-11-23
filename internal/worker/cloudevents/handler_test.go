@@ -2,13 +2,17 @@ package cloudevents
 
 import (
 	"context"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"testing"
 
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/events"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+)
+
+const (
+	ContentType = "application/protobuf"
 )
 
 func TestHandlerSuite(t *testing.T) {
@@ -32,7 +36,9 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Success() {
 	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
 	e.SetType(GoodAnswerType)
-	err := e.SetData(cloudevents.ApplicationJSON, &message)
+	protobufData, err := cprotobuf.EncodeData(ctx, &message)
+	suite.NoError(err)
+	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
 	suite.serviceMock.On("ProcessGoodAnswer", ctx, exerciseID).Return(nil)
@@ -49,7 +55,9 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
 	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
 	e.SetType(GoodAnswerType)
-	err := e.SetData(cloudevents.ApplicationJSON, &message)
+	protobufData, err := cprotobuf.EncodeData(ctx, &message)
+	suite.NoError(err)
+	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
 	suite.serviceMock.On("ProcessGoodAnswer", ctx, exerciseID).Return(assert.AnError)
@@ -67,7 +75,9 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Success() {
 	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
 	e.SetType(BadAnswerType)
-	err := e.SetData(cloudevents.ApplicationJSON, &message)
+	protobufData, err := cprotobuf.EncodeData(ctx, &message)
+	suite.NoError(err)
+	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
 	suite.serviceMock.On("ProcessBadAnswer", ctx, exerciseID).Return(nil)
@@ -84,7 +94,9 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
 	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
 	e.SetType(BadAnswerType)
-	err := e.SetData(cloudevents.ApplicationJSON, &message)
+	protobufData, err := cprotobuf.EncodeData(ctx, &message)
+	suite.NoError(err)
+	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
 	suite.serviceMock.On("ProcessBadAnswer", ctx, exerciseID).Return(assert.AnError)

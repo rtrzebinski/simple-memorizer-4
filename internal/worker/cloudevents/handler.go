@@ -3,6 +3,8 @@ package cloudevents
 import (
 	"context"
 	"fmt"
+
+	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/events"
 )
@@ -36,7 +38,7 @@ func (h *Handler) Handle(ctx context.Context, e event.Event) error {
 func (h *Handler) handleGoodAnswer(ctx context.Context, e event.Event) error {
 	var message events.GoodAnswer
 
-	err := e.DataAs(&message)
+	err := cprotobuf.DecodeData(ctx, e.Data(), &message)
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,7 @@ func (h *Handler) handleGoodAnswer(ctx context.Context, e event.Event) error {
 func (h *Handler) handleBadAnswer(ctx context.Context, e event.Event) error {
 	var message events.BadAnswer
 
-	err := e.DataAs(&message)
+	err := cprotobuf.DecodeData(ctx, e.Data(), &message)
 	if err != nil {
 		return err
 	}
