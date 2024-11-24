@@ -11,8 +11,7 @@ import (
 )
 
 type DeleteLessonHandler struct {
-	s      Service
-	lesson backend.Lesson
+	s Service
 }
 
 func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
@@ -20,7 +19,9 @@ func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
 }
 
 func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.lesson)
+	var lesson backend.Lesson
+
+	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode DeleteLessonHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -28,7 +29,7 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	validator := validation.ValidateLessonIdentified(h.lesson)
+	validator := validation.ValidateLessonIdentified(lesson)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -53,7 +54,7 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.DeleteLesson(h.lesson)
+	err = h.s.DeleteLesson(lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

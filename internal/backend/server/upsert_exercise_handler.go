@@ -11,8 +11,7 @@ import (
 )
 
 type UpsertExerciseHandler struct {
-	s        Service
-	exercise backend.Exercise
+	s Service
 }
 
 func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
@@ -20,7 +19,9 @@ func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
 }
 
 func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.exercise)
+	var exercise backend.Exercise
+
+	err := json.NewDecoder(req.Body).Decode(&exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode UpsertExerciseHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -28,7 +29,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	validator := validation.ValidateUpsertExercise(h.exercise, nil)
+	validator := validation.ValidateUpsertExercise(exercise, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -53,7 +54,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.UpsertExercise(&h.exercise)
+	err = h.s.UpsertExercise(&exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

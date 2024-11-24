@@ -11,8 +11,7 @@ import (
 )
 
 type UpsertLessonHandler struct {
-	s      Service
-	lesson backend.Lesson
+	s Service
 }
 
 func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
@@ -20,7 +19,9 @@ func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
 }
 
 func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.lesson)
+	var lesson backend.Lesson
+
+	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode UpsertLessonHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -28,7 +29,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	validator := validation.ValidateUpsertLesson(h.lesson, nil)
+	validator := validation.ValidateUpsertLesson(lesson, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -53,7 +54,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(&h.lesson)
+	err = h.s.UpsertLesson(&lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

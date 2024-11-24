@@ -10,8 +10,7 @@ import (
 )
 
 type DeleteExerciseHandler struct {
-	s        Service
-	exercise backend.Exercise
+	s Service
 }
 
 func NewDeleteExerciseHandler(s Service) *DeleteExerciseHandler {
@@ -19,7 +18,9 @@ func NewDeleteExerciseHandler(s Service) *DeleteExerciseHandler {
 }
 
 func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.exercise)
+	var exercise backend.Exercise
+
+	err := json.NewDecoder(req.Body).Decode(&exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode DeleteExerciseHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -27,7 +28,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	validator := validation.ValidateExerciseIdentified(h.exercise)
+	validator := validation.ValidateExerciseIdentified(exercise)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -52,7 +53,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.DeleteExercise(h.exercise)
+	err = h.s.DeleteExercise(exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

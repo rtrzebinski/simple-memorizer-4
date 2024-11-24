@@ -11,8 +11,7 @@ import (
 )
 
 type StoreResultHandler struct {
-	s      Service
-	result backend.Result
+	s Service
 }
 
 func NewStoreResultHandler(s Service) *StoreResultHandler {
@@ -20,10 +19,12 @@ func NewStoreResultHandler(s Service) *StoreResultHandler {
 }
 
 func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	var result backend.Result
+
 	// Derive ctx from the request context
 	ctx := req.Context()
 
-	err := json.NewDecoder(req.Body).Decode(&h.result)
+	err := json.NewDecoder(req.Body).Decode(&result)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode StoreResultHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -31,7 +32,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	validator := validation.ValidateStoreResult(h.result)
+	validator := validation.ValidateStoreResult(result)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -56,9 +57,9 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	switch h.result.Type {
+	switch result.Type {
 	case backend.Good:
-		err = h.s.PublishGoodAnswer(ctx, h.result.Exercise.Id)
+		err = h.s.PublishGoodAnswer(ctx, result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish good answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
@@ -66,7 +67,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 			return
 		}
 	case backend.Bad:
-		err = h.s.PublishBadAnswer(ctx, h.result.Exercise.Id)
+		err = h.s.PublishBadAnswer(ctx, result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish bad answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)

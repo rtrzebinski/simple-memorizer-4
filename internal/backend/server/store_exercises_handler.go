@@ -11,8 +11,7 @@ import (
 )
 
 type StoreExercisesHandler struct {
-	s         Service
-	exercises backend.Exercises
+	s Service
 }
 
 func NewStoreExercisesHandler(s Service) *StoreExercisesHandler {
@@ -20,7 +19,9 @@ func NewStoreExercisesHandler(s Service) *StoreExercisesHandler {
 }
 
 func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	err := json.NewDecoder(req.Body).Decode(&h.exercises)
+	var exercises backend.Exercises
+
+	err := json.NewDecoder(req.Body).Decode(&exercises)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode StoreExercisesHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
@@ -28,7 +29,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	validator := validation.ValidateStoreExercises(h.exercises)
+	validator := validation.ValidateStoreExercises(exercises)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -53,7 +54,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.StoreExercises(h.exercises)
+	err = h.s.StoreExercises(exercises)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to store exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
