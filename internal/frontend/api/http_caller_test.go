@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +11,8 @@ import (
 )
 
 func TestHTTPCaller_Call(t *testing.T) {
+	ctx := context.Background()
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		_, err := buf.ReadFrom(r.Body)
@@ -31,7 +34,7 @@ func TestHTTPCaller_Call(t *testing.T) {
 
 	c := NewHTTPCaller(server.Client(), u.Host, u.Scheme)
 
-	respBody, err := c.Call("method", "/route", map[string]string{"foo": "bar"}, []byte("request body"))
+	respBody, err := c.Call(ctx, "method", "/route", map[string]string{"foo": "bar"}, []byte("request body"))
 
 	assert.NoError(t, err)
 	assert.Equal(t, "response body", string(respBody))

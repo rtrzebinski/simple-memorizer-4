@@ -57,7 +57,7 @@ func (compo *LessonRow) onEdit() app.EventHandler {
 func (compo *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
-		err := compo.parent.c.DeleteLesson(frontend.Lesson{Id: id})
+		err := compo.parent.c.DeleteLesson(ctx, frontend.Lesson{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}

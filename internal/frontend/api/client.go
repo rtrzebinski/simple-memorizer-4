@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/server"
@@ -19,10 +20,10 @@ func NewClient(c Caller) *Client {
 }
 
 // FetchLessons fetches all lessons
-func (s *Client) FetchLessons() ([]frontend.Lesson, error) {
+func (s *Client) FetchLessons(ctx context.Context) ([]frontend.Lesson, error) {
 	var lessons []frontend.Lesson
 
-	respBody, err := s.c.Call("GET", server.FetchLessons, nil, nil)
+	respBody, err := s.c.Call(ctx, "GET", server.FetchLessons, nil, nil)
 	if err != nil {
 		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -35,12 +36,12 @@ func (s *Client) FetchLessons() ([]frontend.Lesson, error) {
 }
 
 // HydrateLesson hydrates a lesson
-func (s *Client) HydrateLesson(lesson *frontend.Lesson) error {
+func (s *Client) HydrateLesson(ctx context.Context, lesson *frontend.Lesson) error {
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := s.c.Call("GET", server.HydrateLesson, params, nil)
+	respBody, err := s.c.Call(ctx, "GET", server.HydrateLesson, params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -53,14 +54,14 @@ func (s *Client) HydrateLesson(lesson *frontend.Lesson) error {
 }
 
 // FetchExercises fetches exercises of a lesson
-func (s *Client) FetchExercises(lesson frontend.Lesson) ([]frontend.Exercise, error) {
+func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson) ([]frontend.Exercise, error) {
 	var exercises []frontend.Exercise
 
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := s.c.Call("GET", server.FetchExercises, params, nil)
+	respBody, err := s.c.Call(ctx, "GET", server.FetchExercises, params, nil)
 	if err != nil {
 		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -73,13 +74,13 @@ func (s *Client) FetchExercises(lesson frontend.Lesson) ([]frontend.Exercise, er
 }
 
 // UpsertLesson upserts a lesson
-func (s *Client) UpsertLesson(lesson frontend.Lesson) error {
+func (s *Client) UpsertLesson(ctx context.Context, lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.UpsertLesson, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.UpsertLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -88,13 +89,13 @@ func (s *Client) UpsertLesson(lesson frontend.Lesson) error {
 }
 
 // DeleteLesson deletes a lesson
-func (s *Client) DeleteLesson(lesson frontend.Lesson) error {
+func (s *Client) DeleteLesson(ctx context.Context, lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.DeleteLesson, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.DeleteLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -103,13 +104,13 @@ func (s *Client) DeleteLesson(lesson frontend.Lesson) error {
 }
 
 // UpsertExercise upserts an exercise
-func (s *Client) UpsertExercise(exercise frontend.Exercise) error {
+func (s *Client) UpsertExercise(ctx context.Context, exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.UpsertExercise, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.UpsertExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -118,13 +119,13 @@ func (s *Client) UpsertExercise(exercise frontend.Exercise) error {
 }
 
 // StoreExercises stores exercises
-func (s *Client) StoreExercises(exercises []frontend.Exercise) error {
+func (s *Client) StoreExercises(ctx context.Context, exercises []frontend.Exercise) error {
 	body, err := json.Marshal(exercises)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercises: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.StoreExercises, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.StoreExercises, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -133,13 +134,13 @@ func (s *Client) StoreExercises(exercises []frontend.Exercise) error {
 }
 
 // DeleteExercise deletes an exercise
-func (s *Client) DeleteExercise(exercise frontend.Exercise) error {
+func (s *Client) DeleteExercise(ctx context.Context, exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.DeleteExercise, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.DeleteExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -148,13 +149,13 @@ func (s *Client) DeleteExercise(exercise frontend.Exercise) error {
 }
 
 // StoreResult stores a result
-func (s *Client) StoreResult(result frontend.Result) error {
+func (s *Client) StoreResult(ctx context.Context, result frontend.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {
 		return fmt.Errorf("failed to encode result: %w", err)
 	}
 
-	_, err = s.c.Call("POST", server.StoreResult, nil, body)
+	_, err = s.c.Call(ctx, "POST", server.StoreResult, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

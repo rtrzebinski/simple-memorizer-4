@@ -46,7 +46,7 @@ func (compo *ExerciseRow) Render() app.UI {
 func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete exercise
-		err := compo.parent.c.DeleteExercise(frontend.Exercise{Id: id})
+		err := compo.parent.c.DeleteExercise(ctx, frontend.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}
@@ -60,7 +60,7 @@ func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 		}
 		// replace parent rows slice with a new one - this will update the UI
 		compo.parent.rows = rows
-		compo.parent.hydrateLesson()
+		compo.parent.hydrateLesson(ctx)
 	}
 }
 

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -40,7 +41,7 @@ func NewExercises(c APIClient) *Exercises {
 }
 
 // The OnMount method is run once component is mounted
-func (compo *Exercises) OnMount(_ app.Context) {
+func (compo *Exercises) OnMount(ctx app.Context) {
 	u := app.Window().URL()
 
 	// find lesson_id in the url
@@ -52,13 +53,13 @@ func (compo *Exercises) OnMount(_ app.Context) {
 
 	compo.lesson = frontend.Lesson{Id: lessonId}
 
-	compo.hydrateLesson()
-	compo.displayExercisesOfLesson()
+	compo.hydrateLesson(ctx)
+	compo.displayExercisesOfLesson(ctx)
 }
 
 // hydrateLesson fetch lesson details
-func (compo *Exercises) hydrateLesson() {
-	err := compo.c.HydrateLesson(&compo.lesson)
+func (compo *Exercises) hydrateLesson(ctx context.Context) {
+	err := compo.c.HydrateLesson(ctx, &compo.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 	}
@@ -141,7 +142,7 @@ func (compo *Exercises) handleAddExercise(_ app.Context, _ app.Event) {
 }
 
 // handleCsvUpload upload exercises from a CSV file
-func (compo *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
+func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	file := e.Get("target").Get("files").Index(0)
 
 	// validate file type which can be changed by the user in the file picker
@@ -175,7 +176,7 @@ func (compo *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
 	}
 
 	// store uploaded exercises
-	err = compo.c.StoreExercises(exercises)
+	err = compo.c.StoreExercises(ctx, exercises)
 	if err != nil {
 		app.Log(err)
 		return
@@ -185,8 +186,8 @@ func (compo *Exercises) handleCsvUpload(_ app.Context, e app.Event) {
 	e.Get("target").Set("value", "")
 
 	// reload the UI
-	compo.hydrateLesson()
-	compo.displayExercisesOfLesson()
+	compo.hydrateLesson(ctx)
+	compo.displayExercisesOfLesson(ctx)
 }
 
 // readFile some JS magic converting uploaded file to a slice of bytes
@@ -217,7 +218,7 @@ func readFile(file app.Value) (data []byte, err error) {
 }
 
 // handleSave create new or update existing exercise
-func (compo *Exercises) handleSave(_ app.Context, e app.Event) {
+func (compo *Exercises) handleSave(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
 	// exercise to be saved
@@ -250,7 +251,7 @@ func (compo *Exercises) handleSave(_ app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save exercise
-	err := compo.c.UpsertExercise(exercise)
+	err := compo.c.UpsertExercise(ctx, exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save exercise: %w", err))
 	}
@@ -265,8 +266,8 @@ func (compo *Exercises) handleSave(_ app.Context, e app.Event) {
 	compo.resetForm()
 
 	// reload the UI
-	compo.hydrateLesson()
-	compo.displayExercisesOfLesson()
+	compo.hydrateLesson(ctx)
+	compo.displayExercisesOfLesson(ctx)
 }
 
 // handleCancel handle cancel button click
@@ -285,8 +286,8 @@ func (compo *Exercises) resetForm() {
 }
 
 // displayExercisesOfLesson fetch exercises and display them
-func (compo *Exercises) displayExercisesOfLesson() {
-	exercises, err := compo.c.FetchExercises(compo.lesson)
+func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
+	exercises, err := compo.c.FetchExercises(ctx, compo.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

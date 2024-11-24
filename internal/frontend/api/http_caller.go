@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -22,7 +23,7 @@ func NewHTTPCaller(http *http.Client, host string, scheme string) *HTTPCaller {
 }
 
 // Call makes an HTTP call
-func (c *HTTPCaller) Call(method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
+func (c *HTTPCaller) Call(ctx context.Context, method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
 	if err != nil {
@@ -42,7 +43,7 @@ func (c *HTTPCaller) Call(method, route string, params map[string]string, reqBod
 	buffer := bytes.NewBuffer(reqBody)
 
 	// create a request
-	req, err := http.NewRequest(method, u.String(), buffer)
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), buffer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}

@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -47,9 +48,9 @@ func (compo *Learn) OnMount(ctx app.Context) {
 	}
 
 	compo.lesson = frontend.Lesson{Id: lessonId}
-	compo.hydrateLesson()
+	compo.hydrateLesson(ctx)
 
-	exercisesOfLesson, err := compo.c.FetchExercises(compo.lesson)
+	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 
@@ -70,9 +71,9 @@ func (compo *Learn) OnMount(ctx app.Context) {
 }
 
 // HydrateLesson in go routine
-func (compo *Learn) hydrateLesson() {
+func (compo *Learn) hydrateLesson(ctx context.Context) {
 	go func() {
-		err := compo.c.HydrateLesson(&compo.lesson)
+		err := compo.c.HydrateLesson(ctx, &compo.lesson)
 		if err != nil {
 			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		}
@@ -159,14 +160,14 @@ func (compo *Learn) Render() app.UI {
 			app.Button().
 				Text("⇦ Bad answer").
 				OnClick(func(ctx app.Context, e app.Event) {
-					compo.handleBadAnswer()
+					compo.handleBadAnswer(ctx)
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
 			app.Button().
 				Text("Good answer ⇨").
 				OnClick(func(ctx app.Context, e app.Event) {
-					compo.handleGoodAnswer()
+					compo.handleGoodAnswer(ctx)
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
@@ -191,9 +192,9 @@ func (compo *Learn) bindKeys(ctx app.Context) {
 			case "KeyV", "ArrowUp":
 				compo.handleViewAnswer()
 			case "KeyG", "ArrowRight":
-				compo.handleGoodAnswer()
+				compo.handleGoodAnswer(ctx)
 			case "KeyB", "ArrowLeft":
-				compo.handleBadAnswer()
+				compo.handleBadAnswer(ctx)
 			case "KeyN", "ArrowDown":
 				compo.handleNextExercise()
 			}
@@ -215,10 +216,10 @@ func (compo *Learn) bindKeys(ctx app.Context) {
 // bindSwipes binds swipe events to actions
 func (compo *Learn) bindSwipes(ctx app.Context) {
 	compo.bindSwipe(ctx, "swiped-left", func(ctx app.Context) {
-		compo.handleBadAnswer()
+		compo.handleBadAnswer(ctx)
 	})
 	compo.bindSwipe(ctx, "swiped-right", func(ctx app.Context) {
-		compo.handleGoodAnswer()
+		compo.handleGoodAnswer(ctx)
 	})
 	compo.bindSwipe(ctx, "swiped-up", func(ctx app.Context) {
 		compo.handleNextExercise()
@@ -275,13 +276,13 @@ func (compo *Learn) handleViewAnswer() {
 }
 
 // handleGoodAnswer increments good answers and moves to the next exercise
-func (compo *Learn) handleGoodAnswer() {
+func (compo *Learn) handleGoodAnswer(ctx context.Context) {
 	app.Log("handleGoodAnswer")
 	// copy so go routine will not rely on dynamic compo.exercise
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(frontend.Result{
+		if err := compo.c.StoreResult(ctx, frontend.Result{
 			Exercise: &exCopy,
 			Type:     frontend.Good,
 		}); err != nil {
@@ -294,13 +295,13 @@ func (compo *Learn) handleGoodAnswer() {
 }
 
 // handleBadAnswer increments bad answers and moves to the next exercise
-func (compo *Learn) handleBadAnswer() {
+func (compo *Learn) handleBadAnswer(ctx context.Context) {
 	app.Log("handleBadAnswer")
 	// copy so go routine will not rely on dynamic compo.exercise
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		if err := compo.c.StoreResult(frontend.Result{
+		if err := compo.c.StoreResult(ctx, frontend.Result{
 			Exercise: &exCopy,
 			Type:     frontend.Bad,
 		}); err != nil {

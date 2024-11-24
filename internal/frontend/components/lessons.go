@@ -1,6 +1,7 @@
 package components
 
 import (
+	"context"
 	"fmt"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend"
@@ -34,8 +35,8 @@ func NewLessons(c APIClient) *Lessons {
 }
 
 // The OnMount method is run once component is mounted
-func (compo *Lessons) OnMount(_ app.Context) {
-	compo.displayAllLessons()
+func (compo *Lessons) OnMount(ctx app.Context) {
+	compo.displayAllLessons(ctx)
 }
 
 // The Render method is where the component appearance is defined.
@@ -86,7 +87,7 @@ func (compo *Lessons) handleAddLesson(_ app.Context, e app.Event) {
 }
 
 // handleSave create new or update existing lesson
-func (compo *Lessons) handleSave(_ app.Context, e app.Event) {
+func (compo *Lessons) handleSave(ctx app.Context, e app.Event) {
 	e.PreventDefault()
 
 	var err error
@@ -118,7 +119,7 @@ func (compo *Lessons) handleSave(_ app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save lesson
-	err = compo.c.UpsertLesson(lesson)
+	err = compo.c.UpsertLesson(ctx, lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}
@@ -127,7 +128,7 @@ func (compo *Lessons) handleSave(_ app.Context, e app.Event) {
 	compo.resetForm()
 
 	// refresh lessons list
-	compo.displayAllLessons()
+	compo.displayAllLessons(ctx)
 }
 
 // handleCancel handle cancel button click
@@ -146,8 +147,8 @@ func (compo *Lessons) resetForm() {
 }
 
 // displayAllLessons fetch all lessons and display them
-func (compo *Lessons) displayAllLessons() {
-	lessons, err := compo.c.FetchLessons()
+func (compo *Lessons) displayAllLessons(ctx context.Context) {
+	lessons, err := compo.c.FetchLessons(ctx)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}
