@@ -19,6 +19,8 @@ func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
 }
 
 func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	var exercise backend.Exercise
 
 	err := json.NewDecoder(req.Body).Decode(&exercise)
@@ -54,7 +56,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.UpsertExercise(&exercise)
+	err = h.s.UpsertExercise(ctx, &exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

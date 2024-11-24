@@ -16,7 +16,9 @@ func NewFetchLessonsHandler(s Service) *FetchLessonsHandler {
 }
 
 func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	lessons, err := h.s.FetchLessons()
+	ctx := req.Context()
+
+	lessons, err := h.s.FetchLessons(ctx)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch lessons: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

@@ -12,36 +12,36 @@ func NewService(r Reader, w Writer, p Publisher) *Service {
 	return &Service{r: r, w: w, p: p}
 }
 
-func (s *Service) FetchLessons() (Lessons, error) {
-	return s.r.FetchLessons()
+func (s *Service) FetchLessons(ctx context.Context) (Lessons, error) {
+	return s.r.FetchLessons(ctx)
 }
 
-func (s *Service) HydrateLesson(lesson *Lesson) error {
-	return s.r.HydrateLesson(lesson)
+func (s *Service) HydrateLesson(ctx context.Context, lesson *Lesson) error {
+	return s.r.HydrateLesson(ctx, lesson)
 }
 
-func (s *Service) FetchExercises(lesson Lesson) (Exercises, error) {
-	return s.r.FetchExercises(lesson)
+func (s *Service) FetchExercises(ctx context.Context, lesson Lesson) (Exercises, error) {
+	return s.r.FetchExercises(ctx, lesson)
 }
 
-func (s *Service) UpsertLesson(lesson *Lesson) error {
-	return s.w.UpsertLesson(lesson)
+func (s *Service) UpsertLesson(ctx context.Context, lesson *Lesson) error {
+	return s.w.UpsertLesson(ctx, lesson)
 }
 
-func (s *Service) DeleteLesson(lesson Lesson) error {
-	return s.w.DeleteLesson(lesson)
+func (s *Service) DeleteLesson(ctx context.Context, lesson Lesson) error {
+	return s.w.DeleteLesson(ctx, lesson)
 }
 
-func (s *Service) UpsertExercise(exercise *Exercise) error {
-	return s.w.UpsertExercise(exercise)
+func (s *Service) UpsertExercise(ctx context.Context, exercise *Exercise) error {
+	return s.w.UpsertExercise(ctx, exercise)
 }
 
-func (s *Service) StoreExercises(exercises Exercises) error {
-	return s.w.StoreExercises(exercises)
+func (s *Service) StoreExercises(ctx context.Context, exercises Exercises) error {
+	return s.w.StoreExercises(ctx, exercises)
 }
 
-func (s *Service) DeleteExercise(exercise Exercise) error {
-	return s.w.DeleteExercise(exercise)
+func (s *Service) DeleteExercise(ctx context.Context, exercise Exercise) error {
+	return s.w.DeleteExercise(ctx, exercise)
 }
 
 func (s *Service) PublishGoodAnswer(ctx context.Context, exerciseID int) error {

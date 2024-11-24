@@ -12,18 +12,18 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) FetchLessons() (Lessons, error) {
-	return mock.Called().Get(0).(Lessons), nil
+func (mock *ReaderMock) FetchLessons(ctx context.Context) (Lessons, error) {
+	return mock.Called(ctx).Get(0).(Lessons), nil
 }
 
-func (mock *ReaderMock) HydrateLesson(lesson *Lesson) error {
-	mock.Called(lesson)
+func (mock *ReaderMock) HydrateLesson(ctx context.Context, lesson *Lesson) error {
+	mock.Called(ctx, lesson)
 
 	return nil
 }
 
-func (mock *ReaderMock) FetchExercises(lesson Lesson) (Exercises, error) {
-	return mock.Called(lesson).Get(0).(Exercises), nil
+func (mock *ReaderMock) FetchExercises(ctx context.Context, lesson Lesson) (Exercises, error) {
+	return mock.Called(ctx, lesson).Get(0).(Exercises), nil
 }
 
 type WriterMock struct{ mock.Mock }
@@ -32,32 +32,32 @@ func NewWriterMock() *WriterMock {
 	return &WriterMock{}
 }
 
-func (mock *WriterMock) UpsertLesson(lesson *Lesson) error {
-	mock.Called(lesson)
+func (mock *WriterMock) UpsertLesson(ctx context.Context, lesson *Lesson) error {
+	mock.Called(ctx, lesson)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteLesson(lesson Lesson) error {
-	mock.Called(lesson)
+func (mock *WriterMock) DeleteLesson(ctx context.Context, lesson Lesson) error {
+	mock.Called(ctx, lesson)
 
 	return nil
 }
 
-func (mock *WriterMock) UpsertExercise(exercise *Exercise) error {
-	mock.Called(exercise)
+func (mock *WriterMock) UpsertExercise(ctx context.Context, exercise *Exercise) error {
+	mock.Called(ctx, exercise)
 
 	return nil
 }
 
-func (mock *WriterMock) StoreExercises(exercises Exercises) error {
-	mock.Called(exercises)
+func (mock *WriterMock) StoreExercises(ctx context.Context, exercises Exercises) error {
+	mock.Called(ctx, exercises)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteExercise(exercise Exercise) error {
-	mock.Called(exercise)
+func (mock *WriterMock) DeleteExercise(ctx context.Context, exercise Exercise) error {
+	mock.Called(ctx, exercise)
 
 	return nil
 }

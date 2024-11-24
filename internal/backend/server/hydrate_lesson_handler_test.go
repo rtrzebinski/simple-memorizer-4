@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -14,12 +15,14 @@ import (
 )
 
 func TestHydrateLessonHandler(t *testing.T) {
+	ctx := context.Background()
+
 	lesson := &backend.Lesson{
 		Id: 1,
 	}
 
 	service := NewServiceMock()
-	service.On("HydrateLesson", lesson).Return(nil)
+	service.On("HydrateLesson", ctx, lesson).Return(nil)
 
 	route := NewHydrateLessonHandler(service)
 

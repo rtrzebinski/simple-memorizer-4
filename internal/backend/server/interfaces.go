@@ -7,14 +7,14 @@ import (
 )
 
 type Service interface {
-	FetchLessons() (backend.Lessons, error)
-	HydrateLesson(*backend.Lesson) error
-	FetchExercises(backend.Lesson) (backend.Exercises, error)
-	UpsertLesson(*backend.Lesson) error
-	DeleteLesson(backend.Lesson) error
-	UpsertExercise(*backend.Exercise) error
-	StoreExercises(backend.Exercises) error
-	DeleteExercise(backend.Exercise) error
+	FetchLessons(ctx context.Context) (lessons backend.Lessons, err error)
+	HydrateLesson(ctx context.Context, lesson *backend.Lesson) error
+	FetchExercises(ctx context.Context, lesson backend.Lesson) (backend.Exercises, error)
+	UpsertLesson(ctx context.Context, lesson *backend.Lesson) error
+	DeleteLesson(ctx context.Context, lesson backend.Lesson) error
+	UpsertExercise(ctx context.Context, exercise *backend.Exercise) error
+	StoreExercises(ctx context.Context, exercise backend.Exercises) error
+	DeleteExercise(ctx context.Context, exercise backend.Exercise) error
 	PublishGoodAnswer(ctx context.Context, exerciseID int) error
 	PublishBadAnswer(ctx context.Context, exerciseID int) error
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/guregu/null/v5"
 	"net/http"
@@ -16,6 +17,8 @@ import (
 )
 
 func TestFetchExercisesOfLessonHandler(t *testing.T) {
+	ctx := context.Background()
+
 	exercise := backend.Exercise{
 		Id:                       1,
 		Question:                 "question",
@@ -35,7 +38,7 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 
 	service := NewServiceMock()
 
-	service.On("FetchExercises", backend.Lesson{Id: lessonId}).Return(exercises, nil)
+	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}).Return(exercises, nil)
 
 	route := NewFetchExercisesOfLessonHandler(service)
 

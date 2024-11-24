@@ -19,6 +19,8 @@ func NewStoreExercisesHandler(s Service) *StoreExercisesHandler {
 }
 
 func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	var exercises backend.Exercises
 
 	err := json.NewDecoder(req.Body).Decode(&exercises)
@@ -54,7 +56,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.StoreExercises(exercises)
+	err = h.s.StoreExercises(ctx, exercises)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to store exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

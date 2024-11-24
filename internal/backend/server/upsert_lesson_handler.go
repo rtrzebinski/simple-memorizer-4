@@ -19,6 +19,8 @@ func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
 }
 
 func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	var lesson backend.Lesson
 
 	err := json.NewDecoder(req.Body).Decode(&lesson)
@@ -54,7 +56,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(&lesson)
+	err = h.s.UpsertLesson(ctx, &lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

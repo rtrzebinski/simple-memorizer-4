@@ -18,6 +18,8 @@ func NewDeleteExerciseHandler(s Service) *DeleteExerciseHandler {
 }
 
 func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	var exercise backend.Exercise
 
 	err := json.NewDecoder(req.Body).Decode(&exercise)
@@ -53,7 +55,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.DeleteExercise(exercise)
+	err = h.s.DeleteExercise(ctx, exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

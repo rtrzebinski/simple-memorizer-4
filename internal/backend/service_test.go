@@ -8,37 +8,43 @@ import (
 )
 
 func TestService_FetchLessons(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	expectedLessons := Lessons{}
-	readerMock.On("FetchLessons").Return(expectedLessons, nil)
+	readerMock.On("FetchLessons", ctx).Return(expectedLessons, nil)
 
-	lessons, err := service.FetchLessons()
+	lessons, err := service.FetchLessons(ctx)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedLessons, lessons)
-	readerMock.AssertCalled(t, "FetchLessons")
+	readerMock.AssertExpectations(t)
 }
 
 func TestService_HydrateLesson(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	lesson := &Lesson{}
-	readerMock.On("HydrateLesson", lesson).Return(nil)
+	readerMock.On("HydrateLesson", ctx, lesson).Return(nil)
 
-	err := service.HydrateLesson(lesson)
+	err := service.HydrateLesson(ctx, lesson)
 
 	assert.NoError(t, err)
-	readerMock.AssertCalled(t, "HydrateLesson", lesson)
+	readerMock.AssertExpectations(t)
 }
 
 func TestService_FetchExercises(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
@@ -46,118 +52,130 @@ func TestService_FetchExercises(t *testing.T) {
 
 	lesson := Lesson{}
 	expectedExercises := Exercises{}
-	readerMock.On("FetchExercises", lesson).Return(expectedExercises, nil)
+	readerMock.On("FetchExercises", ctx, lesson).Return(expectedExercises, nil)
 
-	exercises, err := service.FetchExercises(lesson)
+	exercises, err := service.FetchExercises(ctx, lesson)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExercises, exercises)
-	readerMock.AssertCalled(t, "FetchExercises", lesson)
+	readerMock.AssertExpectations(t)
 }
 
 func TestService_UpsertLesson(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	lesson := &Lesson{}
-	writerMock.On("UpsertLesson", lesson).Return(nil)
+	writerMock.On("UpsertLesson", ctx, lesson).Return(nil)
 
-	err := service.UpsertLesson(lesson)
+	err := service.UpsertLesson(ctx, lesson)
 
 	assert.NoError(t, err)
-	writerMock.AssertCalled(t, "UpsertLesson", lesson)
+	writerMock.AssertExpectations(t)
 }
 
 func TestService_DeleteLesson(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	lesson := Lesson{}
-	writerMock.On("DeleteLesson", lesson).Return(nil)
+	writerMock.On("DeleteLesson", ctx, lesson).Return(nil)
 
-	err := service.DeleteLesson(lesson)
+	err := service.DeleteLesson(ctx, lesson)
 
 	assert.NoError(t, err)
-	writerMock.AssertCalled(t, "DeleteLesson", lesson)
+	writerMock.AssertExpectations(t)
 }
 
 func TestService_UpsertExercise(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	exercise := &Exercise{}
-	writerMock.On("UpsertExercise", exercise).Return(nil)
+	writerMock.On("UpsertExercise", ctx, exercise).Return(nil)
 
-	err := service.UpsertExercise(exercise)
+	err := service.UpsertExercise(ctx, exercise)
 
 	assert.NoError(t, err)
-	writerMock.AssertCalled(t, "UpsertExercise", exercise)
+	writerMock.AssertExpectations(t)
 }
 
 func TestService_StoreExercises(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	exercises := Exercises{}
-	writerMock.On("StoreExercises", exercises).Return(nil)
+	writerMock.On("StoreExercises", ctx, exercises).Return(nil)
 
-	err := service.StoreExercises(exercises)
+	err := service.StoreExercises(ctx, exercises)
 
 	assert.NoError(t, err)
-	writerMock.AssertCalled(t, "StoreExercises", exercises)
+	writerMock.AssertExpectations(t)
 }
 
 func TestService_DeleteExercise(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
 	exercise := Exercise{}
-	writerMock.On("DeleteExercise", exercise).Return(nil)
+	writerMock.On("DeleteExercise", ctx, exercise).Return(nil)
 
-	err := service.DeleteExercise(exercise)
+	err := service.DeleteExercise(ctx, exercise)
 
 	assert.NoError(t, err)
-	writerMock.AssertCalled(t, "DeleteExercise", exercise)
+	writerMock.AssertExpectations(t)
 }
 
 func TestService_PublishGoodAnswer(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
-	ctx := context.TODO()
 	exerciseID := 123
 	publisherMock.On("PublishGoodAnswer", ctx, exerciseID).Return(nil)
 
 	err := service.PublishGoodAnswer(ctx, exerciseID)
 
 	assert.NoError(t, err)
-	publisherMock.AssertCalled(t, "PublishGoodAnswer", ctx, exerciseID)
+	publisherMock.AssertExpectations(t)
 }
 
 func TestService_PublishBadAnswer(t *testing.T) {
+	ctx := context.Background()
+
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
 	service := NewService(readerMock, writerMock, publisherMock)
 
-	ctx := context.TODO()
 	exerciseID := 123
 	publisherMock.On("PublishBadAnswer", ctx, exerciseID).Return(nil)
 
 	err := service.PublishBadAnswer(ctx, exerciseID)
 
 	assert.NoError(t, err)
-	publisherMock.AssertCalled(t, "PublishBadAnswer", ctx, exerciseID)
+	publisherMock.AssertExpectations(t)
 }

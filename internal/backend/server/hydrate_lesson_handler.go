@@ -20,6 +20,8 @@ func NewHydrateLessonHandler(s Service) *HydrateLessonHandler {
 }
 
 func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
@@ -53,7 +55,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 	lesson := &backend.Lesson{Id: lessonId}
 
-	err = h.s.HydrateLesson(lesson)
+	err = h.s.HydrateLesson(ctx, lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate a lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

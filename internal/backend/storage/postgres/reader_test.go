@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func (suite *PostgresSuite) TestReader_FetchLessons() {
 
 	createExercise(db, &Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchLessons()
+	res, err := r.FetchLessons(context.Background())
 
 	assert.NoError(suite.T(), err)
 	assert.IsType(suite.T(), backend.Lessons{}, res)
@@ -40,7 +41,7 @@ func (suite *PostgresSuite) TestReader_HydrateLesson() {
 		Id: l.Id,
 	}
 
-	err := r.HydrateLesson(lesson)
+	err := r.HydrateLesson(context.Background(), lesson)
 
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), l.Name, lesson.Name)
@@ -50,7 +51,7 @@ func (suite *PostgresSuite) TestReader_HydrateLesson() {
 	createExercise(db, &Exercise{LessonId: l.Id})
 	createExercise(db, &Exercise{LessonId: l.Id})
 
-	err = r.HydrateLesson(lesson)
+	err = r.HydrateLesson(context.Background(), lesson)
 
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), l.Name, lesson.Name)
@@ -78,7 +79,7 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 	exercise2 := &Exercise{LessonId: exercise1.LessonId}
 	createExercise(db, exercise2)
 
-	res, err := r.FetchExercises(backend.Lesson{Id: exercise1.LessonId})
+	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId})
 
 	assert.NoError(suite.T(), err)
 	assert.IsType(suite.T(), backend.Exercises{}, res)

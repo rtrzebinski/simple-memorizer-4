@@ -3,17 +3,17 @@ package backend
 import "context"
 
 type Reader interface {
-	FetchLessons() (Lessons, error)
-	HydrateLesson(*Lesson) error
-	FetchExercises(Lesson) (Exercises, error)
+	FetchLessons(ctx context.Context) (Lessons, error)
+	HydrateLesson(ctx context.Context, lesson *Lesson) error
+	FetchExercises(ctx context.Context, lesson Lesson) (Exercises, error)
 }
 
 type Writer interface {
-	UpsertLesson(*Lesson) error
-	DeleteLesson(Lesson) error
-	UpsertExercise(*Exercise) error
-	StoreExercises(Exercises) error
-	DeleteExercise(Exercise) error
+	UpsertLesson(ctx context.Context, lesson *Lesson) error
+	DeleteLesson(ctx context.Context, lesson Lesson) error
+	UpsertExercise(ctx context.Context, exercise *Exercise) error
+	StoreExercises(ctx context.Context, exercise Exercises) error
+	DeleteExercise(ctx context.Context, exercise Exercise) error
 }
 
 type Publisher interface {

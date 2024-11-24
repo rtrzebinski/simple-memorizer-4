@@ -19,10 +19,9 @@ func NewStoreResultHandler(s Service) *StoreResultHandler {
 }
 
 func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	var result backend.Result
-
-	// Derive ctx from the request context
 	ctx := req.Context()
+
+	var result backend.Result
 
 	err := json.NewDecoder(req.Body).Decode(&result)
 	if err != nil {

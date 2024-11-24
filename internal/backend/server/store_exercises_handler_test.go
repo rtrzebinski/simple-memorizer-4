@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 )
 
 func TestStoreExercises(t *testing.T) {
+	ctx := context.Background()
+
 	input := backend.Exercises{
 		backend.Exercise{
 			Question: "question",
@@ -27,7 +30,7 @@ func TestStoreExercises(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("StoreExercises", input).Return(nil)
+	service.On("StoreExercises", ctx, input).Return(nil)
 
 	route := NewStoreExercisesHandler(service)
 

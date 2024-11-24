@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 )
 
 func TestUpsertLessonHandler(t *testing.T) {
+	ctx := context.Background()
+
 	input := backend.Lesson{
 		Name:        "name",
 		Description: "description",
@@ -25,7 +28,7 @@ func TestUpsertLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", &input).Return(nil)
+	service.On("UpsertLesson", ctx, &input).Return(nil)
 
 	route := NewUpsertLessonHandler(service)
 

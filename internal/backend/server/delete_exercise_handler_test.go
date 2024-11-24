@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -14,6 +15,8 @@ import (
 )
 
 func TestDeleteExerciseHandler(t *testing.T) {
+	ctx := context.Background()
+
 	input := backend.Exercise{
 		Id: 123,
 	}
@@ -24,7 +27,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", input).Return(nil)
+	service.On("DeleteExercise", ctx, input).Return(nil)
 
 	route := NewDeleteExerciseHandler(service)
 

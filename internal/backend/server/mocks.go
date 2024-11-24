@@ -15,43 +15,43 @@ func NewServiceMock() *ServiceMock {
 	return &ServiceMock{}
 }
 
-func (m *ServiceMock) FetchLessons() (backend.Lessons, error) {
-	args := m.Called()
+func (m *ServiceMock) FetchLessons(ctx context.Context) (backend.Lessons, error) {
+	args := m.Called(ctx)
 	return args.Get(0).(backend.Lessons), args.Error(1)
 }
 
-func (m *ServiceMock) HydrateLesson(lesson *backend.Lesson) error {
-	args := m.Called(lesson)
+func (m *ServiceMock) HydrateLesson(ctx context.Context, lesson *backend.Lesson) error {
+	args := m.Called(ctx, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
-	args := m.Called(lesson)
+func (m *ServiceMock) FetchExercises(ctx context.Context, lesson backend.Lesson) (backend.Exercises, error) {
+	args := m.Called(ctx, lesson)
 	return args.Get(0).(backend.Exercises), args.Error(1)
 }
 
-func (m *ServiceMock) UpsertLesson(lesson *backend.Lesson) error {
-	args := m.Called(lesson)
+func (m *ServiceMock) UpsertLesson(ctx context.Context, lesson *backend.Lesson) error {
+	args := m.Called(ctx, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) DeleteLesson(lesson backend.Lesson) error {
-	args := m.Called(lesson)
+func (m *ServiceMock) DeleteLesson(ctx context.Context, lesson backend.Lesson) error {
+	args := m.Called(ctx, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) UpsertExercise(exercise *backend.Exercise) error {
-	args := m.Called(exercise)
+func (m *ServiceMock) UpsertExercise(ctx context.Context, exercise *backend.Exercise) error {
+	args := m.Called(ctx, exercise)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) StoreExercises(exercises backend.Exercises) error {
-	args := m.Called(exercises)
+func (m *ServiceMock) StoreExercises(ctx context.Context, exercises backend.Exercises) error {
+	args := m.Called(ctx, exercises)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) DeleteExercise(exercise backend.Exercise) error {
-	args := m.Called(exercise)
+func (m *ServiceMock) DeleteExercise(ctx context.Context, exercise backend.Exercise) error {
+	args := m.Called(ctx, exercise)
 	return args.Error(0)
 }
 

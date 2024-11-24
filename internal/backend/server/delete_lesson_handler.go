@@ -19,6 +19,8 @@ func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
 }
 
 func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	var lesson backend.Lesson
 
 	err := json.NewDecoder(req.Body).Decode(&lesson)
@@ -54,7 +56,7 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.DeleteLesson(lesson)
+	err = h.s.DeleteLesson(ctx, lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
@@ -14,7 +15,7 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) FetchLessons() (backend.Lessons, error) {
+func (r *Reader) FetchLessons(ctx context.Context) (backend.Lessons, error) {
 	var lessons backend.Lessons
 
 	const query = `
@@ -25,7 +26,7 @@ func (r *Reader) FetchLessons() (backend.Lessons, error) {
 		ORDER BY l.id, l.name, description DESC
 		`
 
-	rows, err := r.db.Query(query)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return lessons, err
 	}
@@ -44,7 +45,7 @@ func (r *Reader) FetchLessons() (backend.Lessons, error) {
 	return lessons, nil
 }
 
-func (r *Reader) HydrateLesson(lesson *backend.Lesson) error {
+func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson) error {
 	query := `
 		SELECT name, description, count(e.id) AS exercise_count
 		FROM lesson l
@@ -53,14 +54,14 @@ func (r *Reader) HydrateLesson(lesson *backend.Lesson) error {
 		GROUP BY name, description
 	`
 
-	if err := r.db.QueryRow(query, lesson.Id).Scan(&lesson.Name, &lesson.Description, &lesson.ExerciseCount); err != nil {
+	if err := r.db.QueryRowContext(ctx, query, lesson.Id).Scan(&lesson.Name, &lesson.Description, &lesson.ExerciseCount); err != nil {
 		return fmt.Errorf("failed to execute 'SELECT FROM lesson' query: %w", err)
 	}
 
 	return nil
 }
 
-func (r *Reader) FetchExercises(lesson backend.Lesson) (backend.Exercises, error) {
+func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson) (backend.Exercises, error) {
 	const query = `
 SELECT e.id, e.question, e.answer,
        e.bad_answers, e.bad_answers_today, e.latest_bad_answer, e.latest_bad_answer_was_today,
@@ -70,7 +71,7 @@ WHERE lesson_id = $1
 ORDER BY e.id DESC
 `
 
-	rows, err := r.db.Query(query, lesson.Id)
+	rows, err := r.db.QueryContext(ctx, query, lesson.Id)
 	if err != nil {
 		return nil, err
 	}

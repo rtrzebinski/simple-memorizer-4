@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,11 +12,13 @@ import (
 )
 
 func TestFetchLessonsHandler(t *testing.T) {
+	ctx := context.Background()
+
 	lesson := backend.Lesson{}
 	lessons := backend.Lessons{lesson}
 
 	service := NewServiceMock()
-	service.On("FetchLessons").Return(lessons, nil)
+	service.On("FetchLessons", ctx).Return(lessons, nil)
 
 	route := NewFetchLessonsHandler(service)
 

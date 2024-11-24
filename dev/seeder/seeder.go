@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
@@ -85,12 +86,14 @@ func seed(s Seeder, seedMethodName string) {
 }
 
 func (s Seeder) CapitalsSeed() {
+	ctx := context.Background()
+
 	lesson := backend.Lesson{
 		Name:        "Capitals",
 		Description: "What is the capital of given country?",
 	}
 
-	err := s.backendWriter.UpsertLesson(&lesson)
+	err := s.backendWriter.UpsertLesson(ctx, &lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +127,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.backendWriter.UpsertExercise(&exercise)
+		err := s.backendWriter.UpsertExercise(ctx, &exercise)
 		if err != nil {
 			panic(err)
 		}
@@ -132,6 +135,8 @@ func (s Seeder) CapitalsSeed() {
 }
 
 func (s Seeder) LargeLessonSeed() {
+	ctx := context.Background()
+
 	exercisesCount := 100
 	answersCount := 100
 
@@ -140,7 +145,7 @@ func (s Seeder) LargeLessonSeed() {
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err := s.backendWriter.UpsertLesson(&lesson)
+	err := s.backendWriter.UpsertLesson(ctx, &lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -156,7 +161,7 @@ func (s Seeder) LargeLessonSeed() {
 	}
 
 	for k := range exercises {
-		err := s.backendWriter.UpsertExercise(&exercises[k])
+		err := s.backendWriter.UpsertExercise(ctx, &exercises[k])
 		if err != nil {
 			panic(err)
 		}

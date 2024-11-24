@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 		Description: "description",
 	}
 
-	err := w.UpsertLesson(&lesson)
+	err := w.UpsertLesson(context.Background(), &lesson)
 	assert.NoError(suite.T(), err)
 
 	stored := fetchLatestLesson(db)
@@ -33,7 +34,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 	lesson := &Lesson{}
 	createLesson(db, lesson)
 
-	err := w.UpsertLesson(&backend.Lesson{
+	err := w.UpsertLesson(context.Background(), &backend.Lesson{
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
@@ -59,7 +60,7 @@ func (suite *PostgresSuite) TestWriter_DeleteLesson() {
 	})
 	another := fetchLatestLesson(db)
 
-	err := w.DeleteLesson(backend.Lesson{Id: stored.Id})
+	err := w.DeleteLesson(context.Background(), backend.Lesson{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
 	assert.Nil(suite.T(), findLessonById(db, stored.Id))
@@ -82,7 +83,7 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 		Answer:   "answer",
 	}
 
-	err := w.UpsertExercise(&exercise)
+	err := w.UpsertExercise(context.Background(), &exercise)
 	assert.NoError(suite.T(), err)
 
 	stored := fetchLatestExercise(db)
@@ -104,7 +105,7 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 	exercise := Exercise{LessonId: lesson.Id}
 	createExercise(db, &exercise)
 
-	err := w.UpsertExercise(&backend.Exercise{
+	err := w.UpsertExercise(context.Background(), &backend.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",
@@ -153,7 +154,7 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 
 	exercises := backend.Exercises{exercise1, exercise2}
 
-	err := w.StoreExercises(exercises)
+	err := w.StoreExercises(context.Background(), exercises)
 	assert.NoError(suite.T(), err)
 
 	ex1 := findExerciseById(db, 1)
@@ -189,7 +190,7 @@ func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 	})
 	another := fetchLatestExercise(db)
 
-	err := w.DeleteExercise(backend.Exercise{Id: stored.Id})
+	err := w.DeleteExercise(context.Background(), backend.Exercise{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
 	assert.Nil(suite.T(), findExerciseById(db, stored.Id))
