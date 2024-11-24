@@ -54,18 +54,16 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "web")
-
-	if err := run(ctx, logger); err != nil {
-		logger.Error(err.Error())
+	if err := run(ctx); err != nil {
+		slog.Error(err.Error())
 	}
 }
 
 // The main function is the entry point where the app is configured and started.
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
-func run(ctx context.Context, logger *slog.Logger) error {
-	logger.Info("application starting")
+func run(ctx context.Context) error {
+	slog.Info("application starting", "service", "web")
 
 	u := app.Window().URL()
 
@@ -110,9 +108,10 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	if scanner.Scan() {
 		version = scanner.Text()
-		logger.Info("version", "version", version)
+		slog.Info("version", "version", version, "service", "web")
+
 	} else {
-		logger.Info("version unknown")
+		slog.Info("version unknown", "service", "web")
 	}
 
 	// Handle home page
@@ -172,7 +171,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	service := backend.NewService(reader, writer, publisher)
 
 	go func() {
-		logger.Info("initializing server", "port", cfg.Web.Port)
+		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
 		serverErrors <- server.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
 	}()
 
@@ -184,11 +183,11 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		logger.Info("initializing probe server", "addr", cfg.ProbeAddr)
+		slog.Info("initializing probe server", "addr", cfg.ProbeAddr, "service", "web")
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	logger.Info("application running")
+	slog.Info("application running", "service", "web")
 
 	// =========================================
 	// Blocking main and waiting for shutdown.
@@ -200,7 +199,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
 	case <-done.Done():
-		logger.Info("start shutdown")
+		slog.Info("start shutdown", "service", "web")
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
@@ -216,7 +215,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		}
 	}
 
-	logger.Info("application completed")
+	slog.Info("application completed", "service", "web")
 
 	return nil
 }

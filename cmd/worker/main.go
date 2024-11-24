@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -42,15 +41,13 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil)).With("service", "worker")
-
-	if err := run(ctx, logger); err != nil {
-		logger.Error(err.Error())
+	if err := run(ctx); err != nil {
+		slog.Error(err.Error())
 	}
 }
 
-func run(ctx context.Context, logger *slog.Logger) error {
-	logger.Info("application starting")
+func run(ctx context.Context) error {
+	slog.Info("application starting", "service", "worker")
 
 	// Configuration
 	var cfg config
@@ -93,7 +90,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	// Start CloudEvents receiver and send errors to the channel
 	go func() {
-		logger.Info("initializing CloudEvents receiver")
+		slog.Info("initializing CloudEvents receiver", "service", "worker")
 		serverErrors <- ceClient.StartReceiver(ctx, receiver)
 	}()
 
@@ -105,11 +102,11 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		logger.Info("initializing probe server", "addr", cfg.ProbeAddr)
+		slog.Info("initializing probe server", "addr", cfg.ProbeAddr, "service", "worker")
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	logger.Info("application running")
+	slog.Info("application running", "service", "worker")
 
 	// =========================================
 	// Blocking main and waiting for shutdown.
@@ -121,7 +118,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
 	case <-done.Done():
-		logger.Info("start shutdown")
+		slog.Info("start shutdown", "service", "worker")
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
@@ -137,7 +134,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		}
 	}
 
-	logger.Info("application completed")
+	slog.Info("application completed", "service", "worker")
 
 	return nil
 }
