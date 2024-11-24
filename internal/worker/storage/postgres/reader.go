@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
 )
@@ -13,10 +14,10 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) FetchResults(exerciseID int) ([]worker.Result, error) {
+func (r *Reader) FetchResults(ctx context.Context, exerciseID int) ([]worker.Result, error) {
 	const query = `SELECT id, type, exercise_id, created_at FROM result WHERE exercise_id = $1;`
 
-	rows, err := r.db.Query(query, exerciseID)
+	rows, err := r.db.QueryContext(ctx, query, exerciseID)
 	if err != nil {
 		return nil, err
 	}

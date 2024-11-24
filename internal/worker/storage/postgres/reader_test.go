@@ -1,11 +1,14 @@
 package postgres
 
 import (
+	"context"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
 	"time"
 )
 
 func (suite *PostgresSuite) TestReader_FetchResults() {
+	ctx := context.Background()
+
 	db := suite.db
 
 	r := NewReader(db)
@@ -18,7 +21,7 @@ func (suite *PostgresSuite) TestReader_FetchResults() {
 		ExerciseId: exercise.Id,
 	})
 
-	results, err := r.FetchResults(exercise.Id)
+	results, err := r.FetchResults(ctx, exercise.Id)
 	suite.NoError(err)
 	suite.Len(results, 1)
 	suite.Equal(1, results[0].Id)

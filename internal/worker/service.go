@@ -47,20 +47,20 @@ func (s *Service) ProcessBadAnswer(ctx context.Context, exerciseID int) error {
 	return nil
 }
 
-func (s *Service) processAnswer(_ context.Context, result Result) error {
-	err := s.w.StoreResult(result)
+func (s *Service) processAnswer(ctx context.Context, result Result) error {
+	err := s.w.StoreResult(ctx, result)
 	if err != nil {
 		return fmt.Errorf("store result: %w", err)
 	}
 
-	results, err := s.r.FetchResults(result.ExerciseId)
+	results, err := s.r.FetchResults(ctx, result.ExerciseId)
 	if err != nil {
 		return fmt.Errorf("fetch results: %w", err)
 	}
 
 	projection := s.pb.Projection(results)
 
-	err = s.w.UpdateExerciseProjection(result.ExerciseId, projection)
+	err = s.w.UpdateExerciseProjection(ctx, result.ExerciseId, projection)
 	if err != nil {
 		return fmt.Errorf("update exercise projection: %w", err)
 	}

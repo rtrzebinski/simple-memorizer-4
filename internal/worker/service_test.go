@@ -27,6 +27,8 @@ func TestServiceSuite(t *testing.T) {
 }
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
+	ctx := context.Background()
+
 	exerciseID := 1
 	result := Result{
 		Type:       Good,
@@ -44,12 +46,12 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 		GoodAnswers: 1,
 	}
 
-	suite.w.On("StoreResult", result).Return(nil)
-	suite.r.On("FetchResults", exerciseID).Return(results, nil)
+	suite.w.On("StoreResult", ctx, result).Return(nil)
+	suite.r.On("FetchResults", ctx, exerciseID).Return(results, nil)
 	suite.pb.On("Projection", results).Return(projection)
-	suite.w.On("UpdateExerciseProjection", exerciseID, projection).Return(nil)
+	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, projection).Return(nil)
 
-	err := suite.service.ProcessGoodAnswer(context.Background(), exerciseID)
+	err := suite.service.ProcessGoodAnswer(ctx, exerciseID)
 
 	suite.NoError(err)
 	suite.r.AssertExpectations(suite.T())
@@ -58,15 +60,17 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
+	ctx := context.Background()
+
 	exerciseID := 1
 	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
 
-	suite.w.On("StoreResult", result).Return(errors.New("database error"))
+	suite.w.On("StoreResult", ctx, result).Return(errors.New("database error"))
 
-	err := suite.service.ProcessGoodAnswer(context.Background(), exerciseID)
+	err := suite.service.ProcessGoodAnswer(ctx, exerciseID)
 
 	suite.Error(err)
 	suite.Contains(err.Error(), "database error")
@@ -76,6 +80,8 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
+	ctx := context.Background()
+
 	exerciseID := 2
 	result := Result{
 		Type:       Bad,
@@ -93,12 +99,12 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 		BadAnswers: 1,
 	}
 
-	suite.w.On("StoreResult", result).Return(nil)
-	suite.r.On("FetchResults", exerciseID).Return(results, nil)
+	suite.w.On("StoreResult", ctx, result).Return(nil)
+	suite.r.On("FetchResults", ctx, exerciseID).Return(results, nil)
 	suite.pb.On("Projection", results).Return(projection)
-	suite.w.On("UpdateExerciseProjection", exerciseID, projection).Return(nil)
+	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, projection).Return(nil)
 
-	err := suite.service.ProcessBadAnswer(context.Background(), exerciseID)
+	err := suite.service.ProcessBadAnswer(ctx, exerciseID)
 
 	suite.NoError(err)
 	suite.r.AssertExpectations(suite.T())
@@ -107,15 +113,17 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Error() {
+	ctx := context.Background()
+
 	exerciseID := 2
 	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
 
-	suite.w.On("StoreResult", result).Return(errors.New("database error"))
+	suite.w.On("StoreResult", ctx, result).Return(errors.New("database error"))
 
-	err := suite.service.ProcessBadAnswer(context.Background(), exerciseID)
+	err := suite.service.ProcessBadAnswer(ctx, exerciseID)
 
 	suite.Error(err)
 	suite.Contains(err.Error(), "database error")

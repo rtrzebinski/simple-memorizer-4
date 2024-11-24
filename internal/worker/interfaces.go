@@ -1,12 +1,14 @@
 package worker
 
+import "context"
+
 type Reader interface {
-	FetchResults(exerciseID int) ([]Result, error)
+	FetchResults(ctx context.Context, exerciseID int) ([]Result, error)
 }
 
 type Writer interface {
-	StoreResult(Result) error
-	UpdateExerciseProjection(exerciseID int, projection ResultsProjection) error
+	StoreResult(ctx context.Context, result Result) error
+	UpdateExerciseProjection(ctx context.Context, exerciseID int, projection ResultsProjection) error
 }
 
 type ProjectionBuilder interface {

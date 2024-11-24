@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"time"
 
 	"github.com/guregu/null/v5"
@@ -9,6 +10,8 @@ import (
 )
 
 func (suite *PostgresSuite) TestWriter_StoreAnswer() {
+	ctx := context.Background()
+
 	db := suite.db
 
 	w := NewWriter(db)
@@ -21,7 +24,7 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 		ExerciseId: exercise.Id,
 	}
 
-	err := w.StoreResult(result)
+	err := w.StoreResult(ctx, result)
 	assert.NoError(suite.T(), err)
 
 	stored := fetchLatestResult(db)
@@ -31,6 +34,8 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 }
 
 func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections() {
+	ctx := context.Background()
+
 	db := suite.db
 
 	w := NewWriter(db)
@@ -49,7 +54,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections()
 		LatestGoodAnswerWasToday: true,
 	}
 
-	err := w.UpdateExerciseProjection(exercise.Id, projection)
+	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
 	stored := findExerciseById(db, exercise.Id)
@@ -65,6 +70,8 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections()
 }
 
 func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
+	ctx := context.Background()
+
 	db := suite.db
 
 	w := NewWriter(db)
@@ -79,7 +86,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 		LatestBadAnswerWasToday: true,
 	}
 
-	err := w.UpdateExerciseProjection(exercise.Id, projection)
+	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
 	stored := findExerciseById(db, exercise.Id)
@@ -95,6 +102,8 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 }
 
 func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
+	ctx := context.Background()
+
 	db := suite.db
 
 	w := NewWriter(db)
@@ -109,7 +118,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
 		LatestGoodAnswerWasToday: true,
 	}
 
-	err := w.UpdateExerciseProjection(exercise.Id, projection)
+	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
 	stored := findExerciseById(db, exercise.Id)

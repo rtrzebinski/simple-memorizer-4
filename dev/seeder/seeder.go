@@ -182,7 +182,7 @@ func (s Seeder) LargeLessonSeed() {
 				r.Type = worker.Bad
 			}
 
-			err := s.workerWriter.StoreResult(r)
+			err := s.workerWriter.StoreResult(ctx, r)
 			if err != nil {
 				panic(err)
 			}
