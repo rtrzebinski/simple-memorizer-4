@@ -48,7 +48,7 @@ dev: ## Prepare local dev environment (stop + start + migrate + seed)
 
 pubsub: ## Create PubSub topic and subscription
 	@echo "$(OK_COLOR)==> Setting up PubSub...$(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run ./dev/pubsub/pubsub.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run ./dev/pubsub/pubsub.go
 
 start: ## Start docker-compose containers
 	@echo "$(OK_COLOR)==> Bringing containers up for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -103,15 +103,15 @@ build: ## Build client and server
 run: ## Build and run locally
 	@make build
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/worker/main.go & wait
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go & wait
 
 run-web: ## Build and run web locally
 	@make build
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/web/main.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go
 
 run-worker: ## Build and run worker locally
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8085 go run cmd/worker/main.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go
 
 proto: ## Generate protobuf files
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"

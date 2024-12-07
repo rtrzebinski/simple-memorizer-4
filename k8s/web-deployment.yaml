@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sm4-web
-          image: rtrzebinski/sm4:latest
+          image: rtrzebinski/sm4-web:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

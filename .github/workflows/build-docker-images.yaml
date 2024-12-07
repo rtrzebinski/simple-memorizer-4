@@ -1,6 +1,6 @@
-name: Build image and push to Docker Hub
+name: Build Docker Images
 
-concurrency: build-image-and-push-to-docker-hub
+concurrency: build-docker-images
 
 on:
   workflow_run:
@@ -10,7 +10,7 @@ on:
       - completed
 
 jobs:
-  push_to_registry:
+  build_web_image:
     if: github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -27,13 +27,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: rtrzebinski/sm4
+          images: rtrzebinski/sm4-web
 
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile-web
           push: true
-          tags: rtrzebinski/sm4:latest
+          tags: rtrzebinski/sm4-web:latest
           labels: ${{ steps.meta.outputs.labels }}

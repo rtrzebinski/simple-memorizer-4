@@ -23,7 +23,7 @@ spec:
               memory: 16Mi
       containers:
         - name: migrate
-          image: rtrzebinski/sm4:latest
+          image: rtrzebinski/sm4-web:latest
           args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable", "up" ]
           resources:
             limits:
