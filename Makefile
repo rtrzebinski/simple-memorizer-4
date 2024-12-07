@@ -162,6 +162,7 @@ k8s-reset: ## Kubernetes stop and start
 
 k8s-rollout: ## Kubernetes rollout (Docker hub tag 'latest' image)
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-web
+	@kubectl -n sm4 rollout restart deployment.apps/sm4-worker
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-logs-web: ## Kubernetes web logs
