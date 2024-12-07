@@ -139,8 +139,9 @@ k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@kubectx docker-desktop
 	@kubectl create namespace sm4
 	@mkdir -p $(HOME)/sm4-db
-	@kubectl -n sm4 apply -f k8s/web-deployment.yaml
 	@kubectl -n sm4 apply -f k8s/pubsub-deployment.yaml
+	@kubectl -n sm4 apply -f k8s/web-deployment.yaml
+	@kubectl -n sm4 apply -f k8s/worker-deployment.yaml
 	@envsubst < k8s/db-deployment.yaml | kubectl -n sm4 apply -f -
 	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
 	@mkdir -p $(HOME)/sm4-db-backup

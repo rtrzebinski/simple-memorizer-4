@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm4-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sm4-worker
+  template:
+    metadata:
+      labels:
+        app: sm4-worker
+    spec:
+      containers:
+        - name: sm4-worker
+          image: rtrzebinski/sm4-worker:latest
+          imagePullPolicy: Always
+          env:
+            - name: DB_DSN
+              value: "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable"
+            - name: PUBSUB_EMULATOR_HOST
+              value: "sm4-pubsub:8085"
+            - name: PUBSUB_PROJECT_ID
+              value: "sm4-project"
+            - name: PUBSUB_TOPIC_ID
+              value: "sm4-topic"
+            - name: PUBSUB_SUBSCRIPTION_IDS
+              value: "sm4-subscription"
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9091
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9091
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 16Mi
