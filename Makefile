@@ -93,25 +93,28 @@ db: ## Db CLI client connection
 	@echo "$(OK_COLOR)==> Connecting to the db of $(SERVICE_NAME)... $(NO_COLOR)"
 	@PGPASSWORD=postgres PGTZ="$(TIMEZONE)" psql -U postgres -d postgres --port 5430 --host localhost
 
-build: ## Build client and server
+build-web: ## Build client and server
 	@echo "$(OK_COLOR)==> Building client and server for $(SERVICE_NAME)... $(NO_COLOR)"
 	@GOARCH=wasm GOOS=js go build -o web/app.wasm github.com/rtrzebinski/simple-memorizer-4/cmd/web
-	@go build -o bin/simple-memorizer github.com/rtrzebinski/simple-memorizer-4/cmd/web
+	@go build -o bin/sm4-web github.com/rtrzebinski/simple-memorizer-4/cmd/web
 	@date > version
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
 
-run: ## Build and run locally
-	@make build
-	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go & wait
-
 run-web: ## Build and run web locally
-	@make build
+	@make build-web
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
 	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go
 
+build-worker: ## Build and run worker locally
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go build -o bin/sm4-worker github.com/rtrzebinski/simple-memorizer-4/cmd/worker
+
 run-worker: ## Build and run worker locally
 	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go
+
+run: ## Build and run all services locally
+	@make build-web
+	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go & wait
 
 proto: ## Generate protobuf files
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"

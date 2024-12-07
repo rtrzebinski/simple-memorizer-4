@@ -10,7 +10,7 @@ COPY ./ ./
 RUN apk add --update --no-cache git make
 
 # Build the application
-RUN make build
+RUN make build-web
 
 # Install the migrate tool
 RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
@@ -21,7 +21,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # Copy files
-COPY --from=builder /app/bin/simple-memorizer ./
+COPY --from=builder /app/bin/sm4-web ./
 COPY --from=builder /app/web ./web
 COPY --from=builder /go/bin/migrate ./migrate
 COPY --from=builder /app/migrations ./migrations
@@ -39,4 +39,4 @@ ENV PATH="/app:${PATH}"
 EXPOSE 8000
 
 # Start the application
-CMD ["./simple-memorizer"]
+CMD ["./sm4-web"]
