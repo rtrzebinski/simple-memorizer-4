@@ -21,6 +21,12 @@ spec:
           env:
             - name: DB_DSN
               value: "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable"
+            - name: PUBSUB_EMULATOR_HOST
+              value: "sm4-pubsub:8085"
+            - name: PUBSUB_PROJECT_ID
+              value: "sm4-project"
+            - name: PUBSUB_TOPIC_ID
+              value: "sm4-topic"
           readinessProbe:
             httpGet:
               path: /readyz

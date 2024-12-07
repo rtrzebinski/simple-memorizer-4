@@ -133,9 +133,11 @@ go-deps-update: ## Update GO dependencies
 	@go vet ./...
 
 k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
+	@kubectx docker-desktop
 	@kubectl create namespace sm4
 	@mkdir -p $(HOME)/sm4-db
 	@kubectl -n sm4 apply -f k8s/web-deployment.yaml
+	@kubectl -n sm4 apply -f k8s/pubsub-deployment.yaml
 	@envsubst < k8s/db-deployment.yaml | kubectl -n sm4 apply -f -
 	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
 	@mkdir -p $(HOME)/sm4-db-backup
@@ -169,6 +171,3 @@ k8s-db: ## Kubernetes db cli
 
 k8s-db-migrate: ## Kubernetes db migrate
 	@kubectl -n sm4 apply -f k8s/db-migration-job.yaml
-
-k8s-db-seed: ## Kubernetes db seed
-	@kubectl -n sm4 exec deployment.apps/sm4-web -- make seed

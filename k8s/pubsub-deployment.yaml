@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm4-pubsub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm4-pubsub
+  template:
+    metadata:
+      labels:
+        app: sm4-pubsub
+    spec:
+      containers:
+        - name: sm4-pubsub
+          image: google/cloud-sdk:404.0.0-emulators
+          ports:
+            - containerPort: 8085
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 256Mi
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >
+              gcloud beta emulators pubsub start --host-port 0.0.0.0:8085 &
+              until curl -s http://0.0.0.0:8085/v1/projects/sm4-project; do echo "Waiting for Pub/Sub emulator..."; sleep 5; done &&
+              echo "Pub/Sub emulator is up, creating topic and subscription..." &&
+              curl -s -X PUT http://0.0.0.0:8085/v1/projects/sm4-project/topics/sm4-topic &&
+              curl -s -X PUT http://0.0.0.0:8085/v1/projects/sm4-project/subscriptions/sm4-subscription \
+                -H "Content-Type: application/json" \
+                -d '{"topic": "projects/sm4-project/topics/sm4-topic", "ackDeadlineSeconds": 10}' &&
+              tail -f /dev/null
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm4-pubsub
+spec:
+  ports:
+    - port: 8085
+      targetPort: 8085
+  selector:
+    app: sm4-pubsub
