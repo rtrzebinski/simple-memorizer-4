@@ -120,7 +120,7 @@ proto: ## Generate protobuf files
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"
 	@protoc --go_out=./generated --go_opt=paths=source_relative proto/events/*.proto
 
-test: ## Test all
+test: ## Test all (unit + integration)
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go test -failfast -race -covermode=atomic -coverprofile=coverage.out -ldflags=-extldflags=-Wl,-ld_classic ./...
 	@echo "$(OK_COLOR)==> Completed $(NO_COLOR)"
