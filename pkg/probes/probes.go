@@ -25,7 +25,7 @@ func Healthz(w http.ResponseWriter, _ *http.Request) {
 // Readyz is a readiness probe.
 func Readyz(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, _ *http.Request) {
-		if db.Ping() != nil {
+		if db != nil && db.Ping() != nil {
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 
 			return
