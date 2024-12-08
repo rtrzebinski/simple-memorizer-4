@@ -103,18 +103,19 @@ build-web: ## Build web (client and server)
 run-web: ## Build and run web locally
 	@make build-web
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 ./bin/sm4-web
 
 build-worker: ## Build worker
+	@date > version
 	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go build -o bin/sm4-worker github.com/rtrzebinski/simple-memorizer-4/cmd/worker
 
 run-worker: ## Run worker locally
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go
+	@make build-worker
+	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 ./bin/sm4-worker
 
 run: ## Build and run all services locally
-	@make build-web
 	@echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)"
-	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/web/main.go & PUBSUB_EMULATOR_HOST=0.0.0.0:8088 go run cmd/worker/main.go & wait
+	@make run-web & make run-worker & wait
 
 proto: ## Generate protobuf files
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"

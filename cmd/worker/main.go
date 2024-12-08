@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
 	"strings"
 	"time"
 
@@ -48,6 +50,26 @@ func main() {
 
 func run(ctx context.Context) error {
 	slog.Info("application starting", "service", "worker")
+
+	// Version
+	file, err := os.Open("version")
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var version string
+
+	if scanner.Scan() {
+		version = scanner.Text()
+		slog.Info("version", "version", version, "service", "worker")
+
+	} else {
+		slog.Info("version unknown", "service", "worker")
+	}
 
 	// Configuration
 	var cfg config
