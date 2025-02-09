@@ -32,7 +32,7 @@ deps: ## Install local environment dependencies
 	@brew install protobuf
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
-dev: ## Prepare local dev environment (stop + start + migrate + seed)
+dev: ## Prepare local dev environment (stop + start + migrate + seed) [run "make deps" first]
 	@echo "$(OK_COLOR)==> Preparing dev environment for $(SERVICE_NAME)... $(NO_COLOR)"
 	@make stop
 	@make start
@@ -68,15 +68,15 @@ destroy: ## Stop containers and remove volumes
 	@echo "$(OK_COLOR)==> Bringing containers down and removing volumes for $(SERVICE_NAME)... $(NO_COLOR)"
 	@docker-compose -f ./dev/docker-compose.yml down --rmi all --volumes
 
-migrate: ## Run db migrations (migrate up)
+migrate: ## Run db migrations (migrate up) [run "make deps" first]
 	@echo "$(OK_COLOR)==> Running db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" up
 
-migrate-down: ## Revert db migrations (migrate down)
+migrate-down: ## Revert db migrations (migrate down) [run "make deps" first]
 	@echo "$(OK_COLOR)==> Reverting db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" down
 
-migrate-drop: ## Drop db without confirmation (migrate drop)
+migrate-drop: ## Drop db without confirmation (migrate drop) [run "make deps" first]
 	@echo "$(OK_COLOR)==> Dropping db migrations for $(SERVICE_NAME)... $(NO_COLOR)"
 	@migrate -path="migrations" -database="postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=$(TIMEZONE)" drop -f
 
@@ -84,7 +84,7 @@ seed: ## Seed the database with some example data
 	@echo "$(OK_COLOR)==> Seeding the db for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go run dev/seeder/seeder.go
 
-reseed: ## Destroy, recreate and seed the database (no confirmation)
+reseed: ## Destroy, recreate and seed the database (no confirmation) [run "make deps" first]
 	@make migrate-down
 	@make migrate
 	@make seed
@@ -121,9 +121,10 @@ run-auth: ## Run auth locally
 run: ## Build and run all services locally
 	@make run-web & make run-worker & make run-auth & echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)" & wait
 
-proto: ## Generate protobuf files
+proto: ## Generate protobuf files [run "make deps" first]
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"
 	@protoc --go_out=./generated --go_opt=paths=source_relative proto/events/*.proto
+	@protoc --go_out=./generated --go-grpc_out=./generated --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/grpc/*.proto
 
 test: ## Test all (unit + integration)
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"

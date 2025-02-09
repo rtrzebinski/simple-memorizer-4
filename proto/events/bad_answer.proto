@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package events;
 
-option go_package = "github.com/robert/simple-memorizer-4/proto/events";
+option go_package = "proto/events";
 
 message BadAnswer {
   uint32 exerciseID = 1;
