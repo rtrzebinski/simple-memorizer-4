@@ -95,23 +95,24 @@ func run(ctx context.Context) error {
 	app.RunWhenOnBrowser()
 
 	// Version
-	file, err := os.Open("version")
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
 	var version string
+	file, err := os.Open("version")
+	if err == nil {
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				slog.Warn("failed to close file", "error", err, "service", "web")
+			}
+		}()
 
-	if scanner.Scan() {
-		version = scanner.Text()
-		slog.Info("version", "version", version, "service", "web")
+		scanner := bufio.NewScanner(file)
 
-	} else {
-		slog.Info("version unknown", "service", "web")
+		if scanner.Scan() {
+			version = scanner.Text()
+			slog.Info("version", "version", version, "service", "web")
+		} else {
+			slog.Info("version unknown", "service", "web")
+		}
 	}
 
 	// Handle home page

@@ -6,12 +6,16 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net"
 	"os"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/auth"
 	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
+	"google.golang.org/grpc"
 )
 
 type config struct {
@@ -32,23 +36,24 @@ func run(ctx context.Context) error {
 	slog.Info("application starting", "service", "auth")
 
 	// Version
-	file, err := os.Open("version")
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
 	var version string
+	file, err := os.Open("version")
+	if err == nil {
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				slog.Warn("failed to close file", "error", err, "service", "web")
+			}
+		}()
 
-	if scanner.Scan() {
-		version = scanner.Text()
-		slog.Info("version", "version", version, "service", "auth")
+		scanner := bufio.NewScanner(file)
 
-	} else {
-		slog.Info("version unknown", "service", "auth")
+		if scanner.Scan() {
+			version = scanner.Text()
+			slog.Info("version", "version", version, "service", "auth")
+		} else {
+			slog.Info("version unknown", "service", "auth")
+		}
 	}
 
 	// Configuration
@@ -65,13 +70,23 @@ func run(ctx context.Context) error {
 	// Start auth
 	// =========================================
 
-	// todo
+	listener, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	authgrpc.RegisterAuthServiceServer(grpcServer, &auth.GrpcServer{})
+
+	log.Println("gRPC server listening on port 50051")
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 
 	// =========================================
 	// Start probes
 	// =========================================
 
-	// todo add a db check later
 	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, nil)
 
 	// Start probe server and send errors to the channel

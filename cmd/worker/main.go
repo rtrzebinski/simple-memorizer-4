@@ -52,23 +52,24 @@ func run(ctx context.Context) error {
 	slog.Info("application starting", "service", "worker")
 
 	// Version
-	file, err := os.Open("version")
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
 	var version string
+	file, err := os.Open("version")
+	if err == nil {
+		defer func() {
+			err := file.Close()
+			if err != nil {
+				slog.Warn("failed to close file", "error", err, "service", "worker")
+			}
+		}()
 
-	if scanner.Scan() {
-		version = scanner.Text()
-		slog.Info("version", "version", version, "service", "worker")
+		scanner := bufio.NewScanner(file)
 
-	} else {
-		slog.Info("version unknown", "service", "worker")
+		if scanner.Scan() {
+			version = scanner.Text()
+			slog.Info("version", "version", version, "service", "worker")
+		} else {
+			slog.Info("version unknown", "service", "worker")
+		}
 	}
 
 	// Configuration

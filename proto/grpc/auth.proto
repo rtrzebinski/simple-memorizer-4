@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package auth;
+package grpc;
 
-option go_package = "proto/auth";
+option go_package = "proto/grpc";
 
 service AuthService {
   rpc SignUp(SignUpRequest) returns (SignUpResponse);
