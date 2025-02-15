@@ -12,8 +12,8 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/auth"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
 )

@@ -18,11 +18,11 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/cloudevents"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/result"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
 )
 
 type config struct {

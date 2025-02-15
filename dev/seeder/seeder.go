@@ -11,10 +11,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/backend"
-	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
-	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	backendpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/storage/postgres"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
+	workerpostgres "github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/storage/postgres"
 )
 
 type config struct {
