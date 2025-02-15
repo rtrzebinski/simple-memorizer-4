@@ -78,10 +78,10 @@ func run(ctx context.Context) error {
 	grpcServer := grpc.NewServer()
 	authgrpc.RegisterAuthServiceServer(grpcServer, &auth.GrpcServer{})
 
-	log.Println("gRPC server listening on port 50051")
-	if err := grpcServer.Serve(listener); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}
+	go func() {
+		log.Println("gRPC server listening on port 50051")
+		serverErrors <- grpcServer.Serve(listener)
+	}()
 
 	// =========================================
 	// Start probes
