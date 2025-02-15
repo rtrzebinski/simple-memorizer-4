@@ -87,7 +87,7 @@ func TestSignUpCall(t *testing.T) {
 		t.Fatalf("gRPC SignUp call failed: %v", err)
 	}
 
-	t.Logf("UserID: %s, AccessToken: %s", resp.UserId, resp.AccessToken)
+	t.Logf("AccessToken: %s", resp.AccessToken)
 }
 
 func TestSignInCall(t *testing.T) {
@@ -104,5 +104,5 @@ func TestSignInCall(t *testing.T) {
 		t.Fatalf("gRPC SignIn call failed: %v", err)
 	}
 
-	t.Logf("UserID: %s, AccessToken: %s", resp.UserId, resp.AccessToken)
+	t.Logf("AccessToken: %s", resp.AccessToken)
 }

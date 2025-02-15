@@ -15,7 +15,6 @@ message SignUpRequest {
 }
 
 message SignUpResponse {
-  string user_id = 1;
   string access_token = 2;
 }
 
@@ -25,6 +24,5 @@ message SignInRequest {
 }
 
 message SignInResponse {
-  string user_id = 1;
   string access_token = 2;
 }
