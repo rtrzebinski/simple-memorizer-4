@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -73,21 +76,41 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestSignUpCall(t *testing.T) {
+func TestRegisterCall(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	req := &authgrpc.SignUpRequest{
+	req := &authgrpc.RegisterRequest{
 		Email:    "foo@bar.com",
-		Password: "foobar",
+		Name:     "foo bar",
+		Password: "foobar123",
 	}
 
-	resp, err := client.SignUp(ctx, req)
+	resp, err := client.Register(ctx, req)
 	if err != nil {
-		t.Fatalf("gRPC SignUp call failed: %v", err)
+		t.Fatalf("gRPC Register call failed: %v", err)
 	}
 
-	t.Logf("AccessToken: %s", resp.AccessToken)
+	publicKeyBytes, _ := os.ReadFile("./../../keys/public.pem")
+	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+
+	token, err := jwt.Parse(resp.AccessToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return publicKey, nil
+	})
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		fmt.Println("Decoded Claims:", claims)
+	} else {
+		t.Fatalf("Invalid token: %v", err)
+	}
+
+	assert.Equal(t, req.Email, claims["email"])
+	assert.Equal(t, req.Name, claims["name"])
 }
 
 func TestSignInCall(t *testing.T) {
@@ -96,13 +119,32 @@ func TestSignInCall(t *testing.T) {
 
 	req := &authgrpc.SignInRequest{
 		Email:    "foo@bar.com",
-		Password: "foobar",
+		Password: "foobar123",
 	}
 
 	resp, err := client.SignIn(ctx, req)
 	if err != nil {
-		t.Fatalf("gRPC SignIn call failed: %v", err)
+		t.Fatalf("gRPC SignUp call failed: %v", err)
 	}
 
-	t.Logf("AccessToken: %s", resp.AccessToken)
+	publicKeyBytes, _ := os.ReadFile("./../../keys/public.pem")
+	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+
+	token, err := jwt.Parse(resp.AccessToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return publicKey, nil
+	})
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		fmt.Println("Decoded Claims:", claims)
+	} else {
+		t.Fatalf("Invalid token: %v", err)
+	}
+
+	assert.Equal(t, req.Email, claims["email"])
+	assert.Equal(t, "", claims["name"])
 }

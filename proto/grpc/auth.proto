@@ -5,16 +5,17 @@ package grpc;
 option go_package = "proto/grpc";
 
 service AuthService {
-  rpc SignUp(SignUpRequest) returns (SignUpResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc SignIn(SignInRequest) returns (SignInResponse);
 }
 
-message SignUpRequest {
+message RegisterRequest {
   string email = 1;
-  string password = 2;
+  string name = 2;
+  string password = 3;
 }
 
-message SignUpResponse {
+message RegisterResponse {
   string access_token = 2;
 }
 

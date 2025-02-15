@@ -126,6 +126,10 @@ proto: ## Generate protobuf files [run "make deps" first]
 	@protoc --go_out=./generated --go_opt=paths=source_relative proto/events/*.proto
 	@protoc --go_out=./generated --go-grpc_out=./generated --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/grpc/*.proto
 
+gen-rsa-keys: ## Generate RSA keys for JWT signing
+	openssl genpkey -algorithm RSA -out keys/private.pem -pkeyopt rsa_keygen_bits:2048
+	openssl rsa -pubout -in keys/private.pem -out keys/public.pem
+
 test: ## Test all (unit + integration)
 	@echo "$(OK_COLOR)==> Running tests for $(SERVICE_NAME)... $(NO_COLOR)"
 	@go test -failfast -race -covermode=atomic -coverprofile=coverage.out -ldflags=-extldflags=-Wl,-ld_classic ./...

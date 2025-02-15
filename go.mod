@@ -8,6 +8,7 @@ require (
 	github.com/cloudevents/sdk-go/protocol/pubsub/v2 v2.15.2
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/docker/go-connections v0.5.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/google/uuid v1.6.0
 	github.com/guregu/null/v5 v5.0.0
@@ -16,6 +17,7 @@ require (
 	github.com/maxence-charriere/go-app/v10 v10.0.8
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.33.0
+	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.34.2
 )
 
@@ -95,6 +97,5 @@ require (
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240513163218-0867130af1f8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240513163218-0867130af1f8 // indirect
-	google.golang.org/grpc v1.64.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
