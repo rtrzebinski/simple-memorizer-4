@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
-	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	protogrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
+	authgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
 )
@@ -76,7 +76,7 @@ func run(ctx context.Context) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	authgrpc.RegisterAuthServiceServer(grpcServer, &auth.GrpcServer{})
+	protogrpc.RegisterAuthServiceServer(grpcServer, &authgrpc.Server{})
 
 	go func() {
 		log.Println("gRPC server listening on port 50051")
