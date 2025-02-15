@@ -17,12 +17,12 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
+	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/result"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/worker/storage/postgres"
-	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
 )
 
 type config struct {

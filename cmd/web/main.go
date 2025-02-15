@@ -24,8 +24,8 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/frontend/components"
-	probes "github.com/rtrzebinski/simple-memorizer-4/pkg/probes"
-	"github.com/rtrzebinski/simple-memorizer-4/pkg/signal"
+	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 )
 
 type config struct {
