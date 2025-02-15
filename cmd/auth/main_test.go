@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"sync"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
