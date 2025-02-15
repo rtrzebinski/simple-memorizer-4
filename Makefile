@@ -173,6 +173,9 @@ k8s-rollout: ## Kubernetes rollout (Docker hub tag 'latest' image)
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-worker
 	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
+k8s-logs-auth: ## Kubernetes auth logs
+	@kubectl -n sm4 logs -l app=sm4-auth -f
+
 k8s-logs-web: ## Kubernetes web logs
 	@kubectl -n sm4 logs -l app=sm4-web -f
 
@@ -180,7 +183,7 @@ k8s-logs-worker: ## Kubernetes worker logs
 	@kubectl -n sm4 logs -l app=sm4-worker -f
 
 k8s-logs: ## Kubernetes logs
-	@make k8s-logs-worker & make k8s-logs-web & wait
+	@make k8s-logs-auth & make k8s-logs-web & make k8s-logs-worker & wait
 
 k8s-sh: ## Kubernetes web app shell
 	@kubectl -n sm4 exec -it deployment.apps/sm4-web -- sh
