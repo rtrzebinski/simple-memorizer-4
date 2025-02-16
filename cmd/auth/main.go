@@ -85,7 +85,7 @@ func run(ctx context.Context) error {
 	protogrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	go func() {
-		log.Println("gRPC server listening on port 50051")
+		slog.Info("initializing gRPC server", "addr", ":50051", "service", "auth")
 		serverErrors <- grpcServer.Serve(listener)
 	}()
 
