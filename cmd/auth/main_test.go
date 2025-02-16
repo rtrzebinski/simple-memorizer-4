@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"sync"
 	"testing"
@@ -104,7 +105,9 @@ func TestRegisterCall(t *testing.T) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
-		fmt.Println("Decoded Claims:", claims)
+		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"], "iat",
+			claims["iat"], "iat", claims["exp"])
+
 	} else {
 		t.Fatalf("Invalid token: %v", err)
 	}

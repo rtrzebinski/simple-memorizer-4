@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"log"
 	"log/slog"
 	"net"
@@ -14,6 +13,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	protogrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
@@ -77,7 +77,9 @@ func run(ctx context.Context) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	service := auth.NewService()
+
+	writer := &DummyWriter{}
+	service := auth.NewService(writer)
 	server := authgrpc.NewServer(service)
 
 	protogrpc.RegisterAuthServiceServer(grpcServer, server)

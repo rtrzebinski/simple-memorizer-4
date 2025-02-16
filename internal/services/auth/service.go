@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -16,21 +17,39 @@ const (
 	pkPath = "./../../../keys/private.pem"
 )
 
+type Writer interface {
+	Register(ctx context.Context, name, email, password string) (userID string, err error)
+	//SignIn(ctx context.Context, email, password string) (accessToken string, err error)
+}
+
 type Service struct {
+	w Writer
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(w Writer) *Service {
+	return &Service{
+		w: w,
+	}
 }
 
-func (s *Service) Register(_ context.Context, name, email, password string) (accessToken string, err error) {
+func (s *Service) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
 	privateKey, err := pk()
 	if err != nil {
 		return "", fmt.Errorf("failed to get private key: %w", err)
 	}
 
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	userID, err := s.w.Register(ctx, name, email, string(hashed))
+	if err != nil {
+		return "", fmt.Errorf("failed to register user: %w", err)
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":   "1234567890",
+		"sub":   userID,
 		"name":  name,
 		"email": email,
 		"iat":   time.Now().Unix(),
