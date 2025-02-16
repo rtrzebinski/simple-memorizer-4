@@ -8,10 +8,10 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 )
 
-func (suite *PostgresSuite) TestReader_FetchResults() {
+func (s *PostgresSuite) TestReader_FetchResults() {
 	ctx := context.Background()
 
-	db := suite.db
+	db := s.db
 
 	r := NewReader(db)
 
@@ -24,10 +24,10 @@ func (suite *PostgresSuite) TestReader_FetchResults() {
 	})
 
 	results, err := r.FetchResults(ctx, exercise.Id)
-	suite.NoError(err)
-	suite.Len(results, 1)
-	suite.Equal(1, results[0].Id)
-	suite.Equal(worker.ResultType("good"), results[0].Type)
-	suite.Equal(exercise.Id, results[0].ExerciseId)
-	suite.Equal(time.Now().Local().Format("2006-01-02"), results[0].CreatedAt.Local().Format("2006-01-02"))
+	s.NoError(err)
+	s.Len(results, 1)
+	s.Equal(1, results[0].Id)
+	s.Equal(worker.ResultType("good"), results[0].Type)
+	s.Equal(exercise.Id, results[0].ExerciseId)
+	s.Equal(time.Now().Local().Format("2006-01-02"), results[0].CreatedAt.Local().Format("2006-01-02"))
 }

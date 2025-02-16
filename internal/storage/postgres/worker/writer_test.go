@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (suite *PostgresSuite) TestWriter_StoreAnswer() {
+func (s *PostgresSuite) TestWriter_StoreAnswer() {
 	ctx := context.Background()
 
-	db := suite.db
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -26,18 +26,18 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 	}
 
 	err := w.StoreResult(ctx, result)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestResult(db)
 
-	assert.Equal(suite.T(), string(result.Type), stored.Type)
-	assert.Equal(suite.T(), result.ExerciseId, stored.ExerciseId)
+	assert.Equal(s.T(), string(result.Type), stored.Type)
+	assert.Equal(s.T(), result.ExerciseId, stored.ExerciseId)
 }
 
-func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections() {
+func (s *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections() {
 	ctx := context.Background()
 
-	db := suite.db
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -56,24 +56,24 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections()
 	}
 
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FindExerciseById(db, exercise.Id)
 
-	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
-	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)
-	assert.True(suite.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
-	assert.Equal(suite.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
-	assert.Equal(suite.T(), projection.GoodAnswers, stored.GoodAnswers)
-	assert.Equal(suite.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
-	assert.True(suite.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
-	assert.Equal(suite.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
+	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
+	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)
+	assert.True(s.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
+	assert.Equal(s.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
+	assert.Equal(s.T(), projection.GoodAnswers, stored.GoodAnswers)
+	assert.Equal(s.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
+	assert.True(s.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
+	assert.Equal(s.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
 }
 
-func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
+func (s *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 	ctx := context.Background()
 
-	db := suite.db
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -88,24 +88,24 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 	}
 
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FindExerciseById(db, exercise.Id)
 
-	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
-	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)
-	assert.True(suite.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
-	assert.Equal(suite.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
-	assert.Equal(suite.T(), projection.GoodAnswers, stored.GoodAnswers)
-	assert.Equal(suite.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
-	assert.True(suite.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
-	assert.Equal(suite.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
+	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
+	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)
+	assert.True(s.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
+	assert.Equal(s.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
+	assert.Equal(s.T(), projection.GoodAnswers, stored.GoodAnswers)
+	assert.Equal(s.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
+	assert.True(s.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
+	assert.Equal(s.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
 }
 
-func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
+func (s *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
 	ctx := context.Background()
 
-	db := suite.db
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -120,16 +120,16 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
 	}
 
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FindExerciseById(db, exercise.Id)
 
-	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
-	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)
-	assert.True(suite.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
-	assert.Equal(suite.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
-	assert.Equal(suite.T(), projection.GoodAnswers, stored.GoodAnswers)
-	assert.Equal(suite.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
-	assert.True(suite.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
-	assert.Equal(suite.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
+	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
+	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)
+	assert.True(s.T(), projection.LatestBadAnswer.Equal(stored.LatestBadAnswer))
+	assert.Equal(s.T(), projection.LatestBadAnswerWasToday, stored.LatestBadAnswerWasToday)
+	assert.Equal(s.T(), projection.GoodAnswers, stored.GoodAnswers)
+	assert.Equal(s.T(), projection.GoodAnswersToday, stored.GoodAnswersToday)
+	assert.True(s.T(), projection.LatestGoodAnswer.Equal(stored.LatestGoodAnswer))
+	assert.Equal(s.T(), projection.LatestGoodAnswerWasToday, stored.LatestGoodAnswerWasToday)
 }

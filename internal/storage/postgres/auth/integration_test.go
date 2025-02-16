@@ -21,38 +21,38 @@ type PostgresSuite struct {
 }
 
 // SetupSuite runs before all the tests in the suite.
-func (suite *PostgresSuite) SetupSuite() {
+func (s *PostgresSuite) SetupSuite() {
 	ctx := context.Background()
 
 	container, db, err := postgres.CreatePostgresContainer(ctx, "testdb")
-	suite.NoError(err)
+	s.NoError(err)
 
-	suite.container = container
-	suite.db = db
+	s.container = container
+	s.db = db
 
 	mig, err := postgres.NewMigrator(db)
-	suite.NoError(err)
+	s.NoError(err)
 
-	suite.migrator = mig
+	s.migrator = mig
 }
 
 // TearDownSuite runs after all the tests in the suite.
-func (suite *PostgresSuite) TearDownSuite() {
-	err := suite.db.Close()
-	suite.NoError(err)
+func (s *PostgresSuite) TearDownSuite() {
+	err := s.db.Close()
+	s.NoError(err)
 
-	err = suite.container.Terminate(context.Background())
-	suite.NoError(err)
+	err = s.container.Terminate(context.Background())
+	s.NoError(err)
 }
 
 // SetupTest runs before each test in the suite.
-func (suite *PostgresSuite) SetupTest() {
-	suite.NoError(suite.migrator.Up())
+func (s *PostgresSuite) SetupTest() {
+	s.NoError(s.migrator.Up())
 }
 
 // TearDownTest runs after each test in the suite.
-func (suite *PostgresSuite) TearDownTest() {
-	suite.NoError(suite.migrator.Down())
+func (s *PostgresSuite) TearDownTest() {
+	s.NoError(s.migrator.Down())
 }
 
 // TestPostgresSuite runs all test in the suite.

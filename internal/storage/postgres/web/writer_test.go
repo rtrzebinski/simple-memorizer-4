@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_UpsertLesson_createNew() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -19,17 +19,17 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 	}
 
 	err := w.UpsertLesson(context.Background(), &lesson)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestLesson(db)
 
-	assert.Equal(suite.T(), lesson.Name, stored.Name)
-	assert.Equal(suite.T(), lesson.Description, stored.Description)
-	assert.Equal(suite.T(), lesson.Id, stored.Id)
+	assert.Equal(s.T(), lesson.Name, stored.Name)
+	assert.Equal(s.T(), lesson.Description, stored.Description)
+	assert.Equal(s.T(), lesson.Id, stored.Id)
 }
 
-func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -41,16 +41,16 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 		Name:        "newName",
 		Description: "newDescription",
 	})
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestLesson(db)
 
-	assert.Equal(suite.T(), "newName", stored.Name)
-	assert.Equal(suite.T(), "newDescription", stored.Description)
+	assert.Equal(s.T(), "newName", stored.Name)
+	assert.Equal(s.T(), "newDescription", stored.Description)
 }
 
-func (suite *PostgresSuite) TestWriter_DeleteLesson() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_DeleteLesson() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -63,14 +63,14 @@ func (suite *PostgresSuite) TestWriter_DeleteLesson() {
 	another := postgres.FetchLatestLesson(db)
 
 	err := w.DeleteLesson(context.Background(), backend.Lesson{Id: stored.Id})
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
-	assert.Nil(suite.T(), postgres.FindLessonById(db, stored.Id))
-	assert.Equal(suite.T(), "another", postgres.FindLessonById(db, another.Id).Name)
+	assert.Nil(s.T(), postgres.FindLessonById(db, stored.Id))
+	assert.Equal(s.T(), "another", postgres.FindLessonById(db, another.Id).Name)
 }
 
-func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_UpsertExercise_createNew() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -86,18 +86,18 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 	}
 
 	err := w.UpsertExercise(context.Background(), &exercise)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestExercise(db)
 
-	assert.Equal(suite.T(), exercise.Lesson.Id, stored.LessonId)
-	assert.Equal(suite.T(), exercise.Question, stored.Question)
-	assert.Equal(suite.T(), exercise.Answer, stored.Answer)
-	assert.Equal(suite.T(), exercise.Id, stored.Id)
+	assert.Equal(s.T(), exercise.Lesson.Id, stored.LessonId)
+	assert.Equal(s.T(), exercise.Question, stored.Question)
+	assert.Equal(s.T(), exercise.Answer, stored.Answer)
+	assert.Equal(s.T(), exercise.Id, stored.Id)
 }
 
-func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -112,17 +112,17 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 		Question: "newQuestion",
 		Answer:   "newAnswer",
 	})
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestExercise(db)
 
-	assert.Equal(suite.T(), lesson.Id, stored.LessonId)
-	assert.Equal(suite.T(), "newQuestion", stored.Question)
-	assert.Equal(suite.T(), "newAnswer", stored.Answer)
+	assert.Equal(s.T(), lesson.Id, stored.LessonId)
+	assert.Equal(s.T(), "newQuestion", stored.Question)
+	assert.Equal(s.T(), "newAnswer", stored.Answer)
 }
 
-func (suite *PostgresSuite) TestWriter_StoreExercises() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_StoreExercises() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -157,25 +157,25 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	exercises := backend.Exercises{exercise1, exercise2}
 
 	err := w.StoreExercises(context.Background(), exercises)
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
 	ex1 := postgres.FindExerciseById(db, 1)
 
-	assert.Equal(suite.T(), exercise1.Lesson.Id, ex1.LessonId)
-	assert.Equal(suite.T(), exercise1.Question, ex1.Question)
-	assert.Equal(suite.T(), exercise1.Answer, ex1.Answer)
+	assert.Equal(s.T(), exercise1.Lesson.Id, ex1.LessonId)
+	assert.Equal(s.T(), exercise1.Question, ex1.Question)
+	assert.Equal(s.T(), exercise1.Answer, ex1.Answer)
 
 	// ID of inserted exercise will be 3, not 2,
 	// this is because 'ON CONFLICT (lesson_id, question) DO NOTHING',
 	// is still increasing PK auto increment value, even if nothing is inserted
 	ex2 := postgres.FindExerciseById(db, 3)
-	assert.Equal(suite.T(), exercise2.Lesson.Id, ex2.LessonId)
-	assert.Equal(suite.T(), exercise2.Question, ex2.Question)
-	assert.Equal(suite.T(), exercise2.Answer, ex2.Answer)
+	assert.Equal(s.T(), exercise2.Lesson.Id, ex2.LessonId)
+	assert.Equal(s.T(), exercise2.Question, ex2.Question)
+	assert.Equal(s.T(), exercise2.Answer, ex2.Answer)
 }
 
-func (suite *PostgresSuite) TestWriter_DeleteExercise() {
-	db := suite.db
+func (s *PostgresSuite) TestWriter_DeleteExercise() {
+	db := s.db
 
 	w := NewWriter(db)
 
@@ -193,8 +193,8 @@ func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 	another := postgres.FetchLatestExercise(db)
 
 	err := w.DeleteExercise(context.Background(), backend.Exercise{Id: stored.Id})
-	assert.NoError(suite.T(), err)
+	assert.NoError(s.T(), err)
 
-	assert.Nil(suite.T(), postgres.FindExerciseById(db, stored.Id))
-	assert.Equal(suite.T(), "another", postgres.FindExerciseById(db, another.Id).Question)
+	assert.Nil(s.T(), postgres.FindExerciseById(db, stored.Id))
+	assert.Equal(s.T(), "another", postgres.FindExerciseById(db, another.Id).Question)
 }
