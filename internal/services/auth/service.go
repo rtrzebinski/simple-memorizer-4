@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	pkPath       = "./../../../keys/private.pem"
+	keys         = "./../../../keys/"
 	daysToExpire = 30
 )
 
@@ -99,7 +99,7 @@ func pk() (*rsa.PrivateKey, error) {
 
 	dir := filepath.Dir(filename)
 
-	privateKeyBytes, err := os.ReadFile(filepath.Join(dir, pkPath))
+	privateKeyBytes, err := os.ReadFile(filepath.Join(dir, keys, "private.pem"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to read private key: %w", err)
 	}
