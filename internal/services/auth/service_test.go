@@ -38,7 +38,6 @@ func TestService_Register(t *testing.T) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	assert.True(t, ok)
-
 	assert.True(t, token.Valid)
 	assert.Equal(t, "userID", claims["sub"])
 	assert.Equal(t, "name", claims["name"])
@@ -68,7 +67,6 @@ func TestService_SignIn(t *testing.T) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	assert.True(t, ok)
-
 	assert.True(t, token.Valid)
 	assert.Equal(t, "userID", claims["sub"])
 	assert.Equal(t, "name", claims["name"])
