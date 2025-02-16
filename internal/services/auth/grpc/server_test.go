@@ -12,7 +12,6 @@ func TestServer_Register(t *testing.T) {
 	ctx := context.Background()
 
 	req := new(grpc.RegisterRequest)
-
 	req.Email = "email"
 	req.Name = "name"
 	req.Password = "password"
@@ -24,7 +23,6 @@ func TestServer_Register(t *testing.T) {
 
 	res, err := server.Register(ctx, req)
 	assert.NoError(t, err)
-
 	assert.Equal(t, "token", res.AccessToken)
 }
 
@@ -32,7 +30,6 @@ func TestServer_Register_fail(t *testing.T) {
 	ctx := context.Background()
 
 	req := new(grpc.RegisterRequest)
-
 	req.Email = "email"
 	req.Name = "name"
 	req.Password = "password"
@@ -51,7 +48,6 @@ func TestServer_SignIn(t *testing.T) {
 	ctx := context.Background()
 
 	req := new(grpc.SignInRequest)
-
 	req.Email = "email"
 	req.Password = "password"
 
@@ -62,7 +58,6 @@ func TestServer_SignIn(t *testing.T) {
 
 	res, err := server.SignIn(ctx, req)
 	assert.NoError(t, err)
-
 	assert.Equal(t, "token", res.AccessToken)
 }
 
@@ -70,7 +65,6 @@ func TestServer_SignIn_fail(t *testing.T) {
 	ctx := context.Background()
 
 	req := new(grpc.SignInRequest)
-
 	req.Email = "email"
 	req.Password = "password"
 
