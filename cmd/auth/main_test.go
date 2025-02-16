@@ -70,11 +70,47 @@ func TestMain(m *testing.M) {
 
 	conn, err := setupClient()
 	if err != nil {
-		log.Fatalf("Failed to connect to gRPC server: %v", err)
+		log.Fatalf("failed to connect to gRPC server: %v", err)
 	}
 	defer conn.Close()
 
 	os.Exit(m.Run())
+}
+
+func TestSignInCall(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	req := &authgrpc.SignInRequest{
+		Email:    "foo@bar.com",
+		Password: "foobar123",
+	}
+
+	resp, err := client.SignIn(ctx, req)
+	if err != nil {
+		t.Fatalf("gRPC SignUp call failed: %v", err)
+	}
+
+	publicKeyBytes, _ := os.ReadFile("./../../keys/public.pem")
+	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+
+	token, err := jwt.Parse(resp.AccessToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return publicKey, nil
+	})
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		slog.Info("decoded claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
+	} else {
+		t.Fatalf("dnvalid token: %v", err)
+	}
+
+	assert.Equal(t, req.Email, claims["email"])
+	assert.Equal(t, "name", claims["name"])
 }
 
 func TestRegisterCall(t *testing.T) {
@@ -105,48 +141,11 @@ func TestRegisterCall(t *testing.T) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
-		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
-
+		slog.Info("decoded claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
 	} else {
-		t.Fatalf("Invalid token: %v", err)
+		t.Fatalf("tnvalid token: %v", err)
 	}
 
 	assert.Equal(t, req.Email, claims["email"])
 	assert.Equal(t, req.Name, claims["name"])
-}
-
-func TestSignInCall(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	req := &authgrpc.SignInRequest{
-		Email:    "foo@bar.com",
-		Password: "foobar123",
-	}
-
-	resp, err := client.SignIn(ctx, req)
-	if err != nil {
-		t.Fatalf("gRPC SignUp call failed: %v", err)
-	}
-
-	publicKeyBytes, _ := os.ReadFile("./../../keys/public.pem")
-	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
-
-	token, err := jwt.Parse(resp.AccessToken, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return publicKey, nil
-	})
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-
-	if ok && token.Valid {
-		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
-	} else {
-		t.Fatalf("Invalid token: %v", err)
-	}
-
-	assert.Equal(t, req.Email, claims["email"])
-	assert.Equal(t, "name", claims["name"])
 }

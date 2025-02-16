@@ -4,13 +4,13 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -18,17 +18,14 @@ const (
 	daysToExpire = 30
 )
 
-type Writer interface {
-	Register(ctx context.Context, name, email, password string) (userID string, err error)
-	SignIn(ctx context.Context, email, password string) (name, userID string, err error)
-}
-
 type Service struct {
+	r Reader
 	w Writer
 }
 
-func NewService(w Writer) *Service {
+func NewService(r Reader, w Writer) *Service {
 	return &Service{
+		r: r,
 		w: w,
 	}
 }
@@ -71,7 +68,7 @@ func (s *Service) SignIn(ctx context.Context, email, password string) (accessTok
 		return "", fmt.Errorf("failed to get private key: %w", err)
 	}
 
-	name, userID, err := s.w.SignIn(ctx, email, password)
+	name, userID, err := s.r.SignIn(ctx, email, password)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"sub":   userID,

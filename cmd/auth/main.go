@@ -78,8 +78,9 @@ func run(ctx context.Context) error {
 
 	grpcServer := grpc.NewServer()
 
+	reader := &DummyReader{}
 	writer := &DummyWriter{}
-	service := auth.NewService(writer)
+	service := auth.NewService(reader, writer)
 	server := authgrpc.NewServer(service)
 
 	protogrpc.RegisterAuthServiceServer(grpcServer, server)
