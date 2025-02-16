@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"log"
 	"log/slog"
 	"net"
@@ -76,7 +77,10 @@ func run(ctx context.Context) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	protogrpc.RegisterAuthServiceServer(grpcServer, &authgrpc.Server{})
+	service := auth.NewService()
+	server := authgrpc.NewServer(service)
+
+	protogrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	go func() {
 		log.Println("gRPC server listening on port 50051")
