@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	pkPath = "./../../../keys/private.pem"
+	pkPath       = "./../../../keys/private.pem"
+	daysToExpire = 30
 )
 
 type Writer interface {
@@ -53,7 +54,7 @@ func (s *Service) Register(ctx context.Context, name, email, password string) (a
 		"name":  name,
 		"email": email,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"exp":   time.Now().Add(time.Hour * 24 * daysToExpire).Unix(),
 	})
 
 	accessToken, err = token.SignedString(privateKey)
