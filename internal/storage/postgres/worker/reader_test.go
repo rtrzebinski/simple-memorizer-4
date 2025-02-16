@@ -1,9 +1,11 @@
-package postgres
+package worker
 
 import (
 	"context"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"time"
+
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 )
 
 func (suite *PostgresSuite) TestReader_FetchResults() {
@@ -13,10 +15,10 @@ func (suite *PostgresSuite) TestReader_FetchResults() {
 
 	r := NewReader(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise := &postgres.Exercise{}
+	postgres.CreateExercise(db, exercise)
 
-	createResult(db, &Result{
+	postgres.CreateResult(db, &postgres.Result{
 		Type:       "good",
 		ExerciseId: exercise.Id,
 	})

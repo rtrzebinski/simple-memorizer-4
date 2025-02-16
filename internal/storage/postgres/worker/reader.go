@@ -1,8 +1,9 @@
-package postgres
+package worker
 
 import (
 	"context"
 	"database/sql"
+
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 )
 

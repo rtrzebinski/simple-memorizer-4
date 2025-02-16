@@ -1,4 +1,4 @@
-package postgres
+package worker
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,8 +17,8 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 
 	w := NewWriter(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise := &postgres.Exercise{}
+	postgres.CreateExercise(db, exercise)
 
 	result := worker.Result{
 		Type:       worker.Good,
@@ -27,7 +28,7 @@ func (suite *PostgresSuite) TestWriter_StoreAnswer() {
 	err := w.StoreResult(ctx, result)
 	assert.NoError(suite.T(), err)
 
-	stored := fetchLatestResult(db)
+	stored := postgres.FetchLatestResult(db)
 
 	assert.Equal(suite.T(), string(result.Type), stored.Type)
 	assert.Equal(suite.T(), result.ExerciseId, stored.ExerciseId)
@@ -40,8 +41,8 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections()
 
 	w := NewWriter(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise := &postgres.Exercise{}
+	postgres.CreateExercise(db, exercise)
 
 	projection := worker.ResultsProjection{
 		BadAnswers:               1,
@@ -57,7 +58,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_allProjections()
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
-	stored := findExerciseById(db, exercise.Id)
+	stored := postgres.FindExerciseById(db, exercise.Id)
 
 	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)
@@ -76,8 +77,8 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 
 	w := NewWriter(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise := &postgres.Exercise{}
+	postgres.CreateExercise(db, exercise)
 
 	projection := worker.ResultsProjection{
 		BadAnswers:              1,
@@ -89,7 +90,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_badOnly() {
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
-	stored := findExerciseById(db, exercise.Id)
+	stored := postgres.FindExerciseById(db, exercise.Id)
 
 	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)
@@ -108,8 +109,8 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
 
 	w := NewWriter(db)
 
-	exercise := &Exercise{}
-	createExercise(db, exercise)
+	exercise := &postgres.Exercise{}
+	postgres.CreateExercise(db, exercise)
 
 	projection := worker.ResultsProjection{
 		GoodAnswers:              3,
@@ -121,7 +122,7 @@ func (suite *PostgresSuite) TestWriter_UpdateExerciseProjection_goodOnly() {
 	err := w.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(suite.T(), err)
 
-	stored := findExerciseById(db, exercise.Id)
+	stored := postgres.FindExerciseById(db, exercise.Id)
 
 	assert.Equal(suite.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(suite.T(), projection.BadAnswersToday, stored.BadAnswersToday)

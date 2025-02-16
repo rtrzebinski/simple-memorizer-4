@@ -1,11 +1,13 @@
-package postgres
+package web
 
 import (
 	"context"
+	"time"
+
 	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"github.com/stretchr/testify/assert"
-	"time"
 )
 
 func (suite *PostgresSuite) TestReader_FetchLessons() {
@@ -13,10 +15,10 @@ func (suite *PostgresSuite) TestReader_FetchLessons() {
 
 	r := NewReader(db)
 
-	lesson := &Lesson{}
-	createLesson(db, lesson)
+	lesson := &postgres.Lesson{}
+	postgres.CreateLesson(db, lesson)
 
-	createExercise(db, &Exercise{LessonId: lesson.Id})
+	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
 
 	res, err := r.FetchLessons(context.Background())
 
@@ -34,8 +36,8 @@ func (suite *PostgresSuite) TestReader_HydrateLesson() {
 
 	r := NewReader(db)
 
-	l := &Lesson{}
-	createLesson(db, l)
+	l := &postgres.Lesson{}
+	postgres.CreateLesson(db, l)
 
 	lesson := &backend.Lesson{
 		Id: l.Id,
@@ -48,8 +50,8 @@ func (suite *PostgresSuite) TestReader_HydrateLesson() {
 	assert.Equal(suite.T(), l.Description, lesson.Description)
 	assert.Equal(suite.T(), 0, lesson.ExerciseCount)
 
-	createExercise(db, &Exercise{LessonId: l.Id})
-	createExercise(db, &Exercise{LessonId: l.Id})
+	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
+	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
 
 	err = r.HydrateLesson(context.Background(), lesson)
 
@@ -64,7 +66,7 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 
 	r := NewReader(db)
 
-	exercise1 := &Exercise{
+	exercise1 := &postgres.Exercise{
 		BadAnswers:               1,
 		BadAnswersToday:          2,
 		LatestBadAnswer:          null.TimeFrom(time.Now()),
@@ -73,11 +75,11 @@ func (suite *PostgresSuite) TestReader_FetchExercises() {
 		LatestGoodAnswer:         null.Time{},
 		LatestGoodAnswerWasToday: true,
 	}
-	createExercise(db, exercise1)
+	postgres.CreateExercise(db, exercise1)
 
 	// to check of exercise without results will also be fetched
-	exercise2 := &Exercise{LessonId: exercise1.LessonId}
-	createExercise(db, exercise2)
+	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
+	postgres.CreateExercise(db, exercise2)
 
 	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId})
 

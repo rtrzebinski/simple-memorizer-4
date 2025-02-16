@@ -1,9 +1,10 @@
-package postgres
+package web
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
 

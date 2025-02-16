@@ -1,8 +1,10 @@
-package postgres
+package web
 
 import (
 	"context"
+
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +21,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 	err := w.UpsertLesson(context.Background(), &lesson)
 	assert.NoError(suite.T(), err)
 
-	stored := fetchLatestLesson(db)
+	stored := postgres.FetchLatestLesson(db)
 
 	assert.Equal(suite.T(), lesson.Name, stored.Name)
 	assert.Equal(suite.T(), lesson.Description, stored.Description)
@@ -31,8 +33,8 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 
 	w := NewWriter(db)
 
-	lesson := &Lesson{}
-	createLesson(db, lesson)
+	lesson := &postgres.Lesson{}
+	postgres.CreateLesson(db, lesson)
 
 	err := w.UpsertLesson(context.Background(), &backend.Lesson{
 		Id:          1,
@@ -41,7 +43,7 @@ func (suite *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 	})
 	assert.NoError(suite.T(), err)
 
-	stored := fetchLatestLesson(db)
+	stored := postgres.FetchLatestLesson(db)
 
 	assert.Equal(suite.T(), "newName", stored.Name)
 	assert.Equal(suite.T(), "newDescription", stored.Description)
@@ -52,19 +54,19 @@ func (suite *PostgresSuite) TestWriter_DeleteLesson() {
 
 	w := NewWriter(db)
 
-	createLesson(db, &Lesson{})
-	stored := fetchLatestLesson(db)
+	postgres.CreateLesson(db, &postgres.Lesson{})
+	stored := postgres.FetchLatestLesson(db)
 
-	createLesson(db, &Lesson{
+	postgres.CreateLesson(db, &postgres.Lesson{
 		Name: "another",
 	})
-	another := fetchLatestLesson(db)
+	another := postgres.FetchLatestLesson(db)
 
 	err := w.DeleteLesson(context.Background(), backend.Lesson{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
-	assert.Nil(suite.T(), findLessonById(db, stored.Id))
-	assert.Equal(suite.T(), "another", findLessonById(db, another.Id).Name)
+	assert.Nil(suite.T(), postgres.FindLessonById(db, stored.Id))
+	assert.Equal(suite.T(), "another", postgres.FindLessonById(db, another.Id).Name)
 }
 
 func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
@@ -72,8 +74,8 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 
 	w := NewWriter(db)
 
-	lesson := &Lesson{}
-	createLesson(db, lesson)
+	lesson := &postgres.Lesson{}
+	postgres.CreateLesson(db, lesson)
 
 	exercise := backend.Exercise{
 		Lesson: &backend.Lesson{
@@ -86,7 +88,7 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 	err := w.UpsertExercise(context.Background(), &exercise)
 	assert.NoError(suite.T(), err)
 
-	stored := fetchLatestExercise(db)
+	stored := postgres.FetchLatestExercise(db)
 
 	assert.Equal(suite.T(), exercise.Lesson.Id, stored.LessonId)
 	assert.Equal(suite.T(), exercise.Question, stored.Question)
@@ -99,11 +101,11 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 
 	w := NewWriter(db)
 
-	lesson := Lesson{}
-	createLesson(db, &lesson)
+	lesson := postgres.Lesson{}
+	postgres.CreateLesson(db, &lesson)
 
-	exercise := Exercise{LessonId: lesson.Id}
-	createExercise(db, &exercise)
+	exercise := postgres.Exercise{LessonId: lesson.Id}
+	postgres.CreateExercise(db, &exercise)
 
 	err := w.UpsertExercise(context.Background(), &backend.Exercise{
 		Id:       1,
@@ -112,7 +114,7 @@ func (suite *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 	})
 	assert.NoError(suite.T(), err)
 
-	stored := fetchLatestExercise(db)
+	stored := postgres.FetchLatestExercise(db)
 
 	assert.Equal(suite.T(), lesson.Id, stored.LessonId)
 	assert.Equal(suite.T(), "newQuestion", stored.Question)
@@ -124,8 +126,8 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 
 	w := NewWriter(db)
 
-	lesson := &Lesson{}
-	createLesson(db, lesson)
+	lesson := &postgres.Lesson{}
+	postgres.CreateLesson(db, lesson)
 
 	// exercise1 existing
 	exercise1 := backend.Exercise{
@@ -137,7 +139,7 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	}
 
 	// store exercise 1 to db
-	createExercise(db, &Exercise{
+	postgres.CreateExercise(db, &postgres.Exercise{
 		LessonId: exercise1.Lesson.Id,
 		Question: exercise1.Question,
 		Answer:   exercise1.Answer,
@@ -157,7 +159,7 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	err := w.StoreExercises(context.Background(), exercises)
 	assert.NoError(suite.T(), err)
 
-	ex1 := findExerciseById(db, 1)
+	ex1 := postgres.FindExerciseById(db, 1)
 
 	assert.Equal(suite.T(), exercise1.Lesson.Id, ex1.LessonId)
 	assert.Equal(suite.T(), exercise1.Question, ex1.Question)
@@ -166,7 +168,7 @@ func (suite *PostgresSuite) TestWriter_StoreExercises() {
 	// ID of inserted exercise will be 3, not 2,
 	// this is because 'ON CONFLICT (lesson_id, question) DO NOTHING',
 	// is still increasing PK auto increment value, even if nothing is inserted
-	ex2 := findExerciseById(db, 3)
+	ex2 := postgres.FindExerciseById(db, 3)
 	assert.Equal(suite.T(), exercise2.Lesson.Id, ex2.LessonId)
 	assert.Equal(suite.T(), exercise2.Question, ex2.Question)
 	assert.Equal(suite.T(), exercise2.Answer, ex2.Answer)
@@ -177,22 +179,22 @@ func (suite *PostgresSuite) TestWriter_DeleteExercise() {
 
 	w := NewWriter(db)
 
-	lesson := &Lesson{}
-	createLesson(db, lesson)
+	lesson := &postgres.Lesson{}
+	postgres.CreateLesson(db, lesson)
 
-	createExercise(db, &Exercise{
+	postgres.CreateExercise(db, &postgres.Exercise{
 		LessonId: lesson.Id,
 	})
-	stored := fetchLatestExercise(db)
+	stored := postgres.FetchLatestExercise(db)
 
-	createExercise(db, &Exercise{
+	postgres.CreateExercise(db, &postgres.Exercise{
 		Question: "another",
 	})
-	another := fetchLatestExercise(db)
+	another := postgres.FetchLatestExercise(db)
 
 	err := w.DeleteExercise(context.Background(), backend.Exercise{Id: stored.Id})
 	assert.NoError(suite.T(), err)
 
-	assert.Nil(suite.T(), findExerciseById(db, stored.Id))
-	assert.Equal(suite.T(), "another", findExerciseById(db, another.Id).Question)
+	assert.Nil(suite.T(), postgres.FindExerciseById(db, stored.Id))
+	assert.Equal(suite.T(), "another", postgres.FindExerciseById(db, another.Id).Question)
 }

@@ -22,10 +22,10 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/cloudevents"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/storage/postgres"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
+	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
 )
 
 type config struct {
@@ -166,8 +166,8 @@ func run(ctx context.Context) error {
 	// Start server
 	// =========================================
 
-	reader := postgres.NewReader(db)
-	writer := postgres.NewWriter(db)
+	reader := storage.NewReader(db)
+	writer := storage.NewWriter(db)
 	publisher := cloudevents.NewPublisher(ceClient)
 	service := backend.NewService(reader, writer, publisher)
 
