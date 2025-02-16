@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -15,7 +14,7 @@ type Server struct {
 	s Service
 }
 
-func NewServer(s *auth.Service) *Server {
+func NewServer(s Service) *Server {
 	return &Server{s: s}
 }
 
