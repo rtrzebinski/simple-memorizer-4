@@ -20,7 +20,7 @@ const (
 
 type Writer interface {
 	Register(ctx context.Context, name, email, password string) (userID string, err error)
-	//SignIn(ctx context.Context, email, password string) (accessToken string, err error)
+	SignIn(ctx context.Context, email, password string) (name, userID string, err error)
 }
 
 type Service struct {
@@ -65,18 +65,20 @@ func (s *Service) Register(ctx context.Context, name, email, password string) (a
 	return accessToken, nil
 }
 
-func (s *Service) SignIn(_ context.Context, email, password string) (accessToken string, err error) {
+func (s *Service) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
 	privateKey, err := pk()
 	if err != nil {
 		return "", fmt.Errorf("failed to get private key: %w", err)
 	}
 
+	name, userID, err := s.w.SignIn(ctx, email, password)
+
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":   "1234567890",
-		"name":  "", // todo: fetch name from db
+		"sub":   userID,
+		"name":  name,
 		"email": email,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"exp":   time.Now().Add(time.Hour * 24 * daysToExpire).Unix(),
 	})
 
 	accessToken, err = token.SignedString(privateKey)

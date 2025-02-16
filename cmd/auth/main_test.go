@@ -105,8 +105,7 @@ func TestRegisterCall(t *testing.T) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
-		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"], "iat",
-			claims["iat"], "iat", claims["exp"])
+		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
 
 	} else {
 		t.Fatalf("Invalid token: %v", err)
@@ -143,11 +142,11 @@ func TestSignInCall(t *testing.T) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
-		fmt.Println("Decoded Claims:", claims)
+		slog.Info("Decoded Claims:", "sub", claims["sub"], "name", claims["name"], "email", claims["email"])
 	} else {
 		t.Fatalf("Invalid token: %v", err)
 	}
 
 	assert.Equal(t, req.Email, claims["email"])
-	assert.Equal(t, "", claims["name"])
+	assert.Equal(t, "name", claims["name"])
 }
