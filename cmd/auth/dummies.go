@@ -18,7 +18,7 @@ type DummyWriter struct {
 }
 
 func (w *DummyWriter) StoreUser(ctx context.Context, name, email, password string) (userID string, err error) {
-	slog.Info("registering user", "name", name, "email", email)
+	slog.Info("registering user", "name", name, "email", email, "password", password)
 
 	return "userID", nil
 }
