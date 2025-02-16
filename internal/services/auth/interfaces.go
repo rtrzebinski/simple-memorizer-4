@@ -3,9 +3,9 @@ package auth
 import "context"
 
 type Reader interface {
-	SignIn(ctx context.Context, email, password string) (name, userID string, err error)
+	FetchUser(ctx context.Context, email string) (name, password, userID string, err error)
 }
 
 type Writer interface {
-	Register(ctx context.Context, name, email, password string) (userID string, err error)
+	StoreUser(ctx context.Context, name, email, password string) (userID string, err error)
 }

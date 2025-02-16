@@ -8,16 +8,16 @@ import (
 type DummyReader struct {
 }
 
-func (w *DummyReader) SignIn(ctx context.Context, email, password string) (name, userID string, err error) {
+func (w *DummyReader) FetchUser(ctx context.Context, email string) (name, userID, password string, err error) {
 	slog.Info("signing in user", "email", email)
 
-	return "name", "userID", nil
+	return "name", "userID", "$2a$10$3bAYWOIv0JgCj2xf9hf.beUioHU5jHIYED.hOxKLttWtNWFp7Aq/O", nil
 }
 
 type DummyWriter struct {
 }
 
-func (w *DummyWriter) Register(ctx context.Context, name, email, password string) (userID string, err error) {
+func (w *DummyWriter) StoreUser(ctx context.Context, name, email, password string) (userID string, err error) {
 	slog.Info("registering user", "name", name, "email", email)
 
 	return "userID", nil

@@ -45,6 +45,13 @@ type (
 		Type       string
 		CreatedAt  time.Time
 	}
+
+	User struct {
+		Id       int
+		Name     string
+		Email    string
+		Password string
+	}
 )
 
 func CreateLesson(db *sql.DB, lesson *Lesson) {
@@ -217,6 +224,38 @@ func CreateResult(db *sql.DB, answer *Result) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func CreateUser(db *sql.DB, user *User) {
+	query := `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id;`
+
+	err := db.QueryRow(query, &user.Name, &user.Email, &user.Password).
+		Scan(&user.Id)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func FetchUserByEmail(db *sql.DB, email string) *User {
+	const query = `SELECT id, name, email, password FROM "user" WHERE email = $1;`
+
+	rows, err := db.Query(query, email)
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		var user User
+
+		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+		if err != nil {
+			panic(err)
+		}
+
+		return &user
+	}
+
+	return nil
 }
 
 func randomString() string {

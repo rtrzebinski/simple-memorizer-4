@@ -83,7 +83,7 @@ func TestSignInCall(t *testing.T) {
 
 	req := &authgrpc.SignInRequest{
 		Email:    "foo@bar.com",
-		Password: "foobar123",
+		Password: "password",
 	}
 
 	resp, err := client.SignIn(ctx, req)
@@ -120,12 +120,12 @@ func TestRegisterCall(t *testing.T) {
 	req := &authgrpc.RegisterRequest{
 		Email:    "foo@bar.com",
 		Name:     "foo bar",
-		Password: "foobar123",
+		Password: "password",
 	}
 
 	resp, err := client.Register(ctx, req)
 	if err != nil {
-		t.Fatalf("gRPC Register call failed: %v", err)
+		t.Fatalf("gRPC StoreUser call failed: %v", err)
 	}
 
 	publicKeyBytes, _ := os.ReadFile("./../../keys/public.pem")

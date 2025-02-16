@@ -1,15 +1,24 @@
 package auth
 
-import "github.com/stretchr/testify/assert"
+import (
+	"context"
 
-func (s *PostgresSuite) TestWriter_Register() {
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
+	"github.com/stretchr/testify/assert"
+)
 
-	println("TestWriter_Register")
+func (s *PostgresSuite) TestWriter_StoreUser() {
+	ctx := context.Background()
 
-	writer := NewWriter()
+	writer := NewWriter(s.db)
 
-	userID, err := writer.Register(nil, "name", "email", "password")
+	userID, err := writer.StoreUser(ctx, "name", "email", "password")
 
 	assert.NoError(s.T(), err)
-	assert.Equal(s.T(), "userID", userID)
+	assert.Equal(s.T(), "1", userID)
+
+	user := postgres.FetchUserByEmail(s.db, "email")
+	assert.Equal(s.T(), "name", user.Name)
+	assert.Equal(s.T(), "email", user.Email)
+	assert.Equal(s.T(), "password", user.Password)
 }

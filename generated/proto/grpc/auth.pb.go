@@ -285,10 +285,10 @@ var file_proto_grpc_auth_proto_goTypes = []interface{}{
 	(*SignInResponse)(nil),   // 3: grpc.SignInResponse
 }
 var file_proto_grpc_auth_proto_depIdxs = []int32{
-	0, // 0: grpc.AuthService.Register:input_type -> grpc.RegisterRequest
-	2, // 1: grpc.AuthService.SignIn:input_type -> grpc.SignInRequest
-	1, // 2: grpc.AuthService.Register:output_type -> grpc.RegisterResponse
-	3, // 3: grpc.AuthService.SignIn:output_type -> grpc.SignInResponse
+	0, // 0: grpc.AuthService.StoreUser:input_type -> grpc.RegisterRequest
+	2, // 1: grpc.AuthService.FetchUser:input_type -> grpc.SignInRequest
+	1, // 2: grpc.AuthService.StoreUser:output_type -> grpc.RegisterResponse
+	3, // 3: grpc.AuthService.FetchUser:output_type -> grpc.SignInResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

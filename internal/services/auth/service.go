@@ -41,7 +41,7 @@ func (s *Service) Register(ctx context.Context, name, email, password string) (a
 		return "", fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	userID, err := s.w.Register(ctx, name, email, string(hashed))
+	userID, err := s.w.StoreUser(ctx, name, email, string(hashed))
 	if err != nil {
 		return "", fmt.Errorf("failed to register user: %w", err)
 	}
@@ -68,7 +68,12 @@ func (s *Service) SignIn(ctx context.Context, email, password string) (accessTok
 		return "", fmt.Errorf("failed to get private key: %w", err)
 	}
 
-	name, userID, err := s.r.SignIn(ctx, email, password)
+	name, userID, passwordHash, err := s.r.FetchUser(ctx, email)
+
+	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+	if err != nil {
+		return "", fmt.Errorf("failed to verify password: %w", err)
+	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"sub":   userID,

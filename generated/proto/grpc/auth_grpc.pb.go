@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthService_Register_FullMethodName = "/grpc.AuthService/Register"
-	AuthService_SignIn_FullMethodName   = "/grpc.AuthService/SignIn"
+	AuthService_Register_FullMethodName = "/grpc.AuthService/StoreUser"
+	AuthService_SignIn_FullMethodName   = "/grpc.AuthService/FetchUser"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -71,10 +71,10 @@ type UnimplementedAuthServiceServer struct {
 }
 
 func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method StoreUser not implemented")
 }
 func (UnimplementedAuthServiceServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method FetchUser not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -133,11 +133,11 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Register",
+			MethodName: "StoreUser",
 			Handler:    _AuthService_Register_Handler,
 		},
 		{
-			MethodName: "SignIn",
+			MethodName: "FetchUser",
 			Handler:    _AuthService_SignIn_Handler,
 		},
 	},
