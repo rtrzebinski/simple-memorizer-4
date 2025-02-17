@@ -1,4 +1,4 @@
-package cloudevents
+package pubsub
 
 import (
 	"context"

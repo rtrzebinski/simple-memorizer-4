@@ -1,10 +1,10 @@
-package cloudevents
+package pubsub
 
 import (
 	"context"
-	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"testing"
 
+	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/events"
 	"github.com/stretchr/testify/assert"

@@ -1,7 +1,8 @@
-package cloudevents
+package pubsub
 
 import (
 	"context"
+
 	"github.com/stretchr/testify/mock"
 )
 
