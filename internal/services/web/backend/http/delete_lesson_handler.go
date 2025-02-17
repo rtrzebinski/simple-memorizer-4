@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"encoding/json"
@@ -7,31 +7,31 @@ import (
 	"net/http"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type UpsertLessonHandler struct {
+type DeleteLessonHandler struct {
 	s Service
 }
 
-func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
-	return &UpsertLessonHandler{s: s}
+func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
+	return &DeleteLessonHandler{s: s}
 }
 
-func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	var lesson backend.Lesson
 
 	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode UpsertLessonHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode DeleteLessonHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateUpsertLesson(lesson, nil)
+	validator := validation.ValidateLessonIdentified(lesson)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -39,7 +39,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode UpsertLessonHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode DeleteLessonHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -47,7 +47,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write UpsertLessonHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write DeleteLessonHandler HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -56,9 +56,9 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(ctx, &lesson)
+	err = h.s.DeleteLesson(ctx, lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
+		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

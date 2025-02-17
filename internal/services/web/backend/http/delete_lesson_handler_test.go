@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"testing"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeleteExerciseHandler(t *testing.T) {
+func TestDeleteLessonHandler(t *testing.T) {
 	ctx := context.Background()
 
-	input := backend.Exercise{
+	input := backend.Lesson{
 		Id: 123,
 	}
 
@@ -27,9 +27,9 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", ctx, input).Return(nil)
+	service.On("DeleteLesson", ctx, input).Return(nil)
 
-	route := NewDeleteExerciseHandler(service)
+	route := NewDeleteLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -39,8 +39,8 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	service.AssertExpectations(t)
 }
 
-func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
-	input := backend.Exercise{}
+func TestDeleteLessonHandler_invalidInput(t *testing.T) {
+	input := backend.Lesson{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -49,7 +49,7 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewDeleteExerciseHandler(service)
+	route := NewDeleteLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -62,5 +62,5 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
+	assert.Equal(t, validation.ValidateLessonIdentified(input).Error(), result)
 }

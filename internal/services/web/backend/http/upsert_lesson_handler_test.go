@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"context"
@@ -10,17 +10,16 @@ import (
 	"testing"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpsertExerciseHandler(t *testing.T) {
+func TestUpsertLessonHandler(t *testing.T) {
 	ctx := context.Background()
 
-	input := backend.Exercise{
-		Question: "question",
-		Answer:   "answer",
-		Lesson:   &backend.Lesson{Id: 10},
+	input := backend.Lesson{
+		Name:        "name",
+		Description: "description",
 	}
 
 	body, err := json.Marshal(input)
@@ -29,9 +28,9 @@ func TestUpsertExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertExercise", ctx, &input).Return(nil)
+	service.On("UpsertLesson", ctx, &input).Return(nil)
 
-	route := NewUpsertExerciseHandler(service)
+	route := NewUpsertLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -41,8 +40,8 @@ func TestUpsertExerciseHandler(t *testing.T) {
 	service.AssertExpectations(t)
 }
 
-func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
-	input := backend.Exercise{}
+func TestUpsertLessonHandler_invalidInput(t *testing.T) {
+	input := backend.Lesson{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -51,7 +50,7 @@ func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewUpsertExerciseHandler(service)
+	route := NewUpsertLessonHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -64,5 +63,5 @@ func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertExercise(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"log"
 	"log/slog"
 	"net/http"
@@ -21,7 +22,6 @@ import (
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/cloudevents"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
@@ -173,7 +173,7 @@ func run(ctx context.Context) error {
 
 	go func() {
 		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
-		serverErrors <- server.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
+		serverErrors <- bhttp.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
 	}()
 
 	// =========================================

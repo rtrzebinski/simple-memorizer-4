@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/guregu/null/v5"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 	"github.com/stretchr/testify/suite"
 )
@@ -36,7 +36,7 @@ func (suite *ClientSuite) TestClient_FetchLessons() {
 	suite.Assert().NoError(err)
 
 	method := "GET"
-	route := server.FetchLessons
+	route := http.FetchLessons
 	params := map[string]string(nil)
 	reqBody := []byte(nil)
 
@@ -56,7 +56,7 @@ func (suite *ClientSuite) TestClient_HydrateLesson() {
 	suite.Assert().NoError(err)
 
 	method := "GET"
-	route := server.HydrateLesson
+	route := http.HydrateLesson
 	params := map[string]string{"lesson_id": "10"}
 	reqBody := []byte(nil)
 
@@ -106,7 +106,7 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 	suite.Assert().NoError(err)
 
 	method := "GET"
-	route := server.FetchExercises
+	route := http.FetchExercises
 	params := map[string]string{"lesson_id": "1"}
 	reqBody := []byte(nil)
 
@@ -135,7 +135,7 @@ func (suite *ClientSuite) TestClient_UpsertLesson() {
 	lesson := frontend.Lesson{}
 
 	method := "POST"
-	route := server.UpsertLesson
+	route := http.UpsertLesson
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
@@ -152,7 +152,7 @@ func (suite *ClientSuite) TestClient_DeleteLesson() {
 	lesson := frontend.Lesson{}
 
 	method := "POST"
-	route := server.DeleteLesson
+	route := http.DeleteLesson
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
@@ -169,7 +169,7 @@ func (suite *ClientSuite) TestClient_UpsertExercise() {
 	exercise := frontend.Exercise{}
 
 	method := "POST"
-	route := server.UpsertExercise
+	route := http.UpsertExercise
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
@@ -186,7 +186,7 @@ func (suite *ClientSuite) TestClient_StoreExercises() {
 	var exercises []frontend.Exercise
 
 	method := "POST"
-	route := server.StoreExercises
+	route := http.StoreExercises
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercises)
 	suite.Assert().NoError(err)
@@ -203,7 +203,7 @@ func (suite *ClientSuite) TestClient_DeleteExercise() {
 	exercise := frontend.Exercise{}
 
 	method := "POST"
-	route := server.DeleteExercise
+	route := http.DeleteExercise
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
@@ -220,7 +220,7 @@ func (suite *ClientSuite) TestClient_StoreResult() {
 	result := frontend.Result{}
 
 	method := "POST"
-	route := server.StoreResult
+	route := http.StoreResult
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(result)
 	suite.Assert().NoError(err)

@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"context"
@@ -10,16 +10,18 @@ import (
 	"testing"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/server/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpsertLessonHandler(t *testing.T) {
+func TestStoreExercises(t *testing.T) {
 	ctx := context.Background()
 
-	input := backend.Lesson{
-		Name:        "name",
-		Description: "description",
+	input := backend.Exercises{
+		backend.Exercise{
+			Question: "question",
+			Answer:   "answer",
+		},
 	}
 
 	body, err := json.Marshal(input)
@@ -28,9 +30,9 @@ func TestUpsertLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", ctx, &input).Return(nil)
+	service.On("StoreExercises", ctx, input).Return(nil)
 
-	route := NewUpsertLessonHandler(service)
+	route := NewStoreExercisesHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -40,8 +42,10 @@ func TestUpsertLessonHandler(t *testing.T) {
 	service.AssertExpectations(t)
 }
 
-func TestUpsertLessonHandler_invalidInput(t *testing.T) {
-	input := backend.Lesson{}
+func TestStoreExercisesHandler_invalidInput(t *testing.T) {
+	input := backend.Exercises{
+		backend.Exercise{},
+	}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -50,7 +54,7 @@ func TestUpsertLessonHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewUpsertLessonHandler(service)
+	route := NewStoreExercisesHandler(service)
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
@@ -63,5 +67,5 @@ func TestUpsertLessonHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateStoreExercises(input).Error(), result)
 }
