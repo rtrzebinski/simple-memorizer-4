@@ -3,6 +3,7 @@ package components
 import (
 	"context"
 	"fmt"
+
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"

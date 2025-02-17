@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"github.com/guregu/null/v5"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
