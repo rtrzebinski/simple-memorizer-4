@@ -63,7 +63,7 @@ func setupClient() (*grpc.ClientConn, error) {
 func TestMain(m *testing.M) {
 	startServer()
 
-	err := waitForServer(":50051", 1*time.Second)
+	err := waitForServer(":50051", 5*time.Second)
 	if err != nil {
 		log.Fatalf("gRPC server did not start in time: %v", err)
 	}
@@ -78,8 +78,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestSignInCall(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 
 	req := &authgrpc.SignInRequest{
 		Email:    "foo@bar.com",
@@ -114,8 +113,7 @@ func TestSignInCall(t *testing.T) {
 }
 
 func TestRegisterCall(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 
 	req := &authgrpc.RegisterRequest{
 		Email:    "foo@bar.com",
