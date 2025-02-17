@@ -8,7 +8,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
+
+const timeout = 10 * time.Second
 
 // Caller is an HTTP caller
 type Caller struct {
@@ -24,6 +27,9 @@ func NewCaller(http *http.Client, host string, scheme string) *Caller {
 
 // Call makes an HTTP call
 func (c *Caller) Call(ctx context.Context, method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
 	if err != nil {
