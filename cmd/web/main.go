@@ -22,8 +22,8 @@ import (
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/cloudevents"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/api"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
+	fhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
 )
@@ -68,7 +68,7 @@ func run(ctx context.Context) error {
 	u := app.Window().URL()
 
 	// create a service to be injected into components
-	apiClient := api.NewClient(api.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
+	apiClient := fhttp.NewClient(fhttp.NewHTTPCaller(&http.Client{}, u.Host, u.Scheme))
 
 	// The first thing to do is to associate the home component with a path.
 	//
