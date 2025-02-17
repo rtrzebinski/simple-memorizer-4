@@ -1,9 +1,10 @@
 package frontend
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExercise_GoodAnswersPercent(t *testing.T) {

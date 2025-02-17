@@ -1,16 +1,17 @@
-package http
+package caller
 
 import (
 	"bytes"
 	"context"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestHTTPCaller_Call(t *testing.T) {
+func TestCaller_Call(t *testing.T) {
 	ctx := context.Background()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +33,7 @@ func TestHTTPCaller_Call(t *testing.T) {
 	u, err := url.Parse(server.URL)
 	assert.NoError(t, err)
 
-	c := NewHTTPCaller(server.Client(), u.Host, u.Scheme)
+	c := NewCaller(server.Client(), u.Host, u.Scheme)
 
 	respBody, err := c.Call(ctx, "method", "/route", map[string]string{"foo": "bar"}, []byte("request body"))
 
