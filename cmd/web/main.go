@@ -5,8 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http/caller"
 	"log"
 	"log/slog"
 	"net/http"
@@ -22,9 +20,11 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/cloudevents"
+	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
 	fhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http/caller"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
 )
@@ -169,7 +169,7 @@ func run(ctx context.Context) error {
 
 	reader := storage.NewReader(db)
 	writer := storage.NewWriter(db)
-	publisher := cloudevents.NewPublisher(ceClient)
+	publisher := pubsub.NewPublisher(ceClient)
 	service := backend.NewService(reader, writer, publisher)
 
 	go func() {

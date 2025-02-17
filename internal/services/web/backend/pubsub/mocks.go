@@ -1,7 +1,8 @@
-package cloudevents
+package pubsub
 
 import (
 	"context"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/stretchr/testify/mock"
