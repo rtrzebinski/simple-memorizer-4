@@ -8,22 +8,22 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
-// Service provides next exercise to memorize
+// Memorizer provides next exercise to memorize
 // points are calculated based on exercise results
 // the more points an exercise has the more chances it has to be picked
-type Service struct {
+type Memorizer struct {
 	r         *rand.Rand
 	exercises map[int]frontend.Exercise
 }
 
 // Init the service with exercises to memorize
-func (s *Service) Init(exercises map[int]frontend.Exercise) {
+func (s *Memorizer) Init(exercises map[int]frontend.Exercise) {
 	s.r = rand.New(rand.NewSource(time.Now().Unix()))
 	s.exercises = exercises
 }
 
 // Next exercise to memorize
-func (s *Service) Next(previous frontend.Exercise) frontend.Exercise {
+func (s *Memorizer) Next(previous frontend.Exercise) frontend.Exercise {
 	// update previous if provided
 	if previous.Id > 0 {
 		s.exercises[previous.Id] = previous

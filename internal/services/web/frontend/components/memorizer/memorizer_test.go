@@ -17,7 +17,7 @@ func TestMemorizer_simpleRandomization(t *testing.T) {
 	exercises[e1.Id] = e1
 	exercises[e2.Id] = e2
 
-	s := Service{}
+	s := Memorizer{}
 	s.Init(exercises)
 
 	res := s.Next(frontend.Exercise{})
@@ -36,7 +36,7 @@ func TestMemorizer_simpleRandomization_skipPrevious(t *testing.T) {
 	exercises[e1.Id] = e1
 	exercises[e2.Id] = e2
 
-	s := Service{}
+	s := Memorizer{}
 	s.Init(exercises)
 
 	res := s.Next(e2)

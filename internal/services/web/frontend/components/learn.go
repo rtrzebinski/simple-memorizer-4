@@ -17,7 +17,7 @@ const PathLearn = "/learn"
 type Learn struct {
 	app.Compo
 	c         APIClient
-	memorizer memorizer.Service
+	memorizer memorizer.Memorizer
 
 	// component vars
 	lesson          frontend.Lesson
