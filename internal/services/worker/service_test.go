@@ -3,23 +3,24 @@ package worker
 import (
 	"context"
 	"errors"
-	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type ServiceSuite struct {
 	suite.Suite
 	r       *ReaderMock
 	w       *WriterMock
-	pb      *ProjectionBuilderMock
 	service *Service
 }
 
 func (suite *ServiceSuite) SetupTest() {
 	suite.r = new(ReaderMock)
 	suite.w = new(WriterMock)
-	suite.pb = new(ProjectionBuilderMock)
-	suite.service = NewService(suite.r, suite.w, suite.pb)
+	suite.service = NewService(suite.r, suite.w)
 }
 
 func TestServiceSuite(t *testing.T) {
@@ -42,21 +43,19 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 		},
 	}
 
-	projection := ResultsProjection{
+	rp := ResultsProjection{
 		GoodAnswers: 1,
 	}
 
 	suite.w.On("StoreResult", ctx, result).Return(nil)
 	suite.r.On("FetchResults", ctx, exerciseID).Return(results, nil)
-	suite.pb.On("Projection", results).Return(projection)
-	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, projection).Return(nil)
+	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, rp).Return(nil)
 
 	err := suite.service.ProcessGoodAnswer(ctx, exerciseID)
 
 	suite.NoError(err)
 	suite.r.AssertExpectations(suite.T())
 	suite.w.AssertExpectations(suite.T())
-	suite.pb.AssertExpectations(suite.T())
 }
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
@@ -76,7 +75,6 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
 	suite.Contains(err.Error(), "database error")
 	suite.r.AssertExpectations(suite.T())
 	suite.w.AssertExpectations(suite.T())
-	suite.pb.AssertExpectations(suite.T())
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
@@ -95,21 +93,19 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 		},
 	}
 
-	projection := ResultsProjection{
+	rp := ResultsProjection{
 		BadAnswers: 1,
 	}
 
 	suite.w.On("StoreResult", ctx, result).Return(nil)
 	suite.r.On("FetchResults", ctx, exerciseID).Return(results, nil)
-	suite.pb.On("Projection", results).Return(projection)
-	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, projection).Return(nil)
+	suite.w.On("UpdateExerciseProjection", ctx, exerciseID, rp).Return(nil)
 
 	err := suite.service.ProcessBadAnswer(ctx, exerciseID)
 
 	suite.NoError(err)
 	suite.r.AssertExpectations(suite.T())
 	suite.w.AssertExpectations(suite.T())
-	suite.pb.AssertExpectations(suite.T())
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Error() {
@@ -129,5 +125,73 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Error() {
 	suite.Contains(err.Error(), "database error")
 	suite.r.AssertExpectations(suite.T())
 	suite.w.AssertExpectations(suite.T())
-	suite.pb.AssertExpectations(suite.T())
+}
+
+func TestService_resultsProjection(t *testing.T) {
+	yesterday := time.Now().Add(-24 * time.Hour)
+	today := time.Now()
+
+	var results []Result
+
+	results = append(results, Result{
+		Type:      Bad,
+		CreatedAt: yesterday,
+	})
+
+	results = append(results, Result{
+		Type:      Bad,
+		CreatedAt: yesterday,
+	})
+
+	results = append(results, Result{
+		Type:      Bad,
+		CreatedAt: yesterday,
+	})
+
+	results = append(results, Result{
+		Type:      Good,
+		CreatedAt: yesterday,
+	})
+
+	rp := resultsProjection(results)
+
+	assert.Equal(t, 3, rp.BadAnswers)
+	assert.Equal(t, 0, rp.BadAnswersToday)
+	assert.Equal(t, yesterday, rp.LatestBadAnswer.Time)
+	assert.False(t, rp.LatestBadAnswerWasToday)
+	assert.Equal(t, 1, rp.GoodAnswers)
+	assert.Equal(t, 0, rp.GoodAnswersToday)
+	assert.Equal(t, yesterday, rp.LatestGoodAnswer.Time)
+	assert.False(t, rp.LatestGoodAnswerWasToday)
+
+	results = append(results, Result{
+		Type:      Bad,
+		CreatedAt: today,
+	})
+
+	results = append(results, Result{
+		Type:      Bad,
+		CreatedAt: today,
+	})
+
+	results = append(results, Result{
+		Type:      Good,
+		CreatedAt: today,
+	})
+
+	results = append(results, Result{
+		Type:      Good,
+		CreatedAt: today,
+	})
+
+	rp = resultsProjection(results)
+
+	assert.Equal(t, 5, rp.BadAnswers)
+	assert.Equal(t, 2, rp.BadAnswersToday)
+	assert.Equal(t, today, rp.LatestBadAnswer.Time)
+	assert.True(t, rp.LatestBadAnswerWasToday)
+	assert.Equal(t, 3, rp.GoodAnswers)
+	assert.Equal(t, 2, rp.GoodAnswersToday)
+	assert.Equal(t, today, rp.LatestGoodAnswer.Time)
+	assert.True(t, rp.LatestGoodAnswerWasToday)
 }

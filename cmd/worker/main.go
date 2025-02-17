@@ -20,7 +20,6 @@ import (
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/cloudevents"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/result"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/worker"
 )
@@ -104,7 +103,7 @@ func run(ctx context.Context) error {
 
 	reader := storage.NewReader(db)
 	writer := storage.NewWriter(db)
-	service := worker.NewService(reader, writer, result.NewProjectionBuilder())
+	service := worker.NewService(reader, writer)
 	handler := cloudevents.NewHandler(service)
 
 	receiver := func(ctx context.Context, ev event.Event) error {

@@ -27,12 +27,3 @@ func (m *WriterMock) UpdateExerciseProjection(ctx context.Context, exerciseID in
 	args := m.Called(ctx, exerciseID, projection)
 	return args.Error(0)
 }
-
-type ProjectionBuilderMock struct {
-	mock.Mock
-}
-
-func (m *ProjectionBuilderMock) Projection(results []Result) ResultsProjection {
-	args := m.Called(results)
-	return args.Get(0).(ResultsProjection)
-}

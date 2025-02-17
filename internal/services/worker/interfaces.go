@@ -10,7 +10,3 @@ type Writer interface {
 	StoreResult(ctx context.Context, result Result) error
 	UpdateExerciseProjection(ctx context.Context, exerciseID int, projection ResultsProjection) error
 }
-
-type ProjectionBuilder interface {
-	Projection(results []Result) ResultsProjection
-}
