@@ -24,5 +24,8 @@ COPY --from=builder /app/version ./version
 # Add /app to PATH
 ENV PATH="/app:${PATH}"
 
+# Expose port 50051
+EXPOSE 50051
+
 # Start the application
 CMD ["./sm4-auth"]
