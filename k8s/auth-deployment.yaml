@@ -38,3 +38,15 @@ spec:
             requests:
               cpu: 10m
               memory: 16Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm4-auth
+spec:
+  selector:
+    app: sm4-auth
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051

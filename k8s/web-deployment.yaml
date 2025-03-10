@@ -27,6 +27,8 @@ spec:
               value: "sm4-project"
             - name: PUBSUB_TOPIC_ID
               value: "sm4-topic"
+            - name: AUTH_SERVER_ADDRESS
+              value: "sm4-auth:50051"
           readinessProbe:
             httpGet:
               path: /readyz

@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"log/slog"
 	"net/http"
@@ -34,6 +36,9 @@ type config struct {
 		Port     string `envconfig:"WEB_PORT" default:":8000"`
 		CertFile string `envconfig:"WEB_CERT_FILE" default:"ssl/localhost-cert.pem"`
 		KeyFile  string `envconfig:"WEB_KEY_FILE" default:"ssl/localhost-key.pem"`
+	}
+	Auth struct {
+		ServerAddr string `envconfig:"AUTH_SERVER_ADDRESS" default:"localhost:50051"`
 	}
 	Db struct {
 		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
@@ -164,7 +169,28 @@ func run(ctx context.Context) error {
 	serverErrors := make(chan error, 1)
 
 	// =========================================
-	// Start server
+	// Start auth gRPC client
+	// =========================================
+
+	conn, err := grpc.NewClient(
+		cfg.Auth.ServerAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	defer func() {
+		err := conn.Close()
+		if err != nil {
+			slog.Warn("failed to close gRPC connection", "error", err, "service", "web")
+		}
+	}()
+
+	if err != nil {
+		return fmt.Errorf("failed to connect to gRPC server: %w", err)
+	}
+
+	slog.Info("connected to auth gRPC server", "service", "web", "addr", cfg.Auth.ServerAddr)
+
+	// =========================================
+	// Start a Web server
 	// =========================================
 
 	reader := storage.NewReader(db)
@@ -181,7 +207,7 @@ func run(ctx context.Context) error {
 	// Start probes
 	// =========================================
 
-	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db)
+	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db, conn)
 
 	// Start probe server and send errors to the channel
 	go func() {

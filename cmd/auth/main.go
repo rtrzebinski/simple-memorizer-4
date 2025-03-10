@@ -95,7 +95,7 @@ func run(ctx context.Context) error {
 	// Start probes
 	// =========================================
 
-	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, nil)
+	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, nil, nil)
 
 	// Start probe server and send errors to the channel
 	go func() {
