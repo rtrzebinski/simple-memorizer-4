@@ -17,6 +17,8 @@ import (
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type config struct {
@@ -79,12 +81,19 @@ func run(ctx context.Context) error {
 
 	grpcServer := grpc.NewServer()
 
+	healthServer := health.NewServer()
+
+	// register health check service
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+
+	// register auth service
 	reader := &DummyReader{}
 	writer := &DummyWriter{}
 	service := auth.NewService(reader, writer)
 	server := authgrpc.NewServer(service)
-
 	protogrpc.RegisterAuthServiceServer(grpcServer, server)
+
+	healthServer.SetServingStatus("sm4-auth", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	go func() {
 		slog.Info("initializing gRPC server", "addr", cfg.ServerAddr, "service", "auth")
