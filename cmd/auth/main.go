@@ -20,6 +20,7 @@ import (
 )
 
 type config struct {
+	ServerAddr      string        `envconfig:"SERVER_ADDRESS" default:":50051"`
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9092"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
 }
@@ -68,10 +69,10 @@ func run(ctx context.Context) error {
 	serverErrors := make(chan error, 1)
 
 	// =========================================
-	// Start auth
+	// Start auth gRPC server
 	// =========================================
 
-	listener, err := net.Listen("tcp", ":50051")
+	listener, err := net.Listen("tcp", cfg.ServerAddr)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
@@ -86,7 +87,7 @@ func run(ctx context.Context) error {
 	protogrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	go func() {
-		slog.Info("initializing gRPC server", "addr", ":50051", "service", "auth")
+		slog.Info("initializing gRPC server", "addr", cfg.ServerAddr, "service", "auth")
 		serverErrors <- grpcServer.Serve(listener)
 	}()
 
