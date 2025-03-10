@@ -19,11 +19,11 @@ spec:
             - containerPort: 8085
           resources:
             limits:
-              cpu: 200m
+              cpu: 500m
               memory: 1024Mi
             requests:
               cpu: 50m
-              memory: 256Mi
+              memory: 512Mi
           command: [ "/bin/bash", "-c" ]
           args:
             - >
