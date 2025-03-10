@@ -2,9 +2,10 @@ package http
 
 import (
 	"database/sql"
+	"net/http"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"net/http"
 )
 
 func SetupProbeServer(addr string, db *sql.DB, conn *grpc.ClientConn) *http.Server {

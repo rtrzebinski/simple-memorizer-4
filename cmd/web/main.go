@@ -5,8 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"log/slog"
 	"net/http"
@@ -29,6 +27,8 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http/caller"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type config struct {
