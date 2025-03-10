@@ -39,7 +39,7 @@ func Readyz(db *sql.DB, conn *grpc.ClientConn) http.HandlerFunc {
 		if conn != nil {
 			healthClient := grpc_health_v1.NewHealthClient(conn)
 			response, err := healthClient.Check(ctx, &grpc_health_v1.HealthCheckRequest{
-				Service: "sm4-auth-service",
+				Service: "",
 			})
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
