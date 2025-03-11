@@ -28,7 +28,7 @@ func startServer() {
 	})
 }
 
-func waitForServer(address string, timeout time.Duration) error {
+func waitForServer(timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 
 	for time.Now().Before(deadline) {
@@ -63,7 +63,7 @@ func setupClient() (*grpc.ClientConn, error) {
 func TestMain(m *testing.M) {
 	startServer()
 
-	err := waitForServer(":50051", 5*time.Second)
+	err := waitForServer(5 * time.Second)
 	if err != nil {
 		log.Fatalf("gRPC server did not start in time: %v", err)
 	}
