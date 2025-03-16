@@ -19,4 +19,9 @@ const (
 	// download
 
 	ExportLessonCsv = "/export-lesson-csv"
+
+	// auth
+
+	AuthRegister = "/auth-register"
+	AuthSignIn   = "/auth-sign-in"
 )

@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServer_Register(t *testing.T) {
 	ctx := context.Background()
 
-	req := new(grpc.RegisterRequest)
+	req := new(gengrpc.RegisterRequest)
 	req.Email = "email"
 	req.Name = "name"
 	req.Password = "password"
@@ -29,7 +29,7 @@ func TestServer_Register(t *testing.T) {
 func TestServer_Register_fail(t *testing.T) {
 	ctx := context.Background()
 
-	req := new(grpc.RegisterRequest)
+	req := new(gengrpc.RegisterRequest)
 	req.Email = "email"
 	req.Name = "name"
 	req.Password = "password"
@@ -47,7 +47,7 @@ func TestServer_Register_fail(t *testing.T) {
 func TestServer_SignIn(t *testing.T) {
 	ctx := context.Background()
 
-	req := new(grpc.SignInRequest)
+	req := new(gengrpc.SignInRequest)
 	req.Email = "email"
 	req.Password = "password"
 
@@ -64,7 +64,7 @@ func TestServer_SignIn(t *testing.T) {
 func TestServer_SignIn_fail(t *testing.T) {
 	ctx := context.Background()
 
-	req := new(grpc.SignInRequest)
+	req := new(gengrpc.SignInRequest)
 	req.Email = "email"
 	req.Password = "password"
 

@@ -18,8 +18,10 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	webgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/grpc"
 	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
@@ -183,6 +185,8 @@ func run(ctx context.Context) error {
 		}
 	}()
 
+	grpcClient := gengrpc.NewAuthServiceClient(conn)
+
 	if err != nil {
 		return fmt.Errorf("failed to connect to gRPC server: %w", err)
 	}
@@ -196,7 +200,8 @@ func run(ctx context.Context) error {
 	reader := storage.NewReader(db)
 	writer := storage.NewWriter(db)
 	publisher := pubsub.NewPublisher(ceClient)
-	service := backend.NewService(reader, writer, publisher)
+	authClient := webgrpc.NewAuthClient(grpcClient)
+	service := backend.NewService(reader, writer, publisher, authClient)
 
 	go func() {
 		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")

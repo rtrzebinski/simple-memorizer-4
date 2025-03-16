@@ -6,10 +6,11 @@ type Service struct {
 	r Reader
 	w Writer
 	p Publisher
+	a AuthClient
 }
 
-func NewService(r Reader, w Writer, p Publisher) *Service {
-	return &Service{r: r, w: w, p: p}
+func NewService(r Reader, w Writer, p Publisher, a AuthClient) *Service {
+	return &Service{r: r, w: w, p: p, a: a}
 }
 
 func (s *Service) FetchLessons(ctx context.Context) (Lessons, error) {
@@ -50,4 +51,12 @@ func (s *Service) PublishGoodAnswer(ctx context.Context, exerciseID int) error {
 
 func (s *Service) PublishBadAnswer(ctx context.Context, exerciseID int) error {
 	return s.p.PublishBadAnswer(ctx, exerciseID)
+}
+
+func (s *Service) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
+	return s.a.Register(ctx, name, email, password)
+}
+
+func (s *Service) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
+	return s.a.SignIn(ctx, email, password)
 }

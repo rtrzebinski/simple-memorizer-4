@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
-	protogrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	authgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
@@ -91,7 +91,7 @@ func run(ctx context.Context) error {
 	writer := &DummyWriter{}
 	service := auth.NewService(reader, writer)
 	server := authgrpc.NewServer(service)
-	protogrpc.RegisterAuthServiceServer(grpcServer, server)
+	gengrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	healthServer.SetServingStatus("sm4-auth", grpc_health_v1.HealthCheckResponse_SERVING)
 

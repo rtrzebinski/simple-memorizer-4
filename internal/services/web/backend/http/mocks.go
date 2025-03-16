@@ -64,3 +64,13 @@ func (m *ServiceMock) PublishBadAnswer(ctx context.Context, exerciseID int) erro
 	args := m.Called(ctx, exerciseID)
 	return args.Error(0)
 }
+
+func (m *ServiceMock) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
+	args := m.Called(ctx, name, email, password)
+	return args.String(0), args.Error(1)
+}
+
+func (m *ServiceMock) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
+	args := m.Called(ctx, email, password)
+	return args.String(0), args.Error(1)
+}

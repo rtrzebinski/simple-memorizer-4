@@ -13,7 +13,8 @@ func TestService_FetchLessons(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	expectedLessons := Lessons{}
 	readerMock.On("FetchLessons", ctx).Return(expectedLessons, nil)
@@ -31,7 +32,8 @@ func TestService_HydrateLesson(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	lesson := &Lesson{}
 	readerMock.On("HydrateLesson", ctx, lesson).Return(nil)
@@ -48,7 +50,8 @@ func TestService_FetchExercises(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	lesson := Lesson{}
 	expectedExercises := Exercises{}
@@ -67,7 +70,8 @@ func TestService_UpsertLesson(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	lesson := &Lesson{}
 	writerMock.On("UpsertLesson", ctx, lesson).Return(nil)
@@ -84,7 +88,8 @@ func TestService_DeleteLesson(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	lesson := Lesson{}
 	writerMock.On("DeleteLesson", ctx, lesson).Return(nil)
@@ -101,7 +106,8 @@ func TestService_UpsertExercise(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	exercise := &Exercise{}
 	writerMock.On("UpsertExercise", ctx, exercise).Return(nil)
@@ -118,7 +124,8 @@ func TestService_StoreExercises(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	exercises := Exercises{}
 	writerMock.On("StoreExercises", ctx, exercises).Return(nil)
@@ -135,7 +142,8 @@ func TestService_DeleteExercise(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	exercise := Exercise{}
 	writerMock.On("DeleteExercise", ctx, exercise).Return(nil)
@@ -152,7 +160,8 @@ func TestService_PublishGoodAnswer(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	exerciseID := 123
 	publisherMock.On("PublishGoodAnswer", ctx, exerciseID).Return(nil)
@@ -169,7 +178,8 @@ func TestService_PublishBadAnswer(t *testing.T) {
 	readerMock := NewReaderMock()
 	writerMock := NewWriterMock()
 	publisherMock := NewPublisherMock()
-	service := NewService(readerMock, writerMock, publisherMock)
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
 	exerciseID := 123
 	publisherMock.On("PublishBadAnswer", ctx, exerciseID).Return(nil)
@@ -178,4 +188,47 @@ func TestService_PublishBadAnswer(t *testing.T) {
 
 	assert.NoError(t, err)
 	publisherMock.AssertExpectations(t)
+}
+
+func TestService_Register(t *testing.T) {
+	ctx := context.Background()
+
+	readerMock := NewReaderMock()
+	writerMock := NewWriterMock()
+	publisherMock := NewPublisherMock()
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
+
+	name := "name"
+	email := "email"
+	password := "password"
+	accessToken := "accessToken"
+	authClientMock.On("Register", ctx, name, email, password).Return(accessToken, nil)
+
+	token, err := service.Register(ctx, name, email, password)
+
+	assert.NoError(t, err)
+	assert.Equal(t, accessToken, token)
+	authClientMock.AssertExpectations(t)
+}
+
+func TestService_SignIn(t *testing.T) {
+	ctx := context.Background()
+
+	readerMock := NewReaderMock()
+	writerMock := NewWriterMock()
+	publisherMock := NewPublisherMock()
+	authClientMock := NewAuthClientMock()
+	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
+
+	email := "email"
+	password := "password"
+	accessToken := "accessToken"
+	authClientMock.On("SignIn", ctx, email, password).Return(accessToken, nil)
+
+	token, err := service.SignIn(ctx, email, password)
+
+	assert.NoError(t, err)
+	assert.Equal(t, accessToken, token)
+	authClientMock.AssertExpectations(t)
 }

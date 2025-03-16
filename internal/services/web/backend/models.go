@@ -46,4 +46,21 @@ type Result struct {
 	CreatedAt time.Time
 }
 
-type Results []Result
+type RegisterRequest struct {
+	Name     string
+	Email    string
+	Password string
+}
+
+type RegisterResponse struct {
+	AccessToken string
+}
+
+type SignInRequest struct {
+	Email    string
+	Password string
+}
+
+type SignInResponse struct {
+	AccessToken string
+}

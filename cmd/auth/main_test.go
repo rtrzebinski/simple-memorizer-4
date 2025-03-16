@@ -11,14 +11,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	authgrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
-	client authgrpc.AuthServiceClient
+	client gengrpc.AuthServiceClient
 	once   sync.Once
 )
 
@@ -55,7 +55,7 @@ func setupClient() (*grpc.ClientConn, error) {
 		return nil, err
 	}
 
-	client = authgrpc.NewAuthServiceClient(conn)
+	client = gengrpc.NewAuthServiceClient(conn)
 
 	return conn, nil
 }
@@ -80,7 +80,7 @@ func TestMain(m *testing.M) {
 func TestSignInCall(t *testing.T) {
 	ctx := context.Background()
 
-	req := &authgrpc.SignInRequest{
+	req := &gengrpc.SignInRequest{
 		Email:    "foo@bar.com",
 		Password: "password",
 	}
@@ -115,7 +115,7 @@ func TestSignInCall(t *testing.T) {
 func TestRegisterCall(t *testing.T) {
 	ctx := context.Background()
 
-	req := &authgrpc.RegisterRequest{
+	req := &gengrpc.RegisterRequest{
 		Email:    "foo@bar.com",
 		Name:     "foo bar",
 		Password: "password",
