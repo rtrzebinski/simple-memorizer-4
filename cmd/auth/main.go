@@ -14,7 +14,7 @@ import (
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
-	authgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
+	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -90,7 +90,7 @@ func run(ctx context.Context) error {
 	reader := &DummyReader{}
 	writer := &DummyWriter{}
 	service := auth.NewService(reader, writer)
-	server := authgrpc.NewServer(service)
+	server := intgrpc.NewServer(service)
 	gengrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	healthServer.SetServingStatus("sm4-auth", grpc_health_v1.HealthCheckResponse_SERVING)

@@ -21,7 +21,7 @@ import (
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	webgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/grpc"
+	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/grpc"
 	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
@@ -200,7 +200,7 @@ func run(ctx context.Context) error {
 	reader := storage.NewReader(db)
 	writer := storage.NewWriter(db)
 	publisher := pubsub.NewPublisher(ceClient)
-	authClient := webgrpc.NewAuthClient(grpcClient)
+	authClient := intgrpc.NewAuthClient(grpcClient)
 	service := backend.NewService(reader, writer, publisher, authClient)
 
 	go func() {
