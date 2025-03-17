@@ -2,14 +2,14 @@ package grpc
 
 import (
 	"context"
-	"github.com/stretchr/testify/mock"
 	"testing"
 
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestAuthAPIClient_Register(t *testing.T) {
+func TestAuthClient_Register(t *testing.T) {
 	ctx := context.Background()
 
 	clientMock := NewAuthServiceClientMock()
@@ -29,7 +29,7 @@ func TestAuthAPIClient_Register(t *testing.T) {
 	assert.Equal(t, "accessToken", accessToken)
 }
 
-func TestAuthAPIClient_SignIn(t *testing.T) {
+func TestAuthClient_SignIn(t *testing.T) {
 	ctx := context.Background()
 
 	clientMock := NewAuthServiceClientMock()
