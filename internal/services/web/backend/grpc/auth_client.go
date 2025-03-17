@@ -31,7 +31,6 @@ func (a *AuthClient) Register(ctx context.Context, name, email, password string)
 	return res.AccessToken, nil
 }
 
-// todo test
 func (a *AuthClient) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
 	req := gengrpc.SignInRequest{
 		Email:    email,

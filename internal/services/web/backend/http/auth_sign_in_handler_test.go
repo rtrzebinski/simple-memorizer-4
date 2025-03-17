@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -58,7 +59,7 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", ctx, input.Email, input.Password).Return("accessToken", nil)
+	service.On("SignIn", ctx, input.Email, input.Password).Return("", errors.New("unauthorized"))
 
 	handler := NewAuthSignInHandler(service)
 
@@ -67,10 +68,6 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 
 	handler.ServeHTTP(res, req)
 
-	assert.Equal(t, http.StatusOK, res.Code)
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
 	service.AssertExpectations(t)
-	var signInResponse backend.SignInResponse
-	err = json.Unmarshal(res.Body.Bytes(), &signInResponse)
-	assert.NoError(t, err)
-	assert.Equal(t, "accessToken", signInResponse.AccessToken)
 }
