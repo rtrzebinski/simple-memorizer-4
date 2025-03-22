@@ -17,6 +17,10 @@ func (compo *Navigation) Render() app.UI {
 			app.Text(" | "),
 			app.A().Href(PathLessons).Text("Lessons"),
 			app.Text(" | "),
+			app.A().Href(PathAuthRegister).Text("Register"),
+			app.Text(" | "),
+			app.A().Href(PathAuthSignIn).Text("SignIn"),
+			app.Text(" | "),
 			app.Text(app.Getenv("version")),
 		),
 	)

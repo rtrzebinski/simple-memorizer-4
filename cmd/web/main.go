@@ -85,6 +85,8 @@ func run(ctx context.Context) error {
 	app.Route(components.PathHome, func() app.Composer { return components.NewHome() })
 
 	// Associate other frontend routes
+	app.Route(components.PathAuthRegister, func() app.Composer { return components.NewRegister() })
+	app.Route(components.PathAuthSignIn, func() app.Composer { return components.NewSignIn() })
 	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient) })
 	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient) })
 	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient) })
