@@ -9,11 +9,12 @@ const PathAuthSignIn = "/sign-in"
 // SignIn is a component that displays the sign-in form
 type SignIn struct {
 	app.Compo
+	c APIClient
 }
 
 // NewSignIn creates a new sign-in component
-func NewSignIn() *SignIn {
-	return &SignIn{}
+func NewSignIn(c APIClient) *SignIn {
+	return &SignIn{c: c}
 }
 
 // The Render method is where the component appearance is defined.

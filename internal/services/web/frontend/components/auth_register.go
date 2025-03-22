@@ -9,11 +9,12 @@ const PathAuthRegister = "/register"
 // Register is a component that displays the registration form
 type Register struct {
 	app.Compo
+	c APIClient
 }
 
 // NewRegister creates a new Register component
-func NewRegister() *Register {
-	return &Register{}
+func NewRegister(c APIClient) *Register {
+	return &Register{c: c}
 }
 
 // The Render method is where the component appearance is defined.
