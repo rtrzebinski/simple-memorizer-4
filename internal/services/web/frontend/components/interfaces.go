@@ -16,4 +16,6 @@ type APIClient interface {
 	StoreExercises(ctx context.Context, exercises []frontend.Exercise) error
 	DeleteExercise(ctx context.Context, exercise frontend.Exercise) error
 	StoreResult(ctx context.Context, result frontend.Result) error
+	AuthRegister(ctx context.Context, req frontend.RegisterRequest) (frontend.RegisterResponse, error)
+	AuthSignIn(ctx context.Context, req frontend.SignInRequest) (frontend.SignInResponse, error)
 }

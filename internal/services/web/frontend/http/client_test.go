@@ -230,3 +230,47 @@ func (suite *ClientSuite) TestClient_StoreResult() {
 	err = suite.client.StoreResult(ctx, result)
 	suite.Assert().NoError(err)
 }
+
+func (suite *ClientSuite) TestClient_AuthRegister() {
+	ctx := context.Background()
+
+	req := frontend.RegisterRequest{}
+	resp := frontend.RegisterResponse{}
+
+	responseBody, err := json.Marshal(resp)
+	suite.Assert().NoError(err)
+
+	method := "POST"
+	route := http.AuthRegister
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(req)
+	suite.Assert().NoError(err)
+
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody)
+
+	result, err := suite.client.AuthRegister(ctx, req)
+	suite.Assert().NoError(err)
+	suite.Assert().Equal(resp, result)
+}
+
+func (suite *ClientSuite) TestClient_AuthSignIn() {
+	ctx := context.Background()
+
+	req := frontend.SignInRequest{}
+	resp := frontend.SignInResponse{}
+
+	responseBody, err := json.Marshal(resp)
+	suite.Assert().NoError(err)
+
+	method := "POST"
+	route := http.AuthSignIn
+	params := map[string]string(nil)
+	reqBody, err := json.Marshal(req)
+	suite.Assert().NoError(err)
+
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody)
+
+	result, err := suite.client.AuthSignIn(ctx, req)
+	suite.Assert().NoError(err)
+	suite.Assert().Equal(resp, result)
+}

@@ -163,3 +163,43 @@ func (s *Client) StoreResult(ctx context.Context, result frontend.Result) error 
 
 	return nil
 }
+
+func (s *Client) AuthRegister(ctx context.Context, req frontend.RegisterRequest) (frontend.RegisterResponse, error) {
+	res := frontend.RegisterResponse{}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return res, fmt.Errorf("failed to encode register request: %w", err)
+	}
+
+	respBody, err := s.c.Call(ctx, "POST", http.AuthRegister, nil, body)
+	if err != nil {
+		return res, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	if err := json.Unmarshal(respBody, &res); err != nil {
+		return res, fmt.Errorf("failed to decode register response: %w", err)
+	}
+
+	return res, nil
+}
+
+func (s *Client) AuthSignIn(ctx context.Context, req frontend.SignInRequest) (frontend.SignInResponse, error) {
+	res := frontend.SignInResponse{}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return res, fmt.Errorf("failed to encode sign in request: %w", err)
+	}
+
+	respBody, err := s.c.Call(ctx, "POST", http.AuthSignIn, nil, body)
+	if err != nil {
+		return res, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	if err := json.Unmarshal(respBody, &res); err != nil {
+		return res, fmt.Errorf("failed to decode sign in response: %w", err)
+	}
+
+	return res, nil
+}
