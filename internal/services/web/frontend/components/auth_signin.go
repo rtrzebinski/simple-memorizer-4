@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
@@ -14,7 +15,6 @@ type SignIn struct {
 	c APIClient
 
 	// form
-	inputName            string
 	inputEmail           string
 	inputPassword        string
 	submitButtonDisabled bool
@@ -22,7 +22,11 @@ type SignIn struct {
 
 // NewSignIn creates a new sign-in component
 func NewSignIn(c APIClient) *SignIn {
-	return &SignIn{c: c}
+	compo := &SignIn{c: c}
+	compo.inputEmail = "foo@bar.com"
+	compo.inputPassword = "password"
+
+	return compo
 }
 
 // The Render method is where the component appearance is defined.
@@ -48,4 +52,23 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 	compo.submitButtonDisabled = true
 	fmt.Println(compo.inputEmail)
 	fmt.Println(compo.inputPassword)
+
+	req := frontend.SignInRequest{
+		Email:    compo.inputEmail,
+		Password: compo.inputPassword,
+	}
+
+	resp, err := compo.c.AuthSignIn(ctx, req)
+	if err != nil {
+		compo.submitButtonDisabled = false
+		app.Log(fmt.Errorf("failed to sign in: %w", err))
+		return
+	}
+
+	fmt.Println("Response:", resp)
+	compo.submitButtonDisabled = false
+	compo.inputEmail = ""
+	compo.inputPassword = ""
+
+	//app.Window().Get("location").Call("replace", PathLessons)
 }

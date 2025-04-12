@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
@@ -22,7 +23,12 @@ type Register struct {
 
 // NewRegister creates a new Register component
 func NewRegister(c APIClient) *Register {
-	return &Register{c: c}
+	compo := &Register{c: c}
+	compo.inputEmail = "foo@bar.com"
+	compo.inputPassword = "password"
+	compo.inputName = "foo"
+
+	return compo
 }
 
 // The Render method is where the component appearance is defined.
@@ -52,4 +58,23 @@ func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 	fmt.Println(compo.inputName)
 	fmt.Println(compo.inputEmail)
 	fmt.Println(compo.inputPassword)
+
+	req := frontend.RegisterRequest{
+		Name:     compo.inputName,
+		Email:    compo.inputEmail,
+		Password: compo.inputPassword,
+	}
+
+	resp, err := compo.c.AuthRegister(ctx, req)
+	if err != nil {
+		compo.registerButtonDisabled = false
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println("Response:", resp)
+	compo.registerButtonDisabled = false
+	compo.inputName = ""
+	compo.inputEmail = ""
+	compo.inputPassword = ""
 }
