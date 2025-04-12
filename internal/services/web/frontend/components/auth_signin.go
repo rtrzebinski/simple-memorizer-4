@@ -2,9 +2,10 @@ package components
 
 import (
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
 const PathAuthSignIn = "/sign-in"
@@ -12,7 +13,8 @@ const PathAuthSignIn = "/sign-in"
 // SignIn is a component that displays the sign-in form
 type SignIn struct {
 	app.Compo
-	c APIClient
+	c   APIClient
+	nav *Navigation
 
 	// form
 	inputEmail           string
@@ -21,10 +23,11 @@ type SignIn struct {
 }
 
 // NewSignIn creates a new sign-in component
-func NewSignIn(c APIClient) *SignIn {
+func NewSignIn(c APIClient, nav *Navigation) *SignIn {
 	compo := &SignIn{c: c}
 	compo.inputEmail = "foo@bar.com"
 	compo.inputPassword = "password"
+	compo.nav = nav
 
 	return compo
 }
@@ -50,8 +53,6 @@ func (compo *SignIn) Render() app.UI {
 // handleSubmit handles submit button click
 func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 	compo.submitButtonDisabled = true
-	fmt.Println(compo.inputEmail)
-	fmt.Println(compo.inputPassword)
 
 	req := frontend.SignInRequest{
 		Email:    compo.inputEmail,
@@ -70,5 +71,8 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 
-	//app.Window().Get("location").Call("replace", PathLessons)
+	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
+	ctx.NavigateTo(&url.URL{Path: PathHome})
+	compo.nav.showLessons = true
+	compo.nav.showHome = true
 }

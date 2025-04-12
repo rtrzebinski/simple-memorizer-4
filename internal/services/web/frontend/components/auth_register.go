@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
@@ -12,7 +13,8 @@ const PathAuthRegister = "/register"
 // Register is a component that displays the registration form
 type Register struct {
 	app.Compo
-	c APIClient
+	c   APIClient
+	nav *Navigation
 
 	// form
 	inputName              string
@@ -22,8 +24,9 @@ type Register struct {
 }
 
 // NewRegister creates a new Register component
-func NewRegister(c APIClient) *Register {
+func NewRegister(c APIClient, nav *Navigation) *Register {
 	compo := &Register{c: c}
+	compo.nav = nav
 	compo.inputEmail = "foo@bar.com"
 	compo.inputPassword = "password"
 	compo.inputName = "foo"
@@ -77,4 +80,9 @@ func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 	compo.inputName = ""
 	compo.inputEmail = ""
 	compo.inputPassword = ""
+
+	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
+	ctx.NavigateTo(&url.URL{Path: PathHome})
+	compo.nav.showLessons = true
+	compo.nav.showHome = true
 }

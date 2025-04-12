@@ -3,6 +3,8 @@ package components
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
@@ -14,7 +16,8 @@ const PathLessons = "/lessons"
 // Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
-	c APIClient
+	nav *Navigation
+	c   APIClient
 
 	// component vars
 	rows []*LessonRow
@@ -29,14 +32,26 @@ type Lessons struct {
 }
 
 // NewLessons creates a new Lessons component
-func NewLessons(c APIClient) *Lessons {
+func NewLessons(c APIClient, nav *Navigation) *Lessons {
 	return &Lessons{
-		c: c,
+		c:   c,
+		nav: nav,
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Lessons) OnMount(ctx app.Context) {
+	// auth check
+	var at string
+	ctx.GetState("resp.AccessToken", &at)
+	if at == "" {
+		compo.nav.showLessons = false
+		compo.nav.showHome = false
+		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+	} else {
+		slog.Info("access token", "token", at)
+	}
+
 	compo.displayAllLessons(ctx)
 }
 

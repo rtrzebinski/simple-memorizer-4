@@ -3,6 +3,7 @@ package components
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"strconv"
 
@@ -18,7 +19,8 @@ const PathExercises = "/exercises"
 // Exercises is a component that displays all exercises of a lesson
 type Exercises struct {
 	app.Compo
-	c APIClient
+	c   APIClient
+	nav *Navigation
 
 	// component vars
 	lesson frontend.Lesson
@@ -34,14 +36,26 @@ type Exercises struct {
 }
 
 // NewExercises creates a new Exercises component
-func NewExercises(c APIClient) *Exercises {
+func NewExercises(c APIClient, nav *Navigation) *Exercises {
 	return &Exercises{
-		c: c,
+		c:   c,
+		nav: nav,
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Exercises) OnMount(ctx app.Context) {
+	// auth check
+	var at string
+	ctx.GetState("resp.AccessToken", &at)
+	if at == "" {
+		compo.nav.showLessons = false
+		compo.nav.showHome = false
+		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+	} else {
+		slog.Info("access token", "token", at)
+	}
+
 	u := app.Window().URL()
 
 	// find lesson_id in the url

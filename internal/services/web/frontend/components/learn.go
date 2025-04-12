@@ -3,6 +3,7 @@ package components
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"strconv"
 
@@ -16,6 +17,7 @@ const PathLearn = "/learn"
 // Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
+	nav       *Navigation
 	c         APIClient
 	memorizer memorizer.Memorizer
 
@@ -30,14 +32,26 @@ type Learn struct {
 }
 
 // NewLearn creates a new Learn component
-func NewLearn(c APIClient) *Learn {
+func NewLearn(c APIClient, nav *Navigation) *Learn {
 	return &Learn{
-		c: c,
+		c:   c,
+		nav: nav,
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Learn) OnMount(ctx app.Context) {
+	// auth check
+	var at string
+	ctx.GetState("resp.AccessToken", &at)
+	if at == "" {
+		compo.nav.showLessons = false
+		compo.nav.showHome = false
+		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+	} else {
+		slog.Info("access token", "token", at)
+	}
+
 	u := app.Window().URL()
 
 	lessonId, err := strconv.Atoi(u.Query().Get("lesson_id"))
