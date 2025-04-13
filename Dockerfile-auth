@@ -20,6 +20,8 @@ WORKDIR /app
 # Copy files
 COPY --from=builder /app/bin/sm4-auth ./
 COPY --from=builder /app/version ./version
+COPY --from=builder /app/keys/private.pem ./keys/private.pem
+COPY --from=builder /app/keys/public.pem ./keys/public.pem
 
 # Add /app to PATH
 ENV PATH="/app:${PATH}"
