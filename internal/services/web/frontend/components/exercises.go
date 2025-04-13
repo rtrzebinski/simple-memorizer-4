@@ -19,8 +19,7 @@ const PathExercises = "/exercises"
 // Exercises is a component that displays all exercises of a lesson
 type Exercises struct {
 	app.Compo
-	c   APIClient
-	nav *Navigation
+	c APIClient
 
 	// component vars
 	lesson frontend.Lesson
@@ -37,10 +36,9 @@ type Exercises struct {
 }
 
 // NewExercises creates a new Exercises component
-func NewExercises(c APIClient, nav *Navigation) *Exercises {
+func NewExercises(c APIClient) *Exercises {
 	return &Exercises{
 		c:    c,
-		nav:  nav,
 		user: &frontend.User{},
 	}
 }
@@ -80,7 +78,17 @@ func (compo *Exercises) hydrateLesson(ctx context.Context) {
 // The Render method is where the component appearance is defined.
 func (compo *Exercises) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathHome).Text("Home"),
+				app.Text(" | "),
+				app.A().Href(PathLessons).Text("Lessons"),
+				app.Text(" | "),
+				app.A().Href(PathAuthLogout).Text("Logout"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.Text("Welcome "+compo.user.Name),
 		app.Br(),
 		app.P().Body(

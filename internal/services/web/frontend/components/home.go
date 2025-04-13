@@ -14,16 +14,15 @@ const PathHome = "/"
 // Home is a component that displays the home page
 type Home struct {
 	app.Compo
-	nav *Navigation
 
 	// component vars
-	user *frontend.User
+	showHome bool
+	user     *frontend.User
 }
 
 // NewHome creates a new Home component
-func NewHome(nav *Navigation) *Home {
+func NewHome() *Home {
 	return &Home{
-		nav:  nav,
 		user: &frontend.User{},
 	}
 }
@@ -31,7 +30,17 @@ func NewHome(nav *Navigation) *Home {
 // The Render method is where the component appearance is defined.
 func (compo *Home) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathHome).Text("Home"),
+				app.Text(" | "),
+				app.A().Href(PathLessons).Text("Lessons"),
+				app.Text(" | "),
+				app.A().Href(PathAuthLogout).Text("Logout"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.Text("Welcome "+compo.user.Name),
 		app.Br(),
 		app.P().Body(

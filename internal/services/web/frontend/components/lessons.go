@@ -16,7 +16,6 @@ const PathLessons = "/lessons"
 // Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
-	nav  *Navigation
 	c    APIClient
 	user *frontend.User
 
@@ -33,10 +32,9 @@ type Lessons struct {
 }
 
 // NewLessons creates a new Lessons component
-func NewLessons(c APIClient, nav *Navigation) *Lessons {
+func NewLessons(c APIClient) *Lessons {
 	return &Lessons{
 		c:    c,
-		nav:  nav,
 		user: &frontend.User{},
 	}
 }
@@ -56,7 +54,17 @@ func (compo *Lessons) OnMount(ctx app.Context) {
 // The Render method is where the component appearance is defined.
 func (compo *Lessons) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathHome).Text("Home"),
+				app.Text(" | "),
+				app.A().Href(PathLessons).Text("Lessons"),
+				app.Text(" | "),
+				app.A().Href(PathAuthLogout).Text("Logout"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.Text("Welcome "+compo.user.Name),
 		app.Br(),
 		app.P().Body(

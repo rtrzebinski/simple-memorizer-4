@@ -13,8 +13,7 @@ const PathAuthRegister = "/register"
 // Register is a component that displays the registration form
 type Register struct {
 	app.Compo
-	c   APIClient
-	nav *Navigation
+	c APIClient
 
 	// form
 	inputName              string
@@ -24,9 +23,8 @@ type Register struct {
 }
 
 // NewRegister creates a new Register component
-func NewRegister(c APIClient, nav *Navigation) *Register {
+func NewRegister(c APIClient) *Register {
 	compo := &Register{c: c}
-	compo.nav = nav
 	compo.inputEmail = "foo@bar.com"
 	compo.inputPassword = "password"
 	compo.inputName = "foo"
@@ -37,7 +35,15 @@ func NewRegister(c APIClient, nav *Navigation) *Register {
 // The Render method is where the component appearance is defined.
 func (compo *Register) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathAuthSignIn).Text("SignIn"),
+				app.Text(" | "),
+				app.A().Href(PathAuthRegister).Text("Register"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.P().Body(
 			app.Div().Body(
 				app.Input().Type("text").Placeholder("Name").OnInput(compo.ValueTo(&compo.inputName)).Value(compo.inputName).Size(30),
@@ -83,6 +89,4 @@ func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 
 	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
 	ctx.NavigateTo(&url.URL{Path: PathHome})
-	compo.nav.showLessons = true
-	compo.nav.showHome = true
 }

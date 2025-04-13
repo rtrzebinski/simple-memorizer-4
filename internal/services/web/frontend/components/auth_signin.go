@@ -13,8 +13,7 @@ const PathAuthSignIn = "/sign-in"
 // SignIn is a component that displays the sign-in form
 type SignIn struct {
 	app.Compo
-	c   APIClient
-	nav *Navigation
+	c APIClient
 
 	// form
 	inputEmail           string
@@ -23,11 +22,10 @@ type SignIn struct {
 }
 
 // NewSignIn creates a new sign-in component
-func NewSignIn(c APIClient, nav *Navigation) *SignIn {
+func NewSignIn(c APIClient) *SignIn {
 	compo := &SignIn{c: c}
 	compo.inputEmail = "foo@bar.com"
 	compo.inputPassword = "password"
-	compo.nav = nav
 
 	return compo
 }
@@ -35,7 +33,15 @@ func NewSignIn(c APIClient, nav *Navigation) *SignIn {
 // The Render method is where the component appearance is defined.
 func (compo *SignIn) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathAuthSignIn).Text("SignIn"),
+				app.Text(" | "),
+				app.A().Href(PathAuthRegister).Text("Register"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.P().Body(
 			app.Div().Body(
 				app.Input().Type("text").Placeholder("Email").OnInput(compo.ValueTo(&compo.inputEmail)).Value(compo.inputEmail).Size(30),
@@ -73,6 +79,4 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 
 	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
 	ctx.NavigateTo(&url.URL{Path: PathHome})
-	compo.nav.showLessons = true
-	compo.nav.showHome = true
 }

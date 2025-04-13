@@ -17,7 +17,6 @@ const PathLearn = "/learn"
 // Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
-	nav       *Navigation
 	c         APIClient
 	memorizer memorizer.Memorizer
 
@@ -33,10 +32,9 @@ type Learn struct {
 }
 
 // NewLearn creates a new Learn component
-func NewLearn(c APIClient, nav *Navigation) *Learn {
+func NewLearn(c APIClient) *Learn {
 	return &Learn{
 		c:    c,
-		nav:  nav,
 		user: &frontend.User{},
 	}
 }
@@ -103,7 +101,17 @@ func (compo *Learn) OnDismount() {
 // The Render method is where the component appearance is defined.
 func (compo *Learn) Render() app.UI {
 	return app.Div().Body(
-		&Navigation{},
+		app.Div().Body(
+			app.P().Body(
+				app.A().Href(PathHome).Text("Home"),
+				app.Text(" | "),
+				app.A().Href(PathLessons).Text("Lessons"),
+				app.Text(" | "),
+				app.A().Href(PathAuthLogout).Text("Logout"),
+				app.Text(" | "),
+				app.Text(app.Getenv("version")),
+			),
+		),
 		app.Text("Welcome "+compo.user.Name),
 		app.Br(),
 		app.P().Body(

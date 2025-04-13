@@ -78,21 +78,19 @@ func run(ctx context.Context) error {
 	// create a service to be injected into components
 	apiClient := fhttp.NewClient(caller.NewCaller(&http.Client{}, u.Host, u.Scheme))
 
-	nav := components.NewNavigation()
-
 	// The first thing to do is to associate the home component with a path.
 	//
 	// This is done by calling the Route() function, which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route(components.PathHome, func() app.Composer { return components.NewHome(nav) })
+	app.Route(components.PathHome, func() app.Composer { return components.NewHome() })
 
 	// Associate other frontend routes
-	app.Route(components.PathAuthRegister, func() app.Composer { return components.NewRegister(apiClient, nav) })
-	app.Route(components.PathAuthSignIn, func() app.Composer { return components.NewSignIn(apiClient, nav) })
-	app.Route(components.PathAuthLogout, func() app.Composer { return components.NewLogout(nav) })
-	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient, nav) })
-	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient, nav) })
-	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient, nav) })
+	app.Route(components.PathAuthRegister, func() app.Composer { return components.NewRegister(apiClient) })
+	app.Route(components.PathAuthSignIn, func() app.Composer { return components.NewSignIn(apiClient) })
+	app.Route(components.PathAuthLogout, func() app.Composer { return components.NewLogout() })
+	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient) })
+	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient) })
+	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient) })
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
