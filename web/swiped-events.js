@@ -26,7 +26,9 @@
     }
 
     document.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchmove', handleTouchMove, false);
+    // old
+    // document.addEventListener('touchmove', handleTouchMove, false);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, false);
 
     var xDown = null;
@@ -122,13 +124,24 @@
         yDiff = 0;
     }
 
+    // old
+    // function handleTouchMove(e) {
+    //
+    //     if (!xDown || !yDown) return;
+    //
+    //     var xUp = e.touches[0].clientX;
+    //     var yUp = e.touches[0].clientY;
+    //
+    //     xDiff = xDown - xUp;
+    //     yDiff = yDown - yUp;
+    // }
+
     /**
      * Records location diff in px on touchmove event
      * @param {object} e - browser event object
      * @returns {void}
      */
     function handleTouchMove(e) {
-
         if (!xDown || !yDown) return;
 
         var xUp = e.touches[0].clientX;
@@ -136,6 +149,8 @@
 
         xDiff = xDown - xUp;
         yDiff = yDown - yUp;
+
+        e.preventDefault(); // this stops the page from scrolling
     }
 
     /**
