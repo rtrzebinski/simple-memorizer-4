@@ -64,8 +64,7 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
 
 	err = suite.handler.Handle(ctx, e)
 
-	suite.Error(err)
-	suite.Contains(err.Error(), assert.AnError.Error())
+	suite.NoError(err)
 	suite.serviceMock.AssertCalled(suite.T(), "ProcessGoodAnswer", ctx, exerciseID)
 }
 
@@ -103,8 +102,7 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
 
 	err = suite.handler.Handle(ctx, e)
 
-	suite.Error(err)
-	suite.Contains(err.Error(), assert.AnError.Error())
+	suite.NoError(err)
 	suite.serviceMock.AssertCalled(suite.T(), "ProcessBadAnswer", ctx, exerciseID)
 }
 
