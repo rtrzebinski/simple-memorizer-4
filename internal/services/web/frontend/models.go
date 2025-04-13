@@ -83,3 +83,9 @@ type SignInRequest struct {
 type SignInResponse struct {
 	AccessToken string
 }
+
+type User struct {
+	ID    string
+	Name  string
+	Email string
+}

@@ -3,13 +3,13 @@ package components
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/url"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
 )
@@ -25,6 +25,7 @@ type Exercises struct {
 	// component vars
 	lesson frontend.Lesson
 	rows   []*ExerciseRow
+	user   *frontend.User
 
 	// upsert exercise form
 	formVisible        bool
@@ -38,23 +39,20 @@ type Exercises struct {
 // NewExercises creates a new Exercises component
 func NewExercises(c APIClient, nav *Navigation) *Exercises {
 	return &Exercises{
-		c:   c,
-		nav: nav,
+		c:    c,
+		nav:  nav,
+		user: &frontend.User{},
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Exercises) OnMount(ctx app.Context) {
 	// auth check
-	var at string
-	ctx.GetState("resp.AccessToken", &at)
-	if at == "" {
-		compo.nav.showLessons = false
-		compo.nav.showHome = false
+	user, err := auth.User(ctx)
+	if err != nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	} else {
-		slog.Info("access token", "token", at)
 	}
+	compo.user = user
 
 	u := app.Window().URL()
 
@@ -83,6 +81,8 @@ func (compo *Exercises) hydrateLesson(ctx context.Context) {
 func (compo *Exercises) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.Text("Welcome "+compo.user.Name),
+		app.Br(),
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(compo.handleStartLearning).Disabled(compo.lesson.ExerciseCount < 2),
 			app.Button().Text("Add a new exercise").OnClick(compo.handleAddExercise).Hidden(compo.formVisible),

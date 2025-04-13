@@ -3,12 +3,12 @@ package components
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/url"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/memorizer"
 )
 
@@ -25,6 +25,7 @@ type Learn struct {
 	lesson          frontend.Lesson
 	exercise        frontend.Exercise
 	isAnswerVisible bool
+	user            *frontend.User
 
 	// Window events unsubscribers, to be called on component dismount
 	// this is needed so Window events are not piled on each component mounting
@@ -34,23 +35,20 @@ type Learn struct {
 // NewLearn creates a new Learn component
 func NewLearn(c APIClient, nav *Navigation) *Learn {
 	return &Learn{
-		c:   c,
-		nav: nav,
+		c:    c,
+		nav:  nav,
+		user: &frontend.User{},
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Learn) OnMount(ctx app.Context) {
 	// auth check
-	var at string
-	ctx.GetState("resp.AccessToken", &at)
-	if at == "" {
-		compo.nav.showLessons = false
-		compo.nav.showHome = false
+	user, err := auth.User(ctx)
+	if err != nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	} else {
-		slog.Info("access token", "token", at)
 	}
+	compo.user = user
 
 	u := app.Window().URL()
 
@@ -106,6 +104,8 @@ func (compo *Learn) OnDismount() {
 func (compo *Learn) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.Text("Welcome "+compo.user.Name),
+		app.Br(),
 		app.P().Body(
 			app.Button().Text("Show exercises").OnClick(compo.handleShowExercises),
 		),

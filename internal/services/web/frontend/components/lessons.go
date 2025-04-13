@@ -3,11 +3,11 @@ package components
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
 )
 
@@ -16,8 +16,9 @@ const PathLessons = "/lessons"
 // Lessons is a component that displays all lessons
 type Lessons struct {
 	app.Compo
-	nav *Navigation
-	c   APIClient
+	nav  *Navigation
+	c    APIClient
+	user *frontend.User
 
 	// component vars
 	rows []*LessonRow
@@ -34,23 +35,20 @@ type Lessons struct {
 // NewLessons creates a new Lessons component
 func NewLessons(c APIClient, nav *Navigation) *Lessons {
 	return &Lessons{
-		c:   c,
-		nav: nav,
+		c:    c,
+		nav:  nav,
+		user: &frontend.User{},
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Lessons) OnMount(ctx app.Context) {
 	// auth check
-	var at string
-	ctx.GetState("resp.AccessToken", &at)
-	if at == "" {
-		compo.nav.showLessons = false
-		compo.nav.showHome = false
+	user, err := auth.User(ctx)
+	if err != nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	} else {
-		slog.Info("access token", "token", at)
 	}
+	compo.user = user
 
 	compo.displayAllLessons(ctx)
 }
@@ -59,6 +57,8 @@ func (compo *Lessons) OnMount(ctx app.Context) {
 func (compo *Lessons) Render() app.UI {
 	return app.Div().Body(
 		&Navigation{},
+		app.Text("Welcome "+compo.user.Name),
+		app.Br(),
 		app.P().Body(
 			app.Button().Text("Add a new lesson").OnClick(compo.handleAddLesson).Hidden(compo.formVisible),
 		),
