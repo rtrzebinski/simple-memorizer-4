@@ -89,8 +89,6 @@ func (compo *Exercises) Render() app.UI {
 				app.Text(app.Getenv("version")),
 			),
 		),
-		app.Text("Welcome "+compo.user.Name),
-		app.Br(),
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(compo.handleStartLearning).Disabled(compo.lesson.ExerciseCount < 2),
 			app.Button().Text("Add a new exercise").OnClick(compo.handleAddExercise).Hidden(compo.formVisible),

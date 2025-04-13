@@ -112,8 +112,6 @@ func (compo *Learn) Render() app.UI {
 				app.Text(app.Getenv("version")),
 			),
 		),
-		app.Text("Welcome "+compo.user.Name),
-		app.Br(),
 		app.P().Body(
 			app.Button().Text("Show exercises").OnClick(compo.handleShowExercises),
 		),

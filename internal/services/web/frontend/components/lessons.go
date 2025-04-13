@@ -65,8 +65,6 @@ func (compo *Lessons) Render() app.UI {
 				app.Text(app.Getenv("version")),
 			),
 		),
-		app.Text("Welcome "+compo.user.Name),
-		app.Br(),
 		app.P().Body(
 			app.Button().Text("Add a new lesson").OnClick(compo.handleAddLesson).Hidden(compo.formVisible),
 		),
