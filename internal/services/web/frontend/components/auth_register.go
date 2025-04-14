@@ -2,10 +2,10 @@ package components
 
 import (
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
 const PathAuthRegister = "/register"
@@ -87,6 +87,6 @@ func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 
-	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
+	ctx.SetState("AccessToken", resp.AccessToken).Persist()
 	ctx.NavigateTo(&url.URL{Path: PathHome})
 }

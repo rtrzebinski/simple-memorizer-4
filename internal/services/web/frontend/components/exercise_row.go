@@ -2,6 +2,9 @@ package components
 
 import (
 	"fmt"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
+	"log/slog"
+	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
@@ -45,8 +48,13 @@ func (compo *ExerciseRow) Render() app.UI {
 // onDelete handles delete button click
 func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
+		authToken, err := auth.Token(ctx)
+		if err != nil {
+			slog.Error("failed to get token", "err", err)
+			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		}
 		// delete exercise
-		err := compo.parent.c.DeleteExercise(ctx, frontend.Exercise{Id: id})
+		err = compo.parent.c.DeleteExercise(ctx, frontend.Exercise{Id: id}, authToken)
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}

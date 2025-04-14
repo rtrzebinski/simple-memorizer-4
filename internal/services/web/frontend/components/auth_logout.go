@@ -19,6 +19,6 @@ func NewLogout() *Logout {
 }
 
 func (compo *Logout) OnMount(ctx app.Context) {
-	ctx.DelState("resp.AccessToken")
+	ctx.DelState("AccessToken")
 	ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 }

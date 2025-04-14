@@ -77,6 +77,6 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 
-	ctx.SetState("resp.AccessToken", resp.AccessToken).Persist()
+	ctx.SetState("AccessToken", resp.AccessToken).Persist()
 	ctx.NavigateTo(&url.URL{Path: PathHome})
 }
