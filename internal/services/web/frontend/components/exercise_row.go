@@ -2,12 +2,12 @@ package components
 
 import (
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 )
 
 // ExerciseRow is a component that displays a single row of the exercises table

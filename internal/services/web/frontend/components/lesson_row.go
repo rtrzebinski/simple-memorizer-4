@@ -2,13 +2,13 @@ package components
 
 import (
 	"fmt"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"log/slog"
 	"net/url"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 )
 
 // LessonRow is a component that displays a row in the lessons table
