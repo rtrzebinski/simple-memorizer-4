@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
@@ -23,24 +22,6 @@ func NewExportLessonCsvHandler(s Service) *ExportLessonCsvHandler {
 
 func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
-
-	accessToken := req.Header.Get("authorization")
-	if accessToken == "" {
-		log.Print("missing authorization header")
-		res.WriteHeader(http.StatusUnauthorized)
-
-		return
-	}
-
-	userID, err := auth.UserID(accessToken)
-	if err != nil {
-		log.Print(fmt.Errorf("failed to get user ID from access token: %w", err))
-		res.WriteHeader(http.StatusUnauthorized)
-
-		return
-	}
-
-	println(userID)
 
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
