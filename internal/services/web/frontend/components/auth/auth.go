@@ -14,8 +14,6 @@ func User(ctx app.Context) (*frontend.User, error) {
 		return nil, fmt.Errorf("get access token: %w", err)
 	}
 
-	// TODO verify token signature with a public key
-	// Parse the JWT without verifying the signature
 	token, _, err := new(jwt.Parser).ParseUnverified(accessToken, jwt.MapClaims{})
 	if err != nil {
 		return nil, fmt.Errorf("parse token: %w", err)

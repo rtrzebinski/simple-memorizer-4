@@ -59,12 +59,12 @@ func (compo *LessonRow) onEdit() app.EventHandler {
 func (compo *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		// delete lesson
-		authToken, err := auth.Token(ctx)
+		accessToken, err := auth.Token(ctx)
 		if err != nil {
 			slog.Error("failed to get token", "err", err)
 			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 		}
-		err = compo.parent.c.DeleteLesson(ctx, frontend.Lesson{Id: id}, authToken)
+		err = compo.parent.c.DeleteLesson(ctx, frontend.Lesson{Id: id}, accessToken)
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}

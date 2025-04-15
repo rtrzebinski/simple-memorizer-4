@@ -24,6 +24,9 @@ func TestFetchLessonsHandler(t *testing.T) {
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}
+	req.Header = make(map[string][]string)
+	// { "sub": "100" }
+	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 

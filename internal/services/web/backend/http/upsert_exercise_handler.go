@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
@@ -21,9 +22,27 @@ func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
 func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
+	accessToken := req.Header.Get("authorization")
+	if accessToken == "" {
+		log.Print("missing authorization header")
+		res.WriteHeader(http.StatusUnauthorized)
+
+		return
+	}
+
+	userID, err := auth.UserID(accessToken)
+	if err != nil {
+		log.Print(fmt.Errorf("failed to get user ID from access token: %w", err))
+		res.WriteHeader(http.StatusUnauthorized)
+
+		return
+	}
+
+	println(userID)
+
 	var exercise backend.Exercise
 
-	err := json.NewDecoder(req.Body).Decode(&exercise)
+	err = json.NewDecoder(req.Body).Decode(&exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode UpsertExerciseHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)

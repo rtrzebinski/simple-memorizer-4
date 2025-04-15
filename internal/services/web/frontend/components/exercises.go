@@ -69,12 +69,12 @@ func (compo *Exercises) OnMount(ctx app.Context) {
 
 // hydrateLesson fetch lesson details
 func (compo *Exercises) hydrateLesson(ctx app.Context) {
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	err = compo.c.HydrateLesson(ctx, &compo.lesson, authToken)
+	err = compo.c.HydrateLesson(ctx, &compo.lesson, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 	}
@@ -201,12 +201,12 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	}
 
 	// store uploaded exercises
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	err = compo.c.StoreExercises(ctx, exercises, authToken)
+	err = compo.c.StoreExercises(ctx, exercises, accessToken)
 	if err != nil {
 		app.Log(err)
 		return
@@ -281,13 +281,13 @@ func (compo *Exercises) handleSave(ctx app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save exercise
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
 
-	err = compo.c.UpsertExercise(ctx, exercise, authToken)
+	err = compo.c.UpsertExercise(ctx, exercise, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save exercise: %w", err))
 	}
@@ -323,12 +323,12 @@ func (compo *Exercises) resetForm() {
 
 // displayExercisesOfLesson fetch exercises and display them
 func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, authToken)
+	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

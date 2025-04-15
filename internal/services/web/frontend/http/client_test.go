@@ -39,11 +39,11 @@ func (suite *ClientSuite) TestClient_FetchLessons() {
 	route := http.FetchLessons
 	params := map[string]string(nil)
 	reqBody := []byte(nil)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
 
-	result, err := suite.client.FetchLessons(ctx, authToken)
+	result, err := suite.client.FetchLessons(ctx, accessToken)
 	suite.Assert().NoError(err)
 	suite.Assert().Equal(lessons, result)
 }
@@ -60,11 +60,11 @@ func (suite *ClientSuite) TestClient_HydrateLesson() {
 	route := http.HydrateLesson
 	params := map[string]string{"lesson_id": "10"}
 	reqBody := []byte(nil)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
 
-	err = suite.client.HydrateLesson(ctx, lesson, authToken)
+	err = suite.client.HydrateLesson(ctx, lesson, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -111,11 +111,11 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 	route := http.FetchExercises
 	params := map[string]string{"lesson_id": "1"}
 	reqBody := []byte(nil)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
 
-	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, authToken)
+	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, accessToken)
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises[0].Id, result[0].Id)
@@ -142,11 +142,11 @@ func (suite *ClientSuite) TestClient_UpsertLesson() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.UpsertLesson(ctx, lesson, authToken)
+	err = suite.client.UpsertLesson(ctx, lesson, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -160,11 +160,11 @@ func (suite *ClientSuite) TestClient_DeleteLesson() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.DeleteLesson(ctx, lesson, authToken)
+	err = suite.client.DeleteLesson(ctx, lesson, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -178,11 +178,11 @@ func (suite *ClientSuite) TestClient_UpsertExercise() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.UpsertExercise(ctx, exercise, authToken)
+	err = suite.client.UpsertExercise(ctx, exercise, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -196,11 +196,11 @@ func (suite *ClientSuite) TestClient_StoreExercises() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercises)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.StoreExercises(ctx, exercises, authToken)
+	err = suite.client.StoreExercises(ctx, exercises, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -214,11 +214,11 @@ func (suite *ClientSuite) TestClient_DeleteExercise() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.DeleteExercise(ctx, exercise, authToken)
+	err = suite.client.DeleteExercise(ctx, exercise, accessToken)
 	suite.Assert().NoError(err)
 }
 
@@ -232,11 +232,11 @@ func (suite *ClientSuite) TestClient_StoreResult() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(result)
 	suite.Assert().NoError(err)
-	authToken := "authToken"
+	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, authToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
 
-	err = suite.client.StoreResult(ctx, result, authToken)
+	err = suite.client.StoreResult(ctx, result, accessToken)
 	suite.Assert().NoError(err)
 }
 

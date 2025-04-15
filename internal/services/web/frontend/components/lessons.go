@@ -141,12 +141,12 @@ func (compo *Lessons) handleSave(ctx app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save lesson
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	err = compo.c.UpsertLesson(ctx, lesson, authToken)
+	err = compo.c.UpsertLesson(ctx, lesson, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}
@@ -175,12 +175,12 @@ func (compo *Lessons) resetForm() {
 
 // displayAllLessons fetch all lessons and display them
 func (compo *Lessons) displayAllLessons(ctx app.Context) {
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	lessons, err := compo.c.FetchLessons(ctx, authToken)
+	lessons, err := compo.c.FetchLessons(ctx, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}

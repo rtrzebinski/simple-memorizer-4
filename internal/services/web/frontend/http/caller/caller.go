@@ -23,7 +23,7 @@ func NewCaller(http *http.Client, host string, scheme string) *Caller {
 }
 
 // Call makes an HTTP call
-func (c *Caller) Call(ctx context.Context, method, route string, params map[string]string, reqBody []byte, authToken string) ([]byte, error) {
+func (c *Caller) Call(ctx context.Context, method, route string, params map[string]string, reqBody []byte, accessToken string) ([]byte, error) {
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
 	if err != nil {
@@ -52,8 +52,8 @@ func (c *Caller) Call(ctx context.Context, method, route string, params map[stri
 	req.Header.Add("content-type", "application/json")
 
 	// add auth header
-	if len(authToken) > 0 {
-		req.Header.Add("authorization", authToken)
+	if len(accessToken) > 0 {
+		req.Header.Add("authorization", accessToken)
 	}
 
 	// make a request

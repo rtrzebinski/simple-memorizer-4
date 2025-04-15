@@ -60,12 +60,12 @@ func (compo *Learn) OnMount(ctx app.Context) {
 	compo.lesson = frontend.Lesson{Id: lessonId}
 	compo.hydrateLesson(ctx)
 
-	authToken, err := auth.Token(ctx)
+	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson, authToken)
+	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 
@@ -88,12 +88,12 @@ func (compo *Learn) OnMount(ctx app.Context) {
 // HydrateLesson in go routine
 func (compo *Learn) hydrateLesson(ctx app.Context) {
 	go func() {
-		authToken, err := auth.Token(ctx)
+		accessToken, err := auth.Token(ctx)
 		if err != nil {
 			slog.Error("failed to get token", "err", err)
 			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 		}
-		err = compo.c.HydrateLesson(ctx, &compo.lesson, authToken)
+		err = compo.c.HydrateLesson(ctx, &compo.lesson, accessToken)
 		if err != nil {
 			app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 		}
@@ -312,7 +312,7 @@ func (compo *Learn) handleGoodAnswer(ctx app.Context) {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		authToken, err := auth.Token(ctx)
+		accessToken, err := auth.Token(ctx)
 		if err != nil {
 			slog.Error("failed to get token", "err", err)
 			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
@@ -320,7 +320,7 @@ func (compo *Learn) handleGoodAnswer(ctx app.Context) {
 		if err := compo.c.StoreResult(ctx, frontend.Result{
 			Exercise: &exCopy,
 			Type:     frontend.Good,
-		}, authToken); err != nil {
+		}, accessToken); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
@@ -336,7 +336,7 @@ func (compo *Learn) handleBadAnswer(ctx app.Context) {
 	exCopy := compo.exercise
 	// save answer in the background
 	go func() {
-		authToken, err := auth.Token(ctx)
+		accessToken, err := auth.Token(ctx)
 		if err != nil {
 			slog.Error("failed to get token", "err", err)
 			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
@@ -344,7 +344,7 @@ func (compo *Learn) handleBadAnswer(ctx app.Context) {
 		if err := compo.c.StoreResult(ctx, frontend.Result{
 			Exercise: &exCopy,
 			Type:     frontend.Bad,
-		}, authToken); err != nil {
+		}, accessToken); err != nil {
 			app.Log(fmt.Errorf("failed to increment good answers: %w", err))
 		}
 	}()
