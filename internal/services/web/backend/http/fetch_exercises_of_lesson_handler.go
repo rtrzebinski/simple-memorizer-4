@@ -39,8 +39,6 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		return
 	}
 
-	println(userID)
-
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))
@@ -72,7 +70,7 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		}
 	}
 
-	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId})
+	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, userID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

@@ -28,7 +28,7 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishGoodAnswer", mock.AnythingOfType("context.backgroundCtx"), 10).Return(nil)
+	service.On("PublishGoodAnswer", mock.AnythingOfType("context.backgroundCtx"), 10, "100").Return(nil)
 
 	route := NewStoreResultHandler(service)
 
@@ -57,7 +57,7 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishBadAnswer", mock.AnythingOfType("context.backgroundCtx"), 10).Return(nil)
+	service.On("PublishBadAnswer", mock.AnythingOfType("context.backgroundCtx"), 10, "100").Return(nil)
 
 	route := NewStoreResultHandler(service)
 

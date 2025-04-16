@@ -28,7 +28,7 @@ func TestUpsertLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", ctx, &input).Return(nil)
+	service.On("UpsertLesson", ctx, &input, "100").Return(nil)
 
 	route := NewUpsertLessonHandler(service)
 

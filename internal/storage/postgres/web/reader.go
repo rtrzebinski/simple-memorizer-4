@@ -16,7 +16,9 @@ func NewReader(db *sql.DB) *Reader {
 	return &Reader{db: db}
 }
 
-func (r *Reader) FetchLessons(ctx context.Context) (backend.Lessons, error) {
+func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lessons, error) {
+	println(userID)
+
 	var lessons backend.Lessons
 
 	const query = `
@@ -46,7 +48,9 @@ func (r *Reader) FetchLessons(ctx context.Context) (backend.Lessons, error) {
 	return lessons, nil
 }
 
-func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson) error {
+func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+	println(userID)
+
 	query := `
 		SELECT name, description, count(e.id) AS exercise_count
 		FROM lesson l
@@ -62,7 +66,9 @@ func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson) erro
 	return nil
 }
 
-func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson) (backend.Exercises, error) {
+func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson, userID string) (backend.Exercises, error) {
+	println(userID)
+
 	const query = `
 SELECT e.id, e.question, e.answer,
        e.bad_answers, e.bad_answers_today, e.latest_bad_answer, e.latest_bad_answer_was_today,

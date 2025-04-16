@@ -27,7 +27,7 @@ func TestDeleteLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteLesson", ctx, input).Return(nil)
+	service.On("DeleteLesson", ctx, input, "100").Return(nil)
 
 	route := NewDeleteLessonHandler(service)
 

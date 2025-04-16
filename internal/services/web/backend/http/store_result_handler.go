@@ -38,8 +38,6 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	println(userID)
-
 	var result backend.Result
 
 	err = json.NewDecoder(req.Body).Decode(&result)
@@ -77,7 +75,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	switch result.Type {
 	case backend.Good:
-		err = h.s.PublishGoodAnswer(ctx, result.Exercise.Id)
+		err = h.s.PublishGoodAnswer(ctx, result.Exercise.Id, userID)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish good answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
@@ -85,7 +83,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 			return
 		}
 	case backend.Bad:
-		err = h.s.PublishBadAnswer(ctx, result.Exercise.Id)
+		err = h.s.PublishBadAnswer(ctx, result.Exercise.Id, userID)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish bad answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)

@@ -12,18 +12,18 @@ func NewReaderMock() *ReaderMock {
 	return &ReaderMock{}
 }
 
-func (mock *ReaderMock) FetchLessons(ctx context.Context) (Lessons, error) {
-	return mock.Called(ctx).Get(0).(Lessons), nil
+func (mock *ReaderMock) FetchLessons(ctx context.Context, userID string) (Lessons, error) {
+	return mock.Called(ctx, userID).Get(0).(Lessons), nil
 }
 
-func (mock *ReaderMock) HydrateLesson(ctx context.Context, lesson *Lesson) error {
-	mock.Called(ctx, lesson)
+func (mock *ReaderMock) HydrateLesson(ctx context.Context, lesson *Lesson, userID string) error {
+	mock.Called(ctx, lesson, userID)
 
 	return nil
 }
 
-func (mock *ReaderMock) FetchExercises(ctx context.Context, lesson Lesson) (Exercises, error) {
-	return mock.Called(ctx, lesson).Get(0).(Exercises), nil
+func (mock *ReaderMock) FetchExercises(ctx context.Context, lesson Lesson, userID string) (Exercises, error) {
+	return mock.Called(ctx, lesson, userID).Get(0).(Exercises), nil
 }
 
 type WriterMock struct{ mock.Mock }
@@ -32,32 +32,32 @@ func NewWriterMock() *WriterMock {
 	return &WriterMock{}
 }
 
-func (mock *WriterMock) UpsertLesson(ctx context.Context, lesson *Lesson) error {
-	mock.Called(ctx, lesson)
+func (mock *WriterMock) UpsertLesson(ctx context.Context, lesson *Lesson, userID string) error {
+	mock.Called(ctx, lesson, userID)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteLesson(ctx context.Context, lesson Lesson) error {
-	mock.Called(ctx, lesson)
+func (mock *WriterMock) DeleteLesson(ctx context.Context, lesson Lesson, userID string) error {
+	mock.Called(ctx, lesson, userID)
 
 	return nil
 }
 
-func (mock *WriterMock) UpsertExercise(ctx context.Context, exercise *Exercise) error {
-	mock.Called(ctx, exercise)
+func (mock *WriterMock) UpsertExercise(ctx context.Context, exercise *Exercise, userID string) error {
+	mock.Called(ctx, exercise, userID)
 
 	return nil
 }
 
-func (mock *WriterMock) StoreExercises(ctx context.Context, exercises Exercises) error {
-	mock.Called(ctx, exercises)
+func (mock *WriterMock) StoreExercises(ctx context.Context, exercises Exercises, userID string) error {
+	mock.Called(ctx, exercises, userID)
 
 	return nil
 }
 
-func (mock *WriterMock) DeleteExercise(ctx context.Context, exercise Exercise) error {
-	mock.Called(ctx, exercise)
+func (mock *WriterMock) DeleteExercise(ctx context.Context, exercise Exercise, userID string) error {
+	mock.Called(ctx, exercise, userID)
 
 	return nil
 }

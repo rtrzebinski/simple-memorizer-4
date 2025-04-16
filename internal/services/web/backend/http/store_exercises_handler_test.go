@@ -30,7 +30,7 @@ func TestStoreExercises(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("StoreExercises", ctx, input).Return(nil)
+	service.On("StoreExercises", ctx, input, "100").Return(nil)
 
 	route := NewStoreExercisesHandler(service)
 

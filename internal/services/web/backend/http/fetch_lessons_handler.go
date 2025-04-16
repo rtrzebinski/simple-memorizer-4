@@ -36,9 +36,7 @@ func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	println(userID)
-
-	lessons, err := h.s.FetchLessons(ctx)
+	lessons, err := h.s.FetchLessons(ctx, userID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch lessons: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

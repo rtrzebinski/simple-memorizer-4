@@ -38,8 +38,6 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	println(userID)
-
 	var lesson backend.Lesson
 
 	err = json.NewDecoder(req.Body).Decode(&lesson)
@@ -75,7 +73,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(ctx, &lesson)
+	err = h.s.UpsertLesson(ctx, &lesson, userID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

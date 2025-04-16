@@ -38,7 +38,7 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 
 	service := NewServiceMock()
 
-	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}).Return(exercises, nil)
+	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}, "100").Return(exercises, nil)
 
 	route := NewFetchExercisesOfLessonHandler(service)
 

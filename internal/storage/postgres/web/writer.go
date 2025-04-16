@@ -16,7 +16,9 @@ func NewWriter(db *sql.DB) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson) error {
+func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+	println(userID)
+
 	var query string
 
 	if lesson.Id > 0 {
@@ -45,7 +47,9 @@ func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson) error
 	return nil
 }
 
-func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson) error {
+func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
+	println(userID)
+
 	query := `DELETE FROM lesson WHERE id = $1;`
 
 	_, err := w.db.ExecContext(ctx, query, lesson.Id)
@@ -56,7 +60,9 @@ func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson) error 
 	return nil
 }
 
-func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise) error {
+func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
+	println(userID)
+
 	var query string
 
 	if exercise.Id > 0 {
@@ -85,7 +91,9 @@ func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise)
 	return nil
 }
 
-func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises) error {
+func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
+	println(userID)
+
 	const query = `
 		INSERT INTO exercise (lesson_id, question, answer)
 		VALUES ($1, $2, $3)
@@ -101,7 +109,8 @@ func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises
 	return nil
 }
 
-func (w *Writer) DeleteExercise(ctx context.Context, exercise backend.Exercise) error {
+func (w *Writer) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
+	println(userID)
 
 	query := `DELETE FROM exercise WHERE id = $1;`
 

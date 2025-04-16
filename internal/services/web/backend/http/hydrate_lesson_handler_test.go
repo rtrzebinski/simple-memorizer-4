@@ -22,7 +22,7 @@ func TestHydrateLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("HydrateLesson", ctx, lesson).Return(nil)
+	service.On("HydrateLesson", ctx, lesson, "100").Return(nil)
 
 	route := NewHydrateLessonHandler(service)
 

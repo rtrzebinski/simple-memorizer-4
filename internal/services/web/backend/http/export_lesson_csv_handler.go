@@ -57,7 +57,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	// Hydrate lesson
 	lesson := backend.Lesson{Id: lessonId}
-	err = h.s.HydrateLesson(ctx, &lesson)
+	err = h.s.HydrateLesson(ctx, &lesson, "")
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
@@ -66,7 +66,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 	}
 
 	// Fetch exercises of the lesson
-	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId})
+	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, "")
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

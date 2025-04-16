@@ -38,8 +38,6 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	println(userID)
-
 	var lesson backend.Lesson
 
 	err = json.NewDecoder(req.Body).Decode(&lesson)
@@ -75,7 +73,7 @@ func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.DeleteLesson(ctx, lesson)
+	err = h.s.DeleteLesson(ctx, lesson, userID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

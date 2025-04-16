@@ -20,7 +20,7 @@ func (s *PostgresSuite) TestReader_FetchLessons() {
 
 	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchLessons(context.Background())
+	res, err := r.FetchLessons(context.Background(), "userID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
@@ -43,7 +43,7 @@ func (s *PostgresSuite) TestReader_HydrateLesson() {
 		Id: l.Id,
 	}
 
-	err := r.HydrateLesson(context.Background(), lesson)
+	err := r.HydrateLesson(context.Background(), lesson, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -53,7 +53,7 @@ func (s *PostgresSuite) TestReader_HydrateLesson() {
 	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
 	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
 
-	err = r.HydrateLesson(context.Background(), lesson)
+	err = r.HydrateLesson(context.Background(), lesson, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -81,7 +81,7 @@ func (s *PostgresSuite) TestReader_FetchExercises() {
 	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
 	postgres.CreateExercise(db, exercise2)
 
-	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId})
+	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)

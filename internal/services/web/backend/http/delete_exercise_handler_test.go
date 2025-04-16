@@ -27,7 +27,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", ctx, input).Return(nil)
+	service.On("DeleteExercise", ctx, input, "100").Return(nil)
 
 	route := NewDeleteExerciseHandler(service)
 

@@ -18,7 +18,7 @@ func (s *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 		Description: "description",
 	}
 
-	err := w.UpsertLesson(context.Background(), &lesson)
+	err := w.UpsertLesson(context.Background(), &lesson, "userID")
 	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestLesson(db)
@@ -40,7 +40,7 @@ func (s *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
-	})
+	}, "userID")
 	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestLesson(db)
@@ -62,7 +62,7 @@ func (s *PostgresSuite) TestWriter_DeleteLesson() {
 	})
 	another := postgres.FetchLatestLesson(db)
 
-	err := w.DeleteLesson(context.Background(), backend.Lesson{Id: stored.Id})
+	err := w.DeleteLesson(context.Background(), backend.Lesson{Id: stored.Id}, "userID")
 	assert.NoError(s.T(), err)
 
 	assert.Nil(s.T(), postgres.FindLessonById(db, stored.Id))
@@ -85,7 +85,7 @@ func (s *PostgresSuite) TestWriter_UpsertExercise_createNew() {
 		Answer:   "answer",
 	}
 
-	err := w.UpsertExercise(context.Background(), &exercise)
+	err := w.UpsertExercise(context.Background(), &exercise, "userID")
 	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestExercise(db)
@@ -111,7 +111,7 @@ func (s *PostgresSuite) TestWriter_UpsertExercise_updateExisting() {
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",
-	})
+	}, "userID")
 	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestExercise(db)
@@ -156,7 +156,7 @@ func (s *PostgresSuite) TestWriter_StoreExercises() {
 
 	exercises := backend.Exercises{exercise1, exercise2}
 
-	err := w.StoreExercises(context.Background(), exercises)
+	err := w.StoreExercises(context.Background(), exercises, "userID")
 	assert.NoError(s.T(), err)
 
 	ex1 := postgres.FindExerciseById(db, 1)
@@ -192,7 +192,7 @@ func (s *PostgresSuite) TestWriter_DeleteExercise() {
 	})
 	another := postgres.FetchLatestExercise(db)
 
-	err := w.DeleteExercise(context.Background(), backend.Exercise{Id: stored.Id})
+	err := w.DeleteExercise(context.Background(), backend.Exercise{Id: stored.Id}, "userID")
 	assert.NoError(s.T(), err)
 
 	assert.Nil(s.T(), postgres.FindExerciseById(db, stored.Id))
