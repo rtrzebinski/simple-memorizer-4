@@ -16,7 +16,6 @@ spec:
             - until pg_isready -h sm4-db -p 5432; do echo database is not ready; sleep 2; done;
           resources:
             limits:
-              cpu: 200m
               memory: 32Mi
             requests:
               cpu: 100m
@@ -27,8 +26,7 @@ spec:
           args: [ "migrate", "--path", "migrations", "--database", "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable", "up" ]
           resources:
             limits:
-              cpu: 200m
-              memory: 64Mi
+              memory: 128Mi
             requests:
               cpu: 100m
               memory: 32Mi

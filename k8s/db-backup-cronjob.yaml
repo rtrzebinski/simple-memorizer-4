@@ -24,8 +24,7 @@ spec:
                   mountPath: /var/dump
               resources:
                 limits:
-                  cpu: 200m
-                  memory: 64Mi
+                  memory: 128Mi
                 requests:
                   cpu: 100m
                   memory: 32Mi
