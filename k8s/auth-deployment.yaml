@@ -17,6 +17,8 @@ spec:
           image: rtrzebinski/sm4-auth:latest
           imagePullPolicy: Always
           env:
+            - name: DB_DSN
+              value: "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable"
           readinessProbe:
             httpGet:
               path: /readyz
