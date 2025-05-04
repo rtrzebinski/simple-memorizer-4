@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
@@ -17,7 +18,7 @@ func NewReader(db *sql.DB) *Reader {
 }
 
 func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lessons, error) {
-	println(userID)
+	slog.Debug("Reader FetchLessons", "userID", userID)
 
 	var lessons backend.Lessons
 
@@ -49,7 +50,7 @@ func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lesso
 }
 
 func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	println(userID)
+	slog.Debug("Reader HydrateLesson", "userID", userID)
 
 	query := `
 		SELECT name, description, count(e.id) AS exercise_count
@@ -67,7 +68,7 @@ func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, user
 }
 
 func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson, userID string) (backend.Exercises, error) {
-	println(userID)
+	slog.Debug("Reader FetchExercises", "userID", userID)
 
 	const query = `
 SELECT e.id, e.question, e.answer,

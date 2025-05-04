@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
@@ -17,7 +18,7 @@ func NewWriter(db *sql.DB) *Writer {
 }
 
 func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	println(userID)
+	slog.Debug("Writer UpsertLesson", "userID", userID)
 
 	var query string
 
@@ -48,7 +49,7 @@ func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userI
 }
 
 func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
-	println(userID)
+	slog.Debug("Writer DeleteLesson", "userID", userID)
 
 	query := `DELETE FROM lesson WHERE id = $1;`
 
@@ -61,7 +62,7 @@ func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID
 }
 
 func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
-	println(userID)
+	slog.Debug("Writer UpsertExercise", "userID", userID)
 
 	var query string
 
@@ -92,7 +93,7 @@ func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise,
 }
 
 func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
-	println(userID)
+	slog.Debug("Writer StoreExercises", "userID", userID)
 
 	const query = `
 		INSERT INTO exercise (lesson_id, question, answer)
@@ -110,7 +111,7 @@ func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises
 }
 
 func (w *Writer) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
-	println(userID)
+	slog.Debug("Writer DeleteExercise", "userID", userID)
 
 	query := `DELETE FROM exercise WHERE id = $1;`
 
