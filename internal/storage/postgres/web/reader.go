@@ -26,11 +26,12 @@ func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lesso
 		SELECT l.id, l.name, description, count(e.id) AS exercise_count
 		FROM lesson l
 		LEFT JOIN exercise e ON e.lesson_id = l.id
+		WHERE l.user_id = $1
 		GROUP BY l.id, l.name, description
 		ORDER BY l.id, l.name, description DESC
 		`
 
-	rows, err := r.db.QueryContext(ctx, query)
+	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return lessons, err
 	}

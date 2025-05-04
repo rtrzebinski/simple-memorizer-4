@@ -13,12 +13,17 @@ func (s *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 
 	w := NewWriter(db)
 
+	user := &postgres.User{
+		Id: 1,
+	}
+	postgres.CreateUser(db, user)
+
 	lesson := backend.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
 
-	err := w.UpsertLesson(context.Background(), &lesson, "userID")
+	err := w.UpsertLesson(context.Background(), &lesson, "1")
 	assert.NoError(s.T(), err)
 
 	stored := postgres.FetchLatestLesson(db)
@@ -26,6 +31,7 @@ func (s *PostgresSuite) TestWriter_UpsertLesson_createNew() {
 	assert.Equal(s.T(), lesson.Name, stored.Name)
 	assert.Equal(s.T(), lesson.Description, stored.Description)
 	assert.Equal(s.T(), lesson.Id, stored.Id)
+	assert.Equal(s.T(), user.Id, stored.UserID)
 }
 
 func (s *PostgresSuite) TestWriter_UpsertLesson_updateExisting() {

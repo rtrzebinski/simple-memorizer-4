@@ -22,6 +22,7 @@ type (
 		Id          int
 		Name        string
 		Description string
+		UserID      int
 	}
 
 	Exercise struct {
@@ -55,7 +56,7 @@ type (
 )
 
 func CreateLesson(db *sql.DB, lesson *Lesson) {
-	query := `INSERT INTO lesson (name, description) VALUES ($1, $2) RETURNING id;`
+	query := `INSERT INTO lesson (name, description, user_id) VALUES ($1, $2, $3) RETURNING id;`
 
 	if lesson.Name == "" {
 		lesson.Name = randomString()
@@ -65,7 +66,16 @@ func CreateLesson(db *sql.DB, lesson *Lesson) {
 		lesson.Description = randomString()
 	}
 
-	err := db.QueryRow(query, &lesson.Name, &lesson.Description).Scan(&lesson.Id)
+	if lesson.UserID == 0 {
+		user := User{}
+		user.Name = randomString()
+		user.Email = randomString()
+		user.Password = randomString()
+		CreateUser(db, &user)
+		lesson.UserID = user.Id
+	}
+
+	err := db.QueryRow(query, &lesson.Name, &lesson.Description, &lesson.UserID).Scan(&lesson.Id)
 	if err != nil {
 		panic(err)
 	}
@@ -100,12 +110,12 @@ func FetchLatestLesson(db *sql.DB) Lesson {
 	var lesson Lesson
 
 	const query = `
-		SELECT l.id, l.name, l.description
+		SELECT l.id, l.name, l.description, l.user_id
 		FROM lesson l
 		ORDER BY id DESC
 		LIMIT 1;`
 
-	if err := db.QueryRow(query).Scan(&lesson.Id, &lesson.Name, &lesson.Description); err != nil {
+	if err := db.QueryRow(query).Scan(&lesson.Id, &lesson.Name, &lesson.Description, &lesson.UserID); err != nil {
 		panic(err)
 	}
 

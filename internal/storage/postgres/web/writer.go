@@ -30,9 +30,9 @@ func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userI
 			return fmt.Errorf("failed to execute 'UPDATE lesson' query: %w", err)
 		}
 	} else {
-		query = `INSERT INTO lesson (name, description) VALUES ($1, $2) RETURNING id;`
+		query = `INSERT INTO lesson (name, description, user_id) VALUES ($1, $2, $3) RETURNING id;`
 
-		rows, err := w.db.QueryContext(ctx, query, lesson.Name, lesson.Description)
+		rows, err := w.db.QueryContext(ctx, query, lesson.Name, lesson.Description, userID)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
 		}

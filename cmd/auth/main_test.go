@@ -61,6 +61,9 @@ func setupClient() (*grpc.ClientConn, error) {
 }
 
 func TestMain(m *testing.M) {
+	// use dummies
+	os.Setenv("DUMMIES", "TRUE")
+
 	startServer()
 
 	err := waitForServer(5 * time.Second)

@@ -13,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
+	storageauth "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/auth"
 	storageweb "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
 	storageworker "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/worker"
 )
@@ -42,7 +43,7 @@ func main() {
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
-	s := Seeder{db, storageweb.NewWriter(db), storageworker.NewWriter(db)}
+	s := Seeder{db, storageweb.NewWriter(db), storageworker.NewWriter(db), storageauth.NewWriter(db)}
 
 	seedType := reflect.TypeOf(s)
 
@@ -72,6 +73,7 @@ type Seeder struct {
 	db            *sql.DB
 	backendWriter *storageweb.Writer
 	workerWriter  *storageworker.Writer
+	authWriter    *storageauth.Writer
 }
 
 func seed(s Seeder, seedMethodName string) {
@@ -88,12 +90,23 @@ func seed(s Seeder, seedMethodName string) {
 func (s Seeder) CapitalsSeed() {
 	ctx := context.Background()
 
+	user := backend.RegisterRequest{
+		Name:     "seeder",
+		Email:    "",
+		Password: "",
+	}
+
+	userID, err := s.authWriter.StoreUser(ctx, user.Name, user.Email, user.Password)
+	if err != nil {
+		panic(err)
+	}
+
 	lesson := backend.Lesson{
 		Name:        "Capitals",
 		Description: "What is the capital of given country?",
 	}
 
-	err := s.backendWriter.UpsertLesson(ctx, &lesson, "userID")
+	err = s.backendWriter.UpsertLesson(ctx, &lesson, userID)
 	if err != nil {
 		panic(err)
 	}
@@ -127,7 +140,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.backendWriter.UpsertExercise(ctx, &exercise, "userID")
+		err := s.backendWriter.UpsertExercise(ctx, &exercise, userID)
 		if err != nil {
 			panic(err)
 		}
@@ -145,7 +158,7 @@ func (s Seeder) LargeLessonSeed() {
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err := s.backendWriter.UpsertLesson(ctx, &lesson, "userID")
+	err := s.backendWriter.UpsertLesson(ctx, &lesson, "1")
 	if err != nil {
 		panic(err)
 	}
@@ -161,7 +174,7 @@ func (s Seeder) LargeLessonSeed() {
 	}
 
 	for k := range exercises {
-		err := s.backendWriter.UpsertExercise(ctx, &exercises[k], "userID")
+		err := s.backendWriter.UpsertExercise(ctx, &exercises[k], "1")
 		if err != nil {
 			panic(err)
 		}

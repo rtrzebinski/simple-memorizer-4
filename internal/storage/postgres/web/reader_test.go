@@ -15,12 +15,19 @@ func (s *PostgresSuite) TestReader_FetchLessons() {
 
 	r := NewReader(db)
 
-	lesson := &postgres.Lesson{}
+	user := &postgres.User{
+		Id: 1,
+	}
+	postgres.CreateUser(db, user)
+
+	lesson := &postgres.Lesson{
+		UserID: 1,
+	}
 	postgres.CreateLesson(db, lesson)
 
 	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchLessons(context.Background(), "userID")
+	res, err := r.FetchLessons(context.Background(), "1")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
@@ -29,6 +36,30 @@ func (s *PostgresSuite) TestReader_FetchLessons() {
 	assert.Equal(s.T(), lesson.Name, res[0].Name)
 	assert.Equal(s.T(), lesson.Description, res[0].Description)
 	assert.Equal(s.T(), 1, res[0].ExerciseCount)
+}
+
+func (s *PostgresSuite) TestReader_FetchLessons_otherUser() {
+	db := s.db
+
+	r := NewReader(db)
+
+	user := &postgres.User{
+		Id: 1,
+	}
+	postgres.CreateUser(db, user)
+
+	lesson := &postgres.Lesson{
+		UserID: 1,
+	}
+	postgres.CreateLesson(db, lesson)
+
+	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
+
+	res, err := r.FetchLessons(context.Background(), "2")
+
+	assert.NoError(s.T(), err)
+	assert.IsType(s.T(), backend.Lessons{}, res)
+	assert.Len(s.T(), res, 0)
 }
 
 func (s *PostgresSuite) TestReader_HydrateLesson() {
