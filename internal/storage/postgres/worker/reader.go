@@ -22,6 +22,7 @@ func (r *Reader) FetchResults(ctx context.Context, exerciseID int) ([]worker.Res
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var results []worker.Result
 	for rows.Next() {

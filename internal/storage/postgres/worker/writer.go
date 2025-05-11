@@ -23,6 +23,7 @@ func (w *Writer) StoreResult(ctx context.Context, result worker.Result) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute 'INSERT INTO result' query: %w", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&result.Id)

@@ -35,6 +35,7 @@ func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lesso
 	if err != nil {
 		return lessons, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var lesson backend.Lesson
@@ -84,6 +85,7 @@ ORDER BY e.id DESC
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var exercises backend.Exercises
 

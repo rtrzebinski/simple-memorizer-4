@@ -36,6 +36,7 @@ func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userI
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO lesson' query: %w", err)
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			err = rows.Scan(&lesson.Id)
@@ -80,6 +81,7 @@ func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise,
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
 		}
+		defer rows.Close()
 
 		for rows.Next() {
 			err = rows.Scan(&exercise.Id)
@@ -101,7 +103,7 @@ func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises
 		ON CONFLICT (lesson_id, question) DO NOTHING;`
 
 	for _, exercise := range exercises {
-		_, err := w.db.QueryContext(ctx, query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
+		_, err := w.db.ExecContext(ctx, query, exercise.Lesson.Id, exercise.Question, exercise.Answer)
 		if err != nil {
 			return fmt.Errorf("failed to execute 'INSERT INTO exercise' query: %w", err)
 		}
