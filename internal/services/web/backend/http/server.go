@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func ListenAndServe(s Service, port, certFile, keyFile string) error {
+func ListenAndServe(s Service, port string) error {
 	// read
 
 	http.Handle(FetchLessons, NewFetchLessonsHandler(s))
@@ -29,7 +29,7 @@ func ListenAndServe(s Service, port, certFile, keyFile string) error {
 	http.Handle(AuthRegister, NewAuthRegisterHandler(s))
 	http.Handle(AuthSignIn, NewAuthSignInHandler(s))
 
-	if err := http.ListenAndServeTLS(port, certFile, keyFile, nil); err != nil {
+	if err := http.ListenAndServe(port, nil); err != nil {
 		return err
 	}
 

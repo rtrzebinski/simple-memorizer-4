@@ -119,7 +119,7 @@ run-auth: ## Run auth locally
 	@PUBSUB_EMULATOR_HOST=0.0.0.0:8088 ./bin/sm4-auth
 
 run: ## Build and run all services locally
-	@make run-web & make run-worker & make run-auth & echo "$(OK_COLOR)==> Running on https://localhost:8000 $(NO_COLOR)" & wait
+	@make run-web & make run-worker & make run-auth & echo "$(OK_COLOR)==> Running on http://localhost:8000 $(NO_COLOR)" & wait
 
 proto: ## Generate protobuf files [run "make deps" first]
 	@echo "$(OK_COLOR)==> Generating protobuf files for $(SERVICE_NAME)... $(NO_COLOR)"
@@ -158,7 +158,7 @@ k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@mkdir -p $(HOME)/sm4-db-backup
 	@envsubst < k8s/db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
 	@kubectl apply -f k8s/metrics-server.yaml
-	@echo "$(OK_COLOR)==> Running on https://localhost:9000 $(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
 
 k8s-status: ## Kubernetes show all objects
 	@kubectl -n sm4 get all

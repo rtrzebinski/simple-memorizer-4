@@ -35,9 +35,7 @@ import (
 
 type config struct {
 	Web struct {
-		Port     string `envconfig:"WEB_PORT" default:":8000"`
-		CertFile string `envconfig:"WEB_CERT_FILE" default:"ssl/localhost-cert.pem"`
-		KeyFile  string `envconfig:"WEB_KEY_FILE" default:"ssl/localhost-key.pem"`
+		Port string `envconfig:"WEB_PORT" default:":8000"`
 	}
 	Auth struct {
 		ServerAddr string `envconfig:"AUTH_SERVER_ADDRESS" default:"localhost:50051"`
@@ -208,7 +206,7 @@ func run(ctx context.Context) error {
 
 	go func() {
 		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
-		serverErrors <- bhttp.ListenAndServe(service, cfg.Web.Port, cfg.Web.CertFile, cfg.Web.KeyFile)
+		serverErrors <- bhttp.ListenAndServe(service, cfg.Web.Port)
 	}()
 
 	// =========================================
