@@ -107,10 +107,6 @@ func (compo *Exercises) Render() app.UI {
 			app.Text("Lesson name: "),
 			app.Text(compo.lesson.Name),
 		),
-		//app.P().Body(
-		//	app.Text("Lesson description: "),
-		//	app.Text(compo.lesson.Description),
-		//),
 		app.P().Body(
 			app.Text("Exercises: "),
 			app.Text(compo.lesson.ExerciseCount),

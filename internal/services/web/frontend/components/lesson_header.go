@@ -18,9 +18,6 @@ func (compo *LessonHeader) Render() app.UI {
 		app.Th().Style("border", "1px solid black").Body(
 			app.Text("Name"),
 		),
-		//app.Th().Style("border", "1px solid black").Body(
-		//	app.Text("Description"),
-		//),
 		app.Th().Style("border", "1px solid black").Body(
 			app.Text("Exercises"),
 		),

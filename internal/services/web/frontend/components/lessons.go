@@ -81,8 +81,6 @@ func (compo *Lessons) Render() app.UI {
 			app.Textarea().Cols(30).Rows(3).Placeholder("Name").
 				Required(true).OnInput(compo.ValueTo(&compo.inputName)).Text(compo.inputName),
 			app.Br(),
-			//app.Textarea().Cols(30).Rows(3).Placeholder("Description").
-			//	Required(true).OnInput(compo.ValueTo(&compo.inputDescription)).Text(compo.inputDescription),
 			app.Br(),
 			app.Button().Text("Save").OnClick(compo.handleSave).Disabled(compo.saveButtonDisabled),
 			app.Button().Text("Cancel").OnClick(compo.handleCancel),

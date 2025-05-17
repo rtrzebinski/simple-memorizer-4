@@ -125,12 +125,6 @@ func (compo *Learn) Render() app.UI {
 		app.P().Body(
 			app.Button().Text("Show exercises").OnClick(compo.handleShowExercises),
 		),
-		//app.P().Body(
-		//	app.Text("Lesson name: "+compo.lesson.Name),
-		//),
-		//app.P().Body(
-		//	app.Text("Lesson description: "+compo.lesson.Description),
-		//),
 		app.P().Body(
 			app.Text("Question: "),
 			app.If(compo.exercise.Question != "", func() app.UI {
@@ -147,29 +141,6 @@ func (compo *Learn) Render() app.UI {
 				return app.Text("")
 			}),
 		).Hidden(!compo.isAnswerVisible),
-		//app.P().Body(
-		//	app.Text(compo.exercise.BadAnswers),
-		//	app.Text(" bad answers"),
-		//	app.If(compo.exercise.BadAnswers > 0 && compo.exercise.BadAnswersToday > 0, func() app.UI {
-		//		return app.Text(" (today: " + strconv.Itoa(compo.exercise.BadAnswersToday) + ")")
-		//	}).Else(func() app.UI {
-		//		return app.Text(" (latest: " + compo.exercise.LatestBadAnswer.Time.Format("2 Jan 2006 15:04") + ")")
-		//	}),
-		//),
-		//app.P().Body(
-		//	app.Text(compo.exercise.GoodAnswers),
-		//	app.Text(" good answers"),
-		//
-		//	app.If(compo.exercise.GoodAnswers > 0 && compo.exercise.GoodAnswersToday > 0, func() app.UI {
-		//		return app.Text(" (today: " + strconv.Itoa(compo.exercise.GoodAnswersToday) + ")")
-		//	}).Else(func() app.UI {
-		//		return app.Text(" (latest: " + compo.exercise.LatestGoodAnswer.Time.Format("2 Jan 2006 15:04") + ")")
-		//	}),
-		//),
-		//app.P().Body(
-		//	app.Text(compo.exercise.GoodAnswersPercent()),
-		//	app.Text("% of good answers"),
-		//),
 		app.P().Body(
 			app.Button().
 				Text("⇧ View answer").
