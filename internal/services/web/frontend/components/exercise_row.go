@@ -59,11 +59,10 @@ func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}
 		// create a new rows slice to be replaced in parent component
-		rows := make([]*ExerciseRow, len(compo.parent.rows))
-		for i, row := range compo.parent.rows {
-			// add all rows but current one (which is being deleted)
-			if i != id && row != nil {
-				rows[i] = row
+		rows := make([]*ExerciseRow, 0, len(compo.parent.rows))
+		for _, row := range compo.parent.rows {
+			if row != nil && row.exercise.Id != id {
+				rows = append(rows, row)
 			}
 		}
 		// replace parent rows slice with a new one - this will update the UI

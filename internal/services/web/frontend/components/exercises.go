@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"slices"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -349,4 +350,7 @@ func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
 	for _, row := range exercises {
 		compo.rows[row.Id] = &ExerciseRow{exercise: row, parent: compo}
 	}
+
+	// reverse the order to display the latest exercises first
+	slices.Reverse(compo.rows)
 }
