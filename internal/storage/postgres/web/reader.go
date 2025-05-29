@@ -69,7 +69,7 @@ func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, user
 	return nil
 }
 
-func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson, userID string) (backend.Exercises, error) {
+func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
 	slog.Debug("Reader FetchExercises", "userID", userID)
 
 	const query = `
@@ -78,10 +78,11 @@ SELECT e.id, e.question, e.answer,
        e.good_answers, e.good_answers_today, e.latest_good_answer, e.latest_good_answer_was_today
 FROM exercise e
 WHERE lesson_id = $1
+AND id >= $2
 ORDER BY e.id DESC
 `
 
-	rows, err := r.db.QueryContext(ctx, query, lesson.Id)
+	rows, err := r.db.QueryContext(ctx, query, lesson.Id, oldestExerciseID)
 	if err != nil {
 		return nil, err
 	}

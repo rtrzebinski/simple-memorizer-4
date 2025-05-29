@@ -55,11 +55,12 @@ func (s *Client) HydrateLesson(ctx context.Context, lesson *frontend.Lesson, acc
 }
 
 // FetchExercises fetches exercises of a lesson
-func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson, accessToken string) ([]frontend.Exercise, error) {
+func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson, oldestExerciseID int, accessToken string) ([]frontend.Exercise, error) {
 	var exercises []frontend.Exercise
 
 	var params = map[string]string{
-		"lesson_id": strconv.Itoa(lesson.Id),
+		"lesson_id":          strconv.Itoa(lesson.Id),
+		"oldest_exercise_id": strconv.Itoa(oldestExerciseID),
 	}
 
 	respBody, err := s.c.Call(ctx, "GET", http.FetchExercises, params, nil, accessToken)

@@ -38,19 +38,21 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 
 	service := NewServiceMock()
 
-	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}, "100").Return(exercises, nil)
+	oldestExerciseID := 1
+
+	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}, oldestExerciseID, "100").Return(exercises, nil)
 
 	route := NewFetchExercisesOfLessonHandler(service)
 
 	u, _ := url.Parse("/")
 	params := u.Query()
 	params.Add("lesson_id", strconv.Itoa(lessonId))
+	params.Add("oldest_exercise_id", strconv.Itoa(oldestExerciseID))
 	u.RawQuery = params.Encode()
 
 	req := &http.Request{}
 	req.URL = u
 	req.Header = make(map[string][]string)
-	// { "sub": "100" }
 	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	res := httptest.NewRecorder()
@@ -85,7 +87,6 @@ func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
 	req := &http.Request{}
 	req.URL = u
 	req.Header = make(map[string][]string)
-	// { "sub": "100" }
 	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	res := httptest.NewRecorder()

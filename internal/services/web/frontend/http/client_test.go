@@ -107,15 +107,17 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 	responseBody, err := json.Marshal(exercises)
 	suite.Assert().NoError(err)
 
+	oldestExerciseID := 1
+
 	method := "GET"
 	route := http.FetchExercises
-	params := map[string]string{"lesson_id": "1"}
+	params := map[string]string{"lesson_id": "1", "oldest_exercise_id": "1"}
 	reqBody := []byte(nil)
 	accessToken := "accessToken"
 
 	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
 
-	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, accessToken)
+	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, oldestExerciseID, accessToken)
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises[0].Id, result[0].Id)

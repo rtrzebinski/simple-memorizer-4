@@ -65,8 +65,11 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 		return
 	}
 
+	// Set the oldest exercise ID to 1, as we are exporting all exercises
+	oldestExerciseID := 1
+
 	// Fetch exercises of the lesson
-	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, "")
+	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, oldestExerciseID, "")
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

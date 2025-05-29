@@ -22,8 +22,8 @@ func (mock *ReaderMock) HydrateLesson(ctx context.Context, lesson *Lesson, userI
 	return nil
 }
 
-func (mock *ReaderMock) FetchExercises(ctx context.Context, lesson Lesson, userID string) (Exercises, error) {
-	return mock.Called(ctx, lesson, userID).Get(0).(Exercises), nil
+func (mock *ReaderMock) FetchExercises(ctx context.Context, lesson Lesson, oldestExerciseID int, userID string) (Exercises, error) {
+	return mock.Called(ctx, lesson, oldestExerciseID, userID).Get(0).(Exercises), nil
 }
 
 type WriterMock struct{ mock.Mock }

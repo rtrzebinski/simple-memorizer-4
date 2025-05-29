@@ -70,7 +70,12 @@ func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *
 		}
 	}
 
-	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, userID)
+	oldestExerciseID, err := strconv.Atoi(req.URL.Query().Get("oldest_exercise_id"))
+	if err != nil {
+		log.Print(fmt.Errorf("failed to get a oldest_exercise_id: %w", err))
+	}
+
+	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, oldestExerciseID, userID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

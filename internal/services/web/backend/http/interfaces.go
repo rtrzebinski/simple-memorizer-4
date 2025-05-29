@@ -9,7 +9,7 @@ import (
 type Service interface {
 	FetchLessons(ctx context.Context, userID string) (lessons backend.Lessons, err error)
 	HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error
-	FetchExercises(ctx context.Context, lesson backend.Lesson, userID string) (backend.Exercises, error)
+	FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error)
 	UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error
 	DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error
 	UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error

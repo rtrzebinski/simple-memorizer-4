@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
@@ -39,8 +40,9 @@ func (compo *ExerciseRow) Render() app.UI {
 			app.Text(compo.exercise.GoodAnswersPercent()),
 		),
 		app.Td().Style("border", "1px solid black").Body(
-			app.Button().Text("Edit").OnClick(compo.onEdit(), app.EventScope(fmt.Sprintf("%p", compo))),
 			app.Button().Text("Delete").OnClick(compo.onDelete(compo.exercise.Id), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("Edit").OnClick(compo.onEdit(), app.EventScope(fmt.Sprintf("%p", compo))),
+			app.Button().Text("LearnSince").OnClick(compo.onLearnSince(), app.EventScope(fmt.Sprintf("%p", compo))),
 		),
 	)
 }
@@ -79,5 +81,19 @@ func (compo *ExerciseRow) onEdit() app.EventHandler {
 		compo.parent.inputAnswer = compo.exercise.Answer
 		compo.parent.formVisible = true
 		compo.parent.validationErrors = nil
+	}
+}
+
+// onLearnSince handles LearnSince button click
+// It navigates to the learn page with the oldest exercise ID and lesson ID as parameters.
+// This allows the user to start learning from the latest exercise in the lesson, for instance only latest X exercises.
+func (compo *ExerciseRow) onLearnSince() app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		u, _ := url.Parse(PathLearn)
+		params := u.Query()
+		params.Add("lesson_id", strconv.Itoa(compo.parent.lesson.Id))
+		params.Add("oldest_exercise_id", strconv.Itoa(compo.exercise.Id))
+		u.RawQuery = params.Encode()
+		ctx.NavigateTo(u)
 	}
 }

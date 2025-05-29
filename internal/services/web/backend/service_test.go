@@ -53,11 +53,13 @@ func TestService_FetchExercises(t *testing.T) {
 	authClientMock := NewAuthClientMock()
 	service := NewService(readerMock, writerMock, publisherMock, authClientMock)
 
+	oldestExerciseID := 1
+
 	lesson := Lesson{}
 	expectedExercises := Exercises{}
-	readerMock.On("FetchExercises", ctx, lesson, "userID").Return(expectedExercises, nil)
+	readerMock.On("FetchExercises", ctx, lesson, oldestExerciseID, "userID").Return(expectedExercises, nil)
 
-	exercises, err := service.FetchExercises(ctx, lesson, "userID")
+	exercises, err := service.FetchExercises(ctx, lesson, oldestExerciseID, "userID")
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExercises, exercises)

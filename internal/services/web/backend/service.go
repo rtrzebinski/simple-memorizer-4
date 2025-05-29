@@ -21,8 +21,8 @@ func (s *Service) HydrateLesson(ctx context.Context, lesson *Lesson, userID stri
 	return s.r.HydrateLesson(ctx, lesson, userID)
 }
 
-func (s *Service) FetchExercises(ctx context.Context, lesson Lesson, userID string) (Exercises, error) {
-	return s.r.FetchExercises(ctx, lesson, userID)
+func (s *Service) FetchExercises(ctx context.Context, lesson Lesson, oldestExerciseID int, userID string) (Exercises, error) {
+	return s.r.FetchExercises(ctx, lesson, oldestExerciseID, userID)
 }
 
 func (s *Service) UpsertLesson(ctx context.Context, lesson *Lesson, userID string) error {

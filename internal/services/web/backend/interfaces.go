@@ -5,7 +5,7 @@ import "context"
 type Reader interface {
 	FetchLessons(ctx context.Context, userID string) (Lessons, error)
 	HydrateLesson(ctx context.Context, lesson *Lesson, userID string) error
-	FetchExercises(ctx context.Context, lesson Lesson, userID string) (Exercises, error)
+	FetchExercises(ctx context.Context, lesson Lesson, oldestExerciseID int, userID string) (Exercises, error)
 }
 
 type Writer interface {

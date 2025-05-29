@@ -325,7 +325,8 @@ func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, accessToken)
+	oldestExerciseID := 1 // Set the oldest exercise ID to 1, as we are displaying all exercises
+	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

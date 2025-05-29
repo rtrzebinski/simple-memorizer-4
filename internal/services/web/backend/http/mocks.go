@@ -25,8 +25,8 @@ func (m *ServiceMock) HydrateLesson(ctx context.Context, lesson *backend.Lesson,
 	return args.Error(0)
 }
 
-func (m *ServiceMock) FetchExercises(ctx context.Context, lesson backend.Lesson, userID string) (backend.Exercises, error) {
-	args := m.Called(ctx, lesson, userID)
+func (m *ServiceMock) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
+	args := m.Called(ctx, lesson, oldestExerciseID, userID)
 	return args.Get(0).(backend.Exercises), args.Error(1)
 }
 

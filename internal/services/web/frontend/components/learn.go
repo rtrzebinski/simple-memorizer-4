@@ -60,12 +60,17 @@ func (compo *Learn) OnMount(ctx app.Context) {
 	compo.lesson = frontend.Lesson{Id: lessonId}
 	compo.hydrateLesson(ctx)
 
+	oldestExerciseID, err := strconv.Atoi(u.Query().Get("oldest_exercise_id"))
+	if err != nil {
+		oldestExerciseID = 1
+	}
+
 	accessToken, err := auth.Token(ctx)
 	if err != nil {
 		slog.Error("failed to get token", "err", err)
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 	}
-	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson, accessToken)
+	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID, accessToken)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 

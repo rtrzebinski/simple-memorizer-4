@@ -112,7 +112,9 @@ func (s *PostgresSuite) TestReader_FetchExercises() {
 	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
 	postgres.CreateExercise(db, exercise2)
 
-	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, "userID")
+	oldestExerciseID := 1
+
+	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)
@@ -137,4 +139,34 @@ func (s *PostgresSuite) TestReader_FetchExercises() {
 	assert.Equal(s.T(), 0, res[0].GoodAnswersToday)
 	assert.Equal(s.T(), null.Time{}, res[0].LatestGoodAnswer)
 	assert.Equal(s.T(), false, res[0].LatestGoodAnswerWasToday)
+}
+
+func (s *PostgresSuite) TestReader_FetchExercises_oldestExerciseID() {
+	db := s.db
+
+	r := NewReader(db)
+
+	exercise1 := &postgres.Exercise{
+		BadAnswers:               1,
+		BadAnswersToday:          2,
+		LatestBadAnswer:          null.TimeFrom(time.Now()),
+		GoodAnswers:              3,
+		GoodAnswersToday:         4,
+		LatestGoodAnswer:         null.Time{},
+		LatestGoodAnswerWasToday: true,
+	}
+	postgres.CreateExercise(db, exercise1)
+
+	// to check of exercise without results will also be fetched
+	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
+	postgres.CreateExercise(db, exercise2)
+
+	oldestExerciseID := 2
+
+	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
+
+	assert.NoError(s.T(), err)
+	assert.IsType(s.T(), backend.Exercises{}, res)
+	assert.Len(s.T(), res, 1)
+	assert.Equal(s.T(), exercise2.Id, res[0].Id)
 }

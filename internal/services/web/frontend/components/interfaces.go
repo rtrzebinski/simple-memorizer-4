@@ -9,7 +9,7 @@ import (
 type APIClient interface {
 	FetchLessons(ctx context.Context, accessToken string) ([]frontend.Lesson, error)
 	HydrateLesson(ctx context.Context, lesson *frontend.Lesson, accessToken string) error
-	FetchExercises(ctx context.Context, lesson frontend.Lesson, accessToken string) ([]frontend.Exercise, error)
+	FetchExercises(ctx context.Context, lesson frontend.Lesson, oldestExerciseID int, accessToken string) ([]frontend.Exercise, error)
 	UpsertLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error
 	DeleteLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error
 	UpsertExercise(ctx context.Context, exercise frontend.Exercise, accessToken string) error

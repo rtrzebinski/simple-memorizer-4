@@ -29,7 +29,9 @@ func TestExportLessonCsvHandler(t *testing.T) {
 
 	service := NewServiceMock()
 
-	service.On("FetchExercises", ctx, lesson, "").Return(exercises, nil)
+	oldestExerciseID := 1
+
+	service.On("FetchExercises", ctx, lesson, oldestExerciseID, "").Return(exercises, nil)
 	service.On("HydrateLesson", ctx, &lesson, "").Run(func(args mock.Arguments) {
 		args.Get(1).(*backend.Lesson).Name = "lesson name"
 	}).Return(nil)
