@@ -55,6 +55,11 @@ func (compo *LessonRow) onEdit() app.EventHandler {
 // onDelete handles delete button click
 func (compo *LessonRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
+		// confirmation dialog
+		if !app.Window().Call("confirm", "Delete a record?").Bool() {
+			return
+		}
+
 		// delete lesson
 		accessToken, err := auth.Token(ctx)
 		if err != nil {

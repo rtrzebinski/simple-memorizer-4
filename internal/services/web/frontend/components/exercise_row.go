@@ -50,6 +50,11 @@ func (compo *ExerciseRow) Render() app.UI {
 // onDelete handles delete button click
 func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
+		// confirmation dialog
+		if !app.Window().Call("confirm", "Delete a record?").Bool() {
+			return
+		}
+
 		accessToken, err := auth.Token(ctx)
 		if err != nil {
 			slog.Error("failed to get token", "err", err)
