@@ -22,9 +22,6 @@ type LessonRow struct {
 func (compo *LessonRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(compo.lesson.Id),
-		),
-		app.Td().Style("border", "1px solid black").Body(
 			app.Text(compo.lesson.Name),
 		),
 		app.Td().Style("border", "1px solid black").Body(

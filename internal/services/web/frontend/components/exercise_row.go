@@ -22,9 +22,6 @@ type ExerciseRow struct {
 func (compo *ExerciseRow) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Td().Style("border", "1px solid black").Body(
-			app.Text(compo.exercise.Id),
-		),
-		app.Td().Style("border", "1px solid black").Body(
 			app.Text(compo.exercise.Question),
 		),
 		app.Td().Style("border", "1px solid black").Body(

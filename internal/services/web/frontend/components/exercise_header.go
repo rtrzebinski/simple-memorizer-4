@@ -13,9 +13,6 @@ type ExerciseHeader struct {
 func (compo *ExerciseHeader) Render() app.UI {
 	return app.Tr().Style("border", "1px solid black").Body(
 		app.Th().Style("border", "1px solid black").Body(
-			app.Text("Id"),
-		),
-		app.Th().Style("border", "1px solid black").Body(
 			app.Text("Question"),
 		),
 		app.Th().Style("border", "1px solid black").Body(
