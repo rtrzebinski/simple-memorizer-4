@@ -24,7 +24,10 @@ type APIClient interface {
 
 // ExerciseEditor is an interface that defines methods for components that can edit exercises.
 type ExerciseEditor interface {
-	reloadUI(ctx app.Context)
+	// getLesson returns the lesson that edited exercise belongs to, used for FK creation.
 	getLesson() *frontend.Lesson
+	// getExercises returns the list of exercises of the lesson, used for validation against duplicates.
 	getExercises() []*frontend.Exercise
+	// exerciseEditDone is called when the exercise edit is done - either submitted or cancelled.
+	exerciseEditDone(ctx app.Context)
 }

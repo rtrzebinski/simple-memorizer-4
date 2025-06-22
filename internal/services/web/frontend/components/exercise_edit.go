@@ -127,20 +127,20 @@ func (compo *ExerciseEdit) handleSave(ctx app.Context, e app.Event) {
 		compo.visible = false
 	}
 
-	// reset form
+	compo.parent.exerciseEditDone(ctx)
 	compo.resetForm()
-
-	compo.parent.reloadUI(ctx)
 }
 
 // handleCancel handle cancel button click
-func (compo *ExerciseEdit) handleCancel(_ app.Context, _ app.Event) {
-	compo.resetForm()
+func (compo *ExerciseEdit) handleCancel(ctx app.Context, _ app.Event) {
 	compo.visible = false
+	compo.parent.exerciseEditDone(ctx)
+	compo.resetForm()
 }
 
 // resetForm reset form fields
 func (compo *ExerciseEdit) resetForm() {
+	compo.title = ""
 	compo.inputId = 0
 	compo.inputQuestion = ""
 	compo.inputAnswer = ""

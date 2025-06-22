@@ -190,7 +190,8 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	// reset file input for next upload
 	e.Get("target").Set("value", "")
 
-	compo.reloadUI(ctx)
+	compo.hydrateLesson(ctx)
+	compo.displayExercisesOfLesson(ctx)
 }
 
 // readFile some JS magic converting uploaded file to a slice of bytes
@@ -258,8 +259,8 @@ func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
 	slices.Reverse(compo.rows)
 }
 
-// reloadUI reloads the component UI
-func (compo *Exercises) reloadUI(ctx app.Context) {
+// exerciseEditDone is called when the edit form is submitted or cancelled
+func (compo *Exercises) exerciseEditDone(ctx app.Context) {
 	compo.hydrateLesson(ctx)
 	compo.displayExercisesOfLesson(ctx)
 }

@@ -17,14 +17,14 @@ const PathLearn = "/learn"
 // Learn is a component that displays learning page
 type Learn struct {
 	app.Compo
-	c         APIClient
-	memorizer memorizer.Memorizer
-
-	// component vars
+	c               APIClient
+	memorizer       memorizer.Memorizer
 	lesson          frontend.Lesson
 	exercise        frontend.Exercise
 	isAnswerVisible bool
 	user            *frontend.User
+	edit            *ExerciseEdit // edit component for exercises
+	editMode        bool          // used to disable answering while editing exercise
 
 	// Window events unsubscribers, to be called on component dismount
 	// this is needed so Window events are not piled on each component mounting
@@ -33,10 +33,15 @@ type Learn struct {
 
 // NewLearn creates a new Learn component
 func NewLearn(c APIClient) *Learn {
-	return &Learn{
-		c:    c,
-		user: &frontend.User{},
+	learn := &Learn{
+		c:        c,
+		user:     &frontend.User{},
+		editMode: false,
 	}
+
+	learn.edit = NewExerciseEdit(c, learn)
+
+	return learn
 }
 
 // The OnMount method is run once component is mounted
@@ -107,7 +112,11 @@ func (compo *Learn) hydrateLesson(ctx app.Context) {
 
 // The OnDismount method is run once component is dismounted.
 func (compo *Learn) OnDismount() {
-	// unsubscribe from registered Window events
+	compo.runUnsubscribeFunctions()
+}
+
+// runUnsubscribeFunctions unsubscribe from registered Window events
+func (compo *Learn) runUnsubscribeFunctions() {
 	for _, f := range compo.unsubscribers {
 		f()
 	}
@@ -129,7 +138,9 @@ func (compo *Learn) Render() app.UI {
 		),
 		app.P().Body(
 			app.Button().Text("Show exercises").OnClick(compo.handleShowExercises),
+			app.Button().Text("Edit exercise").OnClick(compo.handleEditExercise),
 		),
+		app.Div().Body(compo.edit.Render()),
 		app.P().Body(
 			app.Text("Question: "),
 			app.If(compo.exercise.Question != "", func() app.UI {
@@ -137,7 +148,7 @@ func (compo *Learn) Render() app.UI {
 			}).Else(func() app.UI {
 				return app.Text("")
 			}),
-		),
+		).Hidden(compo.editMode),
 		app.P().Body(
 			app.Text("Answer: "),
 			app.If(compo.exercise.Answer != "", func() app.UI {
@@ -145,7 +156,7 @@ func (compo *Learn) Render() app.UI {
 			}).Else(func() app.UI {
 				return app.Text("")
 			}),
-		).Hidden(!compo.isAnswerVisible),
+		).Hidden(!compo.isAnswerVisible || compo.editMode),
 		app.P().Body(
 			app.Button().
 				Text("⇧ View answer").
@@ -161,7 +172,7 @@ func (compo *Learn) Render() app.UI {
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
-		),
+		).Hidden(compo.editMode),
 		app.P().Body(
 			app.Button().
 				Text("⇦ Bad answer").
@@ -177,7 +188,7 @@ func (compo *Learn) Render() app.UI {
 				}).
 				Style("margin-right", "10px").
 				Style("font-size", "15px"),
-		),
+		).Hidden(compo.editMode),
 	)
 }
 
@@ -327,4 +338,30 @@ func (compo *Learn) handleBadAnswer(ctx app.Context) {
 	// exercise will be passed back to memorizer, needs the updated projection
 	compo.exercise.RegisterBadAnswer()
 	compo.handleNextExercise()
+}
+
+// handleEditExercise is called when the "edit exercise" button is clicked
+func (compo *Learn) handleEditExercise(_ app.Context, _ app.Event) {
+	compo.edit.edit(compo.exercise) // set edit component to edit mode
+	compo.runUnsubscribeFunctions() // remove all previous event listeners (unbind keys and swipes)
+	compo.editMode = true           // disable answering while editing
+}
+
+// exerciseEditDone is called when the edit form is submitted or cancelled
+func (compo *Learn) exerciseEditDone(ctx app.Context) {
+	compo.exercise.Question = compo.edit.inputQuestion // update question
+	compo.exercise.Answer = compo.edit.inputAnswer     // update answer
+	compo.bindKeys(ctx)                                // rebind keys after edit is done
+	compo.bindSwipes(ctx)                              // rebind swipes after edit is done
+	compo.editMode = false                             // enable answering after edit is done
+}
+
+// getLesson returns the current lesson
+func (compo *Learn) getLesson() *frontend.Lesson {
+	return &compo.lesson
+}
+
+// getExercises returns a slice of exercises from the memorizer
+func (compo *Learn) getExercises() []*frontend.Exercise {
+	return compo.memorizer.GetExercises()
 }

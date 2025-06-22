@@ -124,3 +124,13 @@ func points(e frontend.Exercise) int {
 
 	return 100 - percent
 }
+
+func (s *Memorizer) GetExercises() []*frontend.Exercise {
+	var exercises []*frontend.Exercise
+
+	for _, e := range s.exercises {
+		exercises = append(exercises, &e)
+	}
+
+	return exercises
+}
