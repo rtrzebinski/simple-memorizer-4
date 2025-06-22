@@ -12,7 +12,6 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/csv"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
 )
 
 const PathExercises = "/exercises"
@@ -26,22 +25,19 @@ type Exercises struct {
 	lesson frontend.Lesson
 	rows   []*ExerciseRow
 	user   *frontend.User
-
-	// upsert exercise form
-	formVisible        bool
-	validationErrors   []error
-	inputId            int
-	inputQuestion      string
-	inputAnswer        string
-	saveButtonDisabled bool
+	edit   *ExerciseEdit
 }
 
 // NewExercises creates a new Exercises component
 func NewExercises(c APIClient) *Exercises {
-	return &Exercises{
+	exercises := &Exercises{
 		c:    c,
 		user: &frontend.User{},
 	}
+
+	exercises.edit = NewExerciseEdit(c, exercises)
+
+	return exercises
 }
 
 // The OnMount method is run once component is mounted
@@ -97,7 +93,7 @@ func (compo *Exercises) Render() app.UI {
 		),
 		app.P().Body(
 			app.Button().Text("Start learning").OnClick(compo.handleStartLearning).Disabled(compo.lesson.ExerciseCount < 2),
-			app.Button().Text("Add a new exercise").OnClick(compo.handleAddExercise).Hidden(compo.formVisible),
+			app.Button().Text("Add a new exercise").OnClick(compo.handleAddExercise).Hidden(compo.edit.visible),
 			app.A().Href(http.ExportLessonCsv+"?lesson_id="+strconv.Itoa(compo.lesson.Id)).Download("").Body(
 				app.Button().Text("CSV export"),
 			),
@@ -112,25 +108,7 @@ func (compo *Exercises) Render() app.UI {
 			app.Text("Exercises: "),
 			app.Text(compo.lesson.ExerciseCount),
 		),
-		app.Div().Body(
-			app.H3().Text("Add a new exercise"),
-			app.P().Body(
-				app.Range(compo.validationErrors).Slice(func(i int) app.UI {
-					return app.Div().Body(
-						app.Text(compo.validationErrors[i].Error()),
-						app.Br(),
-					).Style("color", "red")
-				}),
-			),
-			app.Textarea().ID("input_question").Cols(30).Rows(3).Placeholder("Question").
-				Required(true).OnInput(compo.ValueTo(&compo.inputQuestion)).Text(compo.inputQuestion),
-			app.Br(),
-			app.Textarea().ID("input_answer").Cols(30).Rows(3).Placeholder("Answer").
-				Required(true).OnInput(compo.ValueTo(&compo.inputAnswer)).Text(compo.inputAnswer),
-			app.Br(),
-			app.Button().Text("Save").OnClick(compo.handleSave).Disabled(compo.saveButtonDisabled),
-			app.Button().Text("Cancel").OnClick(compo.handleCancel),
-		).Hidden(!compo.formVisible),
+		app.Div().Body(compo.edit.Render()),
 		app.Div().Body(
 			app.H3().Text("Exercises"),
 			app.Table().Style("border", "1px solid black").Body(
@@ -160,7 +138,7 @@ func (compo *Exercises) handleStartLearning(ctx app.Context, _ app.Event) {
 
 // handleAddExercise display add exercise form
 func (compo *Exercises) handleAddExercise(_ app.Context, _ app.Event) {
-	compo.formVisible = true
+	compo.edit.add()
 }
 
 // handleCsvUpload upload exercises from a CSV file
@@ -212,9 +190,7 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	// reset file input for next upload
 	e.Get("target").Set("value", "")
 
-	// reload the UI
-	compo.hydrateLesson(ctx)
-	compo.displayExercisesOfLesson(ctx)
+	compo.reloadUI(ctx)
 }
 
 // readFile some JS magic converting uploaded file to a slice of bytes
@@ -242,80 +218,6 @@ func readFile(file app.Value) (data []byte, err error) {
 	}
 
 	return data, err
-}
-
-// handleSave create new or update existing exercise
-func (compo *Exercises) handleSave(ctx app.Context, e app.Event) {
-	e.PreventDefault()
-
-	// exercise to be saved
-	exercise := frontend.Exercise{
-		Id:       compo.inputId,
-		Question: compo.inputQuestion,
-		Answer:   compo.inputAnswer,
-		Lesson: &frontend.Lesson{
-			Id: compo.lesson.Id,
-		},
-	}
-
-	// extract other questions to validate against
-	var questions []string
-	for i, row := range compo.rows {
-		if row != nil && compo.rows[i].exercise.Id != compo.inputId {
-			questions = append(questions, compo.rows[i].exercise.Question)
-		}
-	}
-
-	// validate input
-	validator := validation.ValidateUpsertExercise(exercise, questions)
-	if validator.Failed() {
-		compo.validationErrors = validator.Errors()
-
-		return
-	}
-
-	// disable submit button to avoid duplicated requests
-	compo.saveButtonDisabled = true
-
-	// save exercise
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-
-	err = compo.c.UpsertExercise(ctx, exercise, accessToken)
-	if err != nil {
-		app.Log(fmt.Errorf("failed to save exercise: %w", err))
-	}
-
-	// hide the input form on row edit, but keep open on adding new
-	// because it is common to add a few exercises one after another
-	if compo.inputId != 0 {
-		compo.formVisible = false
-	}
-
-	// reset form
-	compo.resetForm()
-
-	// reload the UI
-	compo.hydrateLesson(ctx)
-	compo.displayExercisesOfLesson(ctx)
-}
-
-// handleCancel handle cancel button click
-func (compo *Exercises) handleCancel(_ app.Context, _ app.Event) {
-	compo.resetForm()
-	compo.formVisible = false
-}
-
-// resetForm reset form fields
-func (compo *Exercises) resetForm() {
-	compo.inputId = 0
-	compo.inputQuestion = ""
-	compo.inputAnswer = ""
-	compo.validationErrors = nil
-	compo.saveButtonDisabled = false
 }
 
 // displayExercisesOfLesson fetch exercises and display them
@@ -354,4 +256,26 @@ func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
 
 	// reverse the order to display the latest exercises first
 	slices.Reverse(compo.rows)
+}
+
+// reloadUI reloads the component UI
+func (compo *Exercises) reloadUI(ctx app.Context) {
+	compo.hydrateLesson(ctx)
+	compo.displayExercisesOfLesson(ctx)
+}
+
+// getLesson returns the lesson associated with the Exercises component
+func (compo *Exercises) getLesson() *frontend.Lesson {
+	return &compo.lesson
+}
+
+// getExercises returns a slice of exercises from the Exercises component
+func (compo *Exercises) getExercises() []*frontend.Exercise {
+	exercises := make([]*frontend.Exercise, 0, len(compo.rows))
+	for _, row := range compo.rows {
+		if row != nil {
+			exercises = append(exercises, &row.exercise)
+		}
+	}
+	return exercises
 }

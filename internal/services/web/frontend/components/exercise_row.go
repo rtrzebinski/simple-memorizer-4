@@ -78,11 +78,7 @@ func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 // onEdit handles edit button click
 func (compo *ExerciseRow) onEdit() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		compo.parent.inputId = compo.exercise.Id
-		compo.parent.inputQuestion = compo.exercise.Question
-		compo.parent.inputAnswer = compo.exercise.Answer
-		compo.parent.formVisible = true
-		compo.parent.validationErrors = nil
+		compo.parent.edit.edit(compo.exercise)
 	}
 }
 
