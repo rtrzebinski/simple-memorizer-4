@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
@@ -76,6 +77,16 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 		return
 	}
+
+	// Sort by ID asc
+	slices.SortFunc(exercises, func(a, b backend.Exercise) int {
+		if a.Id < b.Id {
+			return -1
+		} else if a.Id > b.Id {
+			return 1
+		}
+		return 0
+	})
 
 	// Create CSV records
 	var records [][]string

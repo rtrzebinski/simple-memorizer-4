@@ -18,12 +18,17 @@ import (
 func TestExportLessonCsvHandler(t *testing.T) {
 	ctx := context.Background()
 
-	exercise := backend.Exercise{
+	exercise1 := backend.Exercise{
 		Id:       1,
-		Question: "question",
-		Answer:   "answer",
+		Question: "question1",
+		Answer:   "answer1",
 	}
-	exercises := backend.Exercises{exercise}
+	exercise2 := backend.Exercise{
+		Id:       2,
+		Question: "question2",
+		Answer:   "answer2",
+	}
+	exercises := backend.Exercises{exercise2, exercise1}
 
 	lesson := backend.Lesson{Id: 2}
 
@@ -51,10 +56,10 @@ func TestExportLessonCsvHandler(t *testing.T) {
 	route.ServeHTTP(res, req)
 
 	assert.Equal(t, http.StatusOK, res.Code)
-	assert.Equal(t, "question,answer\n", string(res.Body.Bytes()))
+	assert.Equal(t, "question1,answer1\nquestion2,answer2\n", string(res.Body.Bytes()))
 	assert.Equal(t, "attachment; filename=lesson name.csv", res.Header().Get("Content-Disposition"))
 	assert.Equal(t, "application/octet-stream", res.Header().Get("Content-Type"))
-	assert.Equal(t, "16", res.Header().Get("Content-Length"))
+	assert.Equal(t, "36", res.Header().Get("Content-Length"))
 }
 
 func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
