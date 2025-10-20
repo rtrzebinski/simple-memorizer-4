@@ -1,19 +1,19 @@
-package auth
+package postgres
 
 import (
 	"context"
 	"database/sql"
 )
 
-type Writer struct {
+type AuthWriter struct {
 	db *sql.DB
 }
 
-func NewWriter(db *sql.DB) *Writer {
-	return &Writer{db: db}
+func NewAuthWriter(db *sql.DB) *AuthWriter {
+	return &AuthWriter{db: db}
 }
 
-func (w *Writer) StoreUser(ctx context.Context, name, email, password string) (userID string, err error) {
+func (w *AuthWriter) StoreUser(ctx context.Context, name, email, password string) (userID string, err error) {
 	const query = `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id;`
 
 	row := w.db.QueryRowContext(ctx, query, name, email, password)

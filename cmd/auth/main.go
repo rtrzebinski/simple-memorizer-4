@@ -18,7 +18,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	authstorage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/auth"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -110,8 +110,8 @@ func run(ctx context.Context) error {
 		writer = &DummyWriter{}
 	} else {
 		// Real reader and writer
-		reader = authstorage.NewReader(db)
-		writer = authstorage.NewWriter(db)
+		reader = postgres.NewAuthReader(db)
+		writer = postgres.NewAuthWriter(db)
 	}
 	service := auth.NewService(reader, writer)
 	server := intgrpc.NewServer(service)

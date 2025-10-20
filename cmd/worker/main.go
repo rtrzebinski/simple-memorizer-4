@@ -21,7 +21,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/worker"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 )
 
 type config struct {
@@ -101,8 +101,8 @@ func run(ctx context.Context) error {
 	// Start worker
 	// =========================================
 
-	reader := storage.NewReader(db)
-	writer := storage.NewWriter(db)
+	reader := postgres.NewWorkerReader(db)
+	writer := postgres.NewWorkerWriter(db)
 	service := worker.NewService(reader, writer)
 	handler := pubsub.NewHandler(service)
 

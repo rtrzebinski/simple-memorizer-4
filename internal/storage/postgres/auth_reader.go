@@ -1,19 +1,19 @@
-package auth
+package postgres
 
 import (
 	"context"
 	"database/sql"
 )
 
-type Reader struct {
+type AuthReader struct {
 	db *sql.DB
 }
 
-func NewReader(db *sql.DB) *Reader {
-	return &Reader{db: db}
+func NewAuthReader(db *sql.DB) *AuthReader {
+	return &AuthReader{db: db}
 }
 
-func (r *Reader) FetchUser(ctx context.Context, email string) (name, userID, password string, err error) {
+func (r *AuthReader) FetchUser(ctx context.Context, email string) (name, userID, password string, err error) {
 	const query = `SELECT name, id, password FROM "user" WHERE email = $1;`
 
 	row := r.db.QueryRowContext(ctx, query, email)

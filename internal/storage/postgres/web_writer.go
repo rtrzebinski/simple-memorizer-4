@@ -1,4 +1,4 @@
-package web
+package postgres
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
 
-type Writer struct {
+type WebWriter struct {
 	db *sql.DB
 }
 
-func NewWriter(db *sql.DB) *Writer {
-	return &Writer{db: db}
+func NewWebWriter(db *sql.DB) *WebWriter {
+	return &WebWriter{db: db}
 }
 
-func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	slog.Debug("Writer UpsertLesson", "userID", userID)
+func (w *WebWriter) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+	slog.Debug("WebWriter UpsertLesson", "userID", userID)
 
 	var query string
 
@@ -49,8 +49,8 @@ func (w *Writer) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userI
 	return nil
 }
 
-func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
-	slog.Debug("Writer DeleteLesson", "userID", userID)
+func (w *WebWriter) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
+	slog.Debug("WebWriter DeleteLesson", "userID", userID)
 
 	query := `DELETE FROM lesson WHERE id = $1;`
 
@@ -62,8 +62,8 @@ func (w *Writer) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID
 	return nil
 }
 
-func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
-	slog.Debug("Writer UpsertExercise", "userID", userID)
+func (w *WebWriter) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
+	slog.Debug("WebWriter UpsertExercise", "userID", userID)
 
 	var query string
 
@@ -94,8 +94,8 @@ func (w *Writer) UpsertExercise(ctx context.Context, exercise *backend.Exercise,
 	return nil
 }
 
-func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
-	slog.Debug("Writer StoreExercises", "userID", userID)
+func (w *WebWriter) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
+	slog.Debug("WebWriter StoreExercises", "userID", userID)
 
 	const query = `
 		INSERT INTO exercise (lesson_id, question, answer)
@@ -112,8 +112,8 @@ func (w *Writer) StoreExercises(ctx context.Context, exercises backend.Exercises
 	return nil
 }
 
-func (w *Writer) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
-	slog.Debug("Writer DeleteExercise", "userID", userID)
+func (w *WebWriter) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
+	slog.Debug("WebWriter DeleteExercise", "userID", userID)
 
 	query := `DELETE FROM exercise WHERE id = $1;`
 

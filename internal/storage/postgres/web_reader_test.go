@@ -1,33 +1,49 @@
-package web
+package postgres
 
 import (
-	"context"
+	"testing"
 	"time"
 
 	"github.com/guregu/null/v5"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func (s *PostgresSuite) TestReader_FetchLessons() {
-	db := s.db
+type WebReaderSuite struct {
+	PostgresSuite
+	reader *WebReader
+}
 
-	r := NewReader(db)
+func TestWebReader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
 
-	user := &postgres.User{
+	suite.Run(t, new(WebReaderSuite))
+}
+
+func (s *WebReaderSuite) SetupSuite() {
+	s.PostgresSuite.SetupSuite()
+	s.reader = NewWebReader(s.DB)
+}
+
+func (s *WebReaderSuite) TestWebReader_FetchLessons() {
+	ctx := s.T().Context()
+
+	user := &User{
 		Id: 1,
 	}
-	postgres.CreateUser(db, user)
+	CreateUser(s.DB, user)
 
-	lesson := &postgres.Lesson{
+	lesson := &Lesson{
 		UserID: 1,
 	}
-	postgres.CreateLesson(db, lesson)
+	CreateLesson(s.DB, lesson)
 
-	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
+	CreateExercise(s.DB, &Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchLessons(context.Background(), "1")
+	res, err := s.reader.FetchLessons(ctx, "1")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
@@ -38,53 +54,49 @@ func (s *PostgresSuite) TestReader_FetchLessons() {
 	assert.Equal(s.T(), 1, res[0].ExerciseCount)
 }
 
-func (s *PostgresSuite) TestReader_FetchLessons_otherUser() {
-	db := s.db
+func (s *WebReaderSuite) TestWebReader_FetchLessons_otherUser() {
+	ctx := s.T().Context()
 
-	r := NewReader(db)
-
-	user := &postgres.User{
+	user := &User{
 		Id: 1,
 	}
-	postgres.CreateUser(db, user)
+	CreateUser(s.DB, user)
 
-	lesson := &postgres.Lesson{
+	lesson := &Lesson{
 		UserID: 1,
 	}
-	postgres.CreateLesson(db, lesson)
+	CreateLesson(s.DB, lesson)
 
-	postgres.CreateExercise(db, &postgres.Exercise{LessonId: lesson.Id})
+	CreateExercise(s.DB, &Exercise{LessonId: lesson.Id})
 
-	res, err := r.FetchLessons(context.Background(), "2")
+	res, err := s.reader.FetchLessons(ctx, "2")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
 	assert.Len(s.T(), res, 0)
 }
 
-func (s *PostgresSuite) TestReader_HydrateLesson() {
-	db := s.db
+func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
+	ctx := s.T().Context()
 
-	r := NewReader(db)
-
-	l := &postgres.Lesson{}
-	postgres.CreateLesson(db, l)
+	l := &Lesson{}
+	CreateLesson(s.DB, l)
 
 	lesson := &backend.Lesson{
 		Id: l.Id,
 	}
 
-	err := r.HydrateLesson(context.Background(), lesson, "userID")
+	err := s.reader.HydrateLesson(ctx, lesson, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
 	assert.Equal(s.T(), l.Description, lesson.Description)
 	assert.Equal(s.T(), 0, lesson.ExerciseCount)
 
-	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
-	postgres.CreateExercise(db, &postgres.Exercise{LessonId: l.Id})
+	CreateExercise(s.DB, &Exercise{LessonId: l.Id})
+	CreateExercise(s.DB, &Exercise{LessonId: l.Id})
 
-	err = r.HydrateLesson(context.Background(), lesson, "userID")
+	err = s.reader.HydrateLesson(ctx, lesson, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -92,12 +104,10 @@ func (s *PostgresSuite) TestReader_HydrateLesson() {
 	assert.Equal(s.T(), 2, lesson.ExerciseCount)
 }
 
-func (s *PostgresSuite) TestReader_FetchExercises() {
-	db := s.db
+func (s *WebReaderSuite) TestWebReader_FetchExercises() {
+	ctx := s.T().Context()
 
-	r := NewReader(db)
-
-	exercise1 := &postgres.Exercise{
+	exercise1 := &Exercise{
 		BadAnswers:               1,
 		BadAnswersToday:          2,
 		LatestBadAnswer:          null.TimeFrom(time.Now()),
@@ -106,15 +116,15 @@ func (s *PostgresSuite) TestReader_FetchExercises() {
 		LatestGoodAnswer:         null.Time{},
 		LatestGoodAnswerWasToday: true,
 	}
-	postgres.CreateExercise(db, exercise1)
+	CreateExercise(s.DB, exercise1)
 
 	// to check of exercise without results will also be fetched
-	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
-	postgres.CreateExercise(db, exercise2)
+	exercise2 := &Exercise{LessonId: exercise1.LessonId}
+	CreateExercise(s.DB, exercise2)
 
 	oldestExerciseID := 1
 
-	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
+	res, err := s.reader.FetchExercises(ctx, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)
@@ -141,12 +151,10 @@ func (s *PostgresSuite) TestReader_FetchExercises() {
 	assert.Equal(s.T(), false, res[0].LatestGoodAnswerWasToday)
 }
 
-func (s *PostgresSuite) TestReader_FetchExercises_oldestExerciseID() {
-	db := s.db
+func (s *WebReaderSuite) TestWebReader_FetchExercises_oldestExerciseID() {
+	ctx := s.T().Context()
 
-	r := NewReader(db)
-
-	exercise1 := &postgres.Exercise{
+	exercise1 := &Exercise{
 		BadAnswers:               1,
 		BadAnswersToday:          2,
 		LatestBadAnswer:          null.TimeFrom(time.Now()),
@@ -155,15 +163,15 @@ func (s *PostgresSuite) TestReader_FetchExercises_oldestExerciseID() {
 		LatestGoodAnswer:         null.Time{},
 		LatestGoodAnswerWasToday: true,
 	}
-	postgres.CreateExercise(db, exercise1)
+	CreateExercise(s.DB, exercise1)
 
 	// to check of exercise without results will also be fetched
-	exercise2 := &postgres.Exercise{LessonId: exercise1.LessonId}
-	postgres.CreateExercise(db, exercise2)
+	exercise2 := &Exercise{LessonId: exercise1.LessonId}
+	CreateExercise(s.DB, exercise2)
 
 	oldestExerciseID := 2
 
-	res, err := r.FetchExercises(context.Background(), backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
+	res, err := s.reader.FetchExercises(ctx, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)

@@ -28,7 +28,7 @@ import (
 	fhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http/caller"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	storage "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -198,8 +198,8 @@ func run(ctx context.Context) error {
 	// Start a Web server
 	// =========================================
 
-	reader := storage.NewReader(db)
-	writer := storage.NewWriter(db)
+	reader := postgres.NewWebReader(db)
+	writer := postgres.NewWebWriter(db)
 	publisher := pubsub.NewPublisher(ceClient)
 	authClient := intgrpc.NewAuthClient(grpcClient)
 	service := backend.NewService(reader, writer, publisher, authClient)

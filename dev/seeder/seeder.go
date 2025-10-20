@@ -13,9 +13,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
-	storageauth "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/auth"
-	storageweb "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/web"
-	storageworker "github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres/worker"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 )
 
 type config struct {
@@ -43,7 +41,7 @@ func main() {
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
-	s := Seeder{db, storageweb.NewWriter(db), storageworker.NewWriter(db), storageauth.NewWriter(db)}
+	s := Seeder{db, postgres.NewWebWriter(db), postgres.NewWorkerWriter(db), postgres.NewAuthWriter(db)}
 
 	seedType := reflect.TypeOf(s)
 
@@ -71,9 +69,9 @@ func randomString() string {
 
 type Seeder struct {
 	db            *sql.DB
-	backendWriter *storageweb.Writer
-	workerWriter  *storageworker.Writer
-	authWriter    *storageauth.Writer
+	backendWriter *postgres.WebWriter
+	workerWriter  *postgres.WorkerWriter
+	authWriter    *postgres.AuthWriter
 }
 
 func seed(s Seeder, seedMethodName string) {

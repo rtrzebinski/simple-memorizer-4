@@ -1,4 +1,4 @@
-package web
+package postgres
 
 import (
 	"context"
@@ -9,16 +9,16 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
 
-type Reader struct {
+type WebReader struct {
 	db *sql.DB
 }
 
-func NewReader(db *sql.DB) *Reader {
-	return &Reader{db: db}
+func NewWebReader(db *sql.DB) *WebReader {
+	return &WebReader{db: db}
 }
 
-func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lessons, error) {
-	slog.Debug("Reader FetchLessons", "userID", userID)
+func (r *WebReader) FetchLessons(ctx context.Context, userID string) (backend.Lessons, error) {
+	slog.Debug("WebReader FetchLessons", "userID", userID)
 
 	var lessons backend.Lessons
 
@@ -51,8 +51,8 @@ func (r *Reader) FetchLessons(ctx context.Context, userID string) (backend.Lesso
 	return lessons, nil
 }
 
-func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	slog.Debug("Reader HydrateLesson", "userID", userID)
+func (r *WebReader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+	slog.Debug("WebReader HydrateLesson", "userID", userID)
 
 	query := `
 		SELECT name, description, count(e.id) AS exercise_count
@@ -69,8 +69,8 @@ func (r *Reader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, user
 	return nil
 }
 
-func (r *Reader) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
-	slog.Debug("Reader FetchExercises", "userID", userID)
+func (r *WebReader) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
+	slog.Debug("WebReader FetchExercises", "userID", userID)
 
 	const query = `
 SELECT e.id, e.question, e.answer,

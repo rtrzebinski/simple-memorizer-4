@@ -1,4 +1,4 @@
-package worker
+package postgres
 
 import (
 	"context"
@@ -8,15 +8,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 )
 
-type Writer struct {
+type WorkerWriter struct {
 	db *sql.DB
 }
 
-func NewWriter(db *sql.DB) *Writer {
-	return &Writer{db: db}
+func NewWorkerWriter(db *sql.DB) *WorkerWriter {
+	return &WorkerWriter{db: db}
 }
 
-func (w *Writer) StoreResult(ctx context.Context, result worker.Result) error {
+func (w *WorkerWriter) StoreResult(ctx context.Context, result worker.Result) error {
 	const query = `INSERT INTO result (type, exercise_id) VALUES ($1, $2) RETURNING id;`
 
 	rows, err := w.db.QueryContext(ctx, query, result.Type, result.ExerciseId)
@@ -35,7 +35,7 @@ func (w *Writer) StoreResult(ctx context.Context, result worker.Result) error {
 	return nil
 }
 
-func (w *Writer) UpdateExerciseProjection(ctx context.Context, exerciseID int, projection worker.ResultsProjection) error {
+func (w *WorkerWriter) UpdateExerciseProjection(ctx context.Context, exerciseID int, projection worker.ResultsProjection) error {
 	const query = `UPDATE exercise SET
                     bad_answers = $1,
                     bad_answers_today = $2,
