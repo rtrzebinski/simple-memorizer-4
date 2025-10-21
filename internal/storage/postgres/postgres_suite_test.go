@@ -90,7 +90,7 @@ func CreatePostgresContainer(ctx context.Context) (testcontainers.Container, *sq
 
 	req := testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        "rtrzebinski/postgres:15-cron",
+			Image:        "postgres:17.0-alpine",
 			ExposedPorts: []string{string(port)},
 			Env: map[string]string{
 				"POSTGRES_PASSWORD": "password",
