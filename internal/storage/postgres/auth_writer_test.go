@@ -33,7 +33,7 @@ func (s *AuthWriterSuite) TestAuthWriter_StoreUser() {
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), "1", userID)
 
-	user := FetchUserByEmail(s.DB, "email")
+	user := fetchUserByEmail(s.DB, "email")
 	assert.Equal(s.T(), "name", user.Name)
 	assert.Equal(s.T(), "email", user.Email)
 	assert.Equal(s.T(), "password", user.Password)

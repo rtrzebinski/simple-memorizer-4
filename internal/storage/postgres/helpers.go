@@ -10,14 +10,14 @@ import (
 )
 
 type (
-	Lesson struct {
+	lesson struct {
 		Id          int
 		Name        string
 		Description string
 		UserID      int
 	}
 
-	Exercise struct {
+	exercise struct {
 		Id                       int
 		LessonId                 int
 		Question                 string
@@ -32,14 +32,14 @@ type (
 		LatestGoodAnswerWasToday bool
 	}
 
-	Result struct {
+	result struct {
 		Id         int
 		ExerciseId int
 		Type       string
 		CreatedAt  time.Time
 	}
 
-	User struct {
+	user struct {
 		Id       int
 		Name     string
 		Email    string
@@ -47,7 +47,7 @@ type (
 	}
 )
 
-func CreateLesson(db *sql.DB, lesson *Lesson) {
+func createLesson(db *sql.DB, lesson *lesson) {
 	query := `INSERT INTO lesson (name, description, user_id) VALUES ($1, $2, $3) RETURNING id;`
 
 	if lesson.Name == "" {
@@ -59,11 +59,11 @@ func CreateLesson(db *sql.DB, lesson *Lesson) {
 	}
 
 	if lesson.UserID == 0 {
-		user := User{}
+		user := user{}
 		user.Name = randomString()
 		user.Email = randomString()
 		user.Password = randomString()
-		CreateUser(db, &user)
+		createUser(db, &user)
 		lesson.UserID = user.Id
 	}
 
@@ -73,7 +73,7 @@ func CreateLesson(db *sql.DB, lesson *Lesson) {
 	}
 }
 
-func FindLessonById(db *sql.DB, lessonId int) *Lesson {
+func findLessonById(db *sql.DB, lessonId int) *lesson {
 	const query = `
 		SELECT l.id, l.name, l.description
 		FROM lesson l
@@ -85,7 +85,7 @@ func FindLessonById(db *sql.DB, lessonId int) *Lesson {
 	}
 
 	for rows.Next() {
-		var lesson Lesson
+		var lesson lesson
 
 		err = rows.Scan(&lesson.Id, &lesson.Name, &lesson.Description)
 		if err != nil {
@@ -98,8 +98,8 @@ func FindLessonById(db *sql.DB, lessonId int) *Lesson {
 	return nil
 }
 
-func FetchLatestLesson(db *sql.DB) Lesson {
-	var lesson Lesson
+func fetchLatestLesson(db *sql.DB) lesson {
+	var lesson lesson
 
 	const query = `
 		SELECT l.id, l.name, l.description, l.user_id
@@ -114,7 +114,7 @@ func FetchLatestLesson(db *sql.DB) Lesson {
 	return lesson
 }
 
-func CreateExercise(db *sql.DB, exercise *Exercise) {
+func createExercise(db *sql.DB, exercise *exercise) {
 	query := `
 INSERT INTO exercise (lesson_id, question, answer, bad_answers, bad_answers_today, latest_bad_answer, 
 latest_bad_answer_was_today, good_answers, good_answers_today, latest_good_answer, latest_good_answer_was_today)
@@ -122,8 +122,8 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;
 `
 
 	if exercise.LessonId == 0 {
-		lesson := Lesson{}
-		CreateLesson(db, &lesson)
+		lesson := lesson{}
+		createLesson(db, &lesson)
 		exercise.LessonId = lesson.Id
 	}
 
@@ -143,7 +143,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;
 	}
 }
 
-func FindExerciseById(db *sql.DB, exerciseId int) *Exercise {
+func findExerciseById(db *sql.DB, exerciseId int) *exercise {
 	const query = `
 		SELECT e.id, e.question, e.answer, e.lesson_id, e.bad_answers, e.bad_answers_today, e.latest_bad_answer,
 		e.latest_bad_answer_was_today, e.good_answers, e.good_answers_today, e.latest_good_answer,
@@ -157,7 +157,7 @@ func FindExerciseById(db *sql.DB, exerciseId int) *Exercise {
 	}
 
 	for rows.Next() {
-		var exercise Exercise
+		var exercise exercise
 
 		err = rows.Scan(&exercise.Id, &exercise.Question, &exercise.Answer, &exercise.LessonId, &exercise.BadAnswers,
 			&exercise.BadAnswersToday, &exercise.LatestBadAnswer, &exercise.LatestBadAnswerWasToday,
@@ -173,8 +173,8 @@ func FindExerciseById(db *sql.DB, exerciseId int) *Exercise {
 	return nil
 }
 
-func FetchLatestExercise(db *sql.DB) Exercise {
-	var exercise Exercise
+func fetchLatestExercise(db *sql.DB) exercise {
+	var exercise exercise
 
 	const query = `
 SELECT e.id, e.lesson_id, e.question, e.answer, e.bad_answers, e.bad_answers_today, e.latest_bad_answer,
@@ -193,8 +193,8 @@ LIMIT 1;`
 	return exercise
 }
 
-func FetchLatestResult(db *sql.DB) Result {
-	var answer Result
+func fetchLatestResult(db *sql.DB) result {
+	var answer result
 
 	const query = `
 		SELECT r.id, r.type, r.exercise_id, r.created_at
@@ -209,12 +209,12 @@ func FetchLatestResult(db *sql.DB) Result {
 	return answer
 }
 
-func CreateResult(db *sql.DB, answer *Result) {
+func createResult(db *sql.DB, answer *result) {
 	query := `INSERT INTO result (exercise_id, type) VALUES ($1, $2) RETURNING id, created_at;`
 
 	if answer.ExerciseId == 0 {
-		exercise := &Exercise{}
-		CreateExercise(db, exercise)
+		exercise := &exercise{}
+		createExercise(db, exercise)
 		answer.ExerciseId = exercise.Id
 	}
 
@@ -228,7 +228,7 @@ func CreateResult(db *sql.DB, answer *Result) {
 	}
 }
 
-func CreateUser(db *sql.DB, user *User) {
+func createUser(db *sql.DB, user *user) {
 	query := `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id;`
 
 	err := db.QueryRow(query, &user.Name, &user.Email, &user.Password).
@@ -238,7 +238,7 @@ func CreateUser(db *sql.DB, user *User) {
 	}
 }
 
-func FetchUserByEmail(db *sql.DB, email string) *User {
+func fetchUserByEmail(db *sql.DB, email string) *user {
 	const query = `SELECT id, name, email, password FROM "user" WHERE email = $1;`
 
 	rows, err := db.Query(query, email)
@@ -247,7 +247,7 @@ func FetchUserByEmail(db *sql.DB, email string) *User {
 	}
 
 	for rows.Next() {
-		var user User
+		var user user
 
 		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
 		if err != nil {

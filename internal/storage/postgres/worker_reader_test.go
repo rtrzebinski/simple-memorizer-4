@@ -29,10 +29,10 @@ func (s *WorkerReaderSuite) SetupSuite() {
 func (s *WorkerReaderSuite) TestWorkerReader_FetchResults() {
 	ctx := s.T().Context()
 
-	exercise := &Exercise{}
-	CreateExercise(s.DB, exercise)
+	exercise := &exercise{}
+	createExercise(s.DB, exercise)
 
-	CreateResult(s.DB, &Result{
+	createResult(s.DB, &result{
 		Type:       "good",
 		ExerciseId: exercise.Id,
 	})

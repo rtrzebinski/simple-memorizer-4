@@ -30,8 +30,8 @@ func (s *WorkerWriterSuite) SetupSuite() {
 func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {
 	ctx := s.T().Context()
 
-	exercise := &Exercise{}
-	CreateExercise(s.DB, exercise)
+	exercise := &exercise{}
+	createExercise(s.DB, exercise)
 
 	result := worker.Result{
 		Type:       worker.Good,
@@ -41,7 +41,7 @@ func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {
 	err := s.writer.StoreResult(ctx, result)
 	assert.NoError(s.T(), err)
 
-	stored := FetchLatestResult(s.DB)
+	stored := fetchLatestResult(s.DB)
 
 	assert.Equal(s.T(), string(result.Type), stored.Type)
 	assert.Equal(s.T(), result.ExerciseId, stored.ExerciseId)
@@ -50,8 +50,8 @@ func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {
 func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_allProjections() {
 	ctx := s.T().Context()
 
-	exercise := &Exercise{}
-	CreateExercise(s.DB, exercise)
+	exercise := &exercise{}
+	createExercise(s.DB, exercise)
 
 	projection := worker.ResultsProjection{
 		BadAnswers:               1,
@@ -67,7 +67,7 @@ func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_allProject
 	err := s.writer.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(s.T(), err)
 
-	stored := FindExerciseById(s.DB, exercise.Id)
+	stored := findExerciseById(s.DB, exercise.Id)
 
 	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)
@@ -82,8 +82,8 @@ func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_allProject
 func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_badOnly() {
 	ctx := s.T().Context()
 
-	exercise := &Exercise{}
-	CreateExercise(s.DB, exercise)
+	exercise := &exercise{}
+	createExercise(s.DB, exercise)
 
 	projection := worker.ResultsProjection{
 		BadAnswers:              1,
@@ -95,7 +95,7 @@ func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_badOnly() 
 	err := s.writer.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(s.T(), err)
 
-	stored := FindExerciseById(s.DB, exercise.Id)
+	stored := findExerciseById(s.DB, exercise.Id)
 
 	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)
@@ -110,8 +110,8 @@ func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_badOnly() 
 func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_goodOnly() {
 	ctx := s.T().Context()
 
-	exercise := &Exercise{}
-	CreateExercise(s.DB, exercise)
+	exercise := &exercise{}
+	createExercise(s.DB, exercise)
 
 	projection := worker.ResultsProjection{
 		GoodAnswers:              3,
@@ -123,7 +123,7 @@ func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_goodOnly()
 	err := s.writer.UpdateExerciseProjection(ctx, exercise.Id, projection)
 	assert.NoError(s.T(), err)
 
-	stored := FindExerciseById(s.DB, exercise.Id)
+	stored := findExerciseById(s.DB, exercise.Id)
 
 	assert.Equal(s.T(), projection.BadAnswers, stored.BadAnswers)
 	assert.Equal(s.T(), projection.BadAnswersToday, stored.BadAnswersToday)

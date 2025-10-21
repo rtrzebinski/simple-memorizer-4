@@ -28,7 +28,7 @@ func (s *AuthReaderSuite) SetupSuite() {
 func (s *AuthReaderSuite) TestAuthReader_FetchUser() {
 	ctx := s.T().Context()
 
-	CreateUser(s.DB, &User{
+	createUser(s.DB, &user{
 		Name:     "name",
 		Email:    "email",
 		Password: "password",
