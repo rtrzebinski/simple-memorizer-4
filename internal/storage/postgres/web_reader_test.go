@@ -11,7 +11,7 @@ import (
 )
 
 type WebReaderSuite struct {
-	PostgresSuite
+	Suite
 	reader *WebReader
 }
 
@@ -24,7 +24,7 @@ func TestWebReader(t *testing.T) {
 }
 
 func (s *WebReaderSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.reader = NewWebReader(s.DB)
 }
 

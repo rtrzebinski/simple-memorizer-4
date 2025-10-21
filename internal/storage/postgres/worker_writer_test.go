@@ -11,7 +11,7 @@ import (
 )
 
 type WorkerWriterSuite struct {
-	PostgresSuite
+	Suite
 	writer *WorkerWriter
 }
 
@@ -24,7 +24,7 @@ func TestWorkerWriter(t *testing.T) {
 }
 
 func (s *WorkerWriterSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.writer = NewWorkerWriter(s.DB)
 }
 func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {

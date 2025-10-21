@@ -9,7 +9,7 @@ import (
 )
 
 type WorkerReaderSuite struct {
-	PostgresSuite
+	Suite
 	reader *WorkerReader
 }
 
@@ -22,7 +22,7 @@ func TestWorkerReader(t *testing.T) {
 }
 
 func (s *WorkerReaderSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.reader = NewWorkerReader(s.DB)
 }
 

@@ -9,7 +9,7 @@ import (
 )
 
 type WebWriterSuite struct {
-	PostgresSuite
+	Suite
 	writer *WebWriter
 }
 
@@ -22,7 +22,7 @@ func TestWebWriter(t *testing.T) {
 }
 
 func (s *WebWriterSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.writer = NewWebWriter(s.DB)
 }
 

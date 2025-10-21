@@ -8,7 +8,7 @@ import (
 )
 
 type AuthReaderSuite struct {
-	PostgresSuite
+	Suite
 	reader *AuthReader
 }
 
@@ -21,7 +21,7 @@ func TestAuthReader(t *testing.T) {
 }
 
 func (s *AuthReaderSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.reader = NewAuthReader(s.DB)
 }
 

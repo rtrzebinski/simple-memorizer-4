@@ -8,7 +8,7 @@ import (
 )
 
 type AuthWriterSuite struct {
-	PostgresSuite
+	Suite
 	writer *AuthWriter
 }
 
@@ -21,7 +21,7 @@ func TestAuthWriter(t *testing.T) {
 }
 
 func (s *AuthWriterSuite) SetupSuite() {
-	s.PostgresSuite.SetupSuite()
+	s.Suite.SetupSuite()
 	s.writer = NewAuthWriter(s.DB)
 }
 

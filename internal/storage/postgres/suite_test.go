@@ -17,9 +17,9 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-// PostgresSuite is a test suite that manages a PostgreSQL testcontainer and handles database migrations.
+// Suite is a test suite that manages a PostgreSQL testcontainer and handles database migrations.
 // Use it as an embedded struct in your test suites.
-type PostgresSuite struct {
+type Suite struct {
 	suite.Suite
 
 	Container testcontainers.Container
@@ -35,7 +35,7 @@ var (
 	sharedMigr *migrate.Migrate
 )
 
-func (s *PostgresSuite) SetupSuite() {
+func (s *Suite) SetupSuite() {
 	ctx := s.T().Context()
 
 	startOnce.Do(func() {
@@ -61,7 +61,7 @@ func (s *PostgresSuite) SetupSuite() {
 	s.Migrator = sharedMigr
 }
 
-func (s *PostgresSuite) SetupTest() {
+func (s *Suite) SetupTest() {
 	if s.Migrator == nil {
 		s.T().Fatal("migrator is nil in SetupTest")
 	}
@@ -70,7 +70,7 @@ func (s *PostgresSuite) SetupTest() {
 	}
 }
 
-func (s *PostgresSuite) TearDownTest() {
+func (s *Suite) TearDownTest() {
 	if s.Migrator == nil {
 		return
 	}
