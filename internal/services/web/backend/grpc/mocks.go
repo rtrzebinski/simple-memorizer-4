@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
