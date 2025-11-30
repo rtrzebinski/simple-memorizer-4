@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -16,7 +17,8 @@ type Register struct {
 	c APIClient
 
 	// form
-	inputName              string
+	inputFirstName         string
+	inputLastName          string
 	inputEmail             string
 	inputPassword          string
 	registerButtonDisabled bool
@@ -25,9 +27,10 @@ type Register struct {
 // NewRegister creates a new Register component
 func NewRegister(c APIClient) *Register {
 	compo := &Register{c: c}
-	compo.inputEmail = "foo@bar.com"
+	compo.inputEmail = "test.user.registered@example.com"
 	compo.inputPassword = "password"
-	compo.inputName = "foo"
+	compo.inputFirstName = "Test UserProfile"
+	compo.inputLastName = "Registered"
 
 	return compo
 }
@@ -46,7 +49,10 @@ func (compo *Register) Render() app.UI {
 		),
 		app.P().Body(
 			app.Div().Body(
-				app.Input().Type("text").Placeholder("Name").OnInput(compo.ValueTo(&compo.inputName)).Value(compo.inputName).Size(30),
+				app.Input().Type("text").Placeholder("First Name").OnInput(compo.ValueTo(&compo.inputFirstName)).Value(compo.inputFirstName).Size(30),
+				app.Br(),
+				app.Br(),
+				app.Input().Type("text").Placeholder("Last Name").OnInput(compo.ValueTo(&compo.inputLastName)).Value(compo.inputLastName).Size(30),
 				app.Br(),
 				app.Br(),
 				app.Input().Type("text").Placeholder("Email").OnInput(compo.ValueTo(&compo.inputEmail)).Value(compo.inputEmail).Size(30),
@@ -64,29 +70,37 @@ func (compo *Register) Render() app.UI {
 // handleRegister handles register button click
 func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 	compo.registerButtonDisabled = true
-	fmt.Println(compo.inputName)
+	fmt.Println(compo.inputFirstName)
+	fmt.Println(compo.inputLastName)
 	fmt.Println(compo.inputEmail)
 	fmt.Println(compo.inputPassword)
 
 	req := frontend.RegisterRequest{
-		Name:     compo.inputName,
-		Email:    compo.inputEmail,
-		Password: compo.inputPassword,
+		FirstName: compo.inputFirstName,
+		LastName:  compo.inputLastName,
+		Email:     compo.inputEmail,
+		Password:  compo.inputPassword,
 	}
 
-	resp, err := compo.c.AuthRegister(ctx, req)
+	err := compo.c.AuthRegister(ctx, req)
 	if err != nil {
 		compo.registerButtonDisabled = false
 		fmt.Println("Error:", err)
 		return
 	}
 
-	fmt.Println("Response:", resp)
 	compo.registerButtonDisabled = false
-	compo.inputName = ""
+	compo.inputFirstName = ""
+	compo.inputLastName = ""
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 
-	ctx.SetState("AccessToken", resp.AccessToken).Persist()
+	user, err := compo.c.UserProfile(ctx)
+	if err != nil {
+		slog.Error("failed to fetch user profile", "err", err)
+	}
+
+	ctx.SetState("user", user).Persist()
+
 	ctx.NavigateTo(&url.URL{Path: PathHome})
 }

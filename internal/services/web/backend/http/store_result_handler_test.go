@@ -28,15 +28,17 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishGoodAnswer", mock.AnythingOfType("context.backgroundCtx"), 10, "100").Return(nil)
+	service.On("PublishGoodAnswer", mock.Anything, 10, "100").Return(nil)
 
-	route := NewStoreResultHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 
@@ -57,15 +59,17 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishBadAnswer", mock.AnythingOfType("context.backgroundCtx"), 10, "100").Return(nil)
+	service.On("PublishBadAnswer", mock.Anything, 10, "100").Return(nil)
 
-	route := NewStoreResultHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 
@@ -82,13 +86,15 @@ func TestStoreResultHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewStoreResultHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 

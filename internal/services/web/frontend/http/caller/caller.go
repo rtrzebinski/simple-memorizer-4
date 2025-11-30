@@ -2,12 +2,13 @@ package caller
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 // Caller is an HTTP caller
@@ -23,7 +24,7 @@ func NewCaller(http *http.Client, host string, scheme string) *Caller {
 }
 
 // Call makes an HTTP call
-func (c *Caller) Call(ctx context.Context, method, route string, params map[string]string, reqBody []byte, accessToken string) ([]byte, error) {
+func (c *Caller) Call(ctx app.Context, method, route string, params map[string]string, reqBody []byte) ([]byte, error) {
 	// parse url
 	u, err := url.Parse(c.scheme + "://" + c.host + route)
 	if err != nil {
@@ -50,11 +51,6 @@ func (c *Caller) Call(ctx context.Context, method, route string, params map[stri
 
 	// add content-type header
 	req.Header.Add("content-type", "application/json")
-
-	// add auth header
-	if len(accessToken) > 0 {
-		req.Header.Add("authorization", accessToken)
-	}
 
 	// make a request
 	resp, err := c.http.Do(req)

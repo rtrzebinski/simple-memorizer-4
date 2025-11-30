@@ -2,7 +2,6 @@ package components
 
 import (
 	"fmt"
-	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -17,7 +16,7 @@ const PathLessons = "/lessons"
 type Lessons struct {
 	app.Compo
 	c    APIClient
-	user *frontend.User
+	user *frontend.UserProfile
 
 	// component vars
 	rows []*LessonRow
@@ -35,18 +34,18 @@ type Lessons struct {
 func NewLessons(c APIClient) *Lessons {
 	return &Lessons{
 		c:    c,
-		user: &frontend.User{},
+		user: &frontend.UserProfile{},
 	}
 }
 
 // The OnMount method is run once component is mounted
 func (compo *Lessons) OnMount(ctx app.Context) {
 	// auth check
-	user, err := auth.User(ctx)
-	if err != nil {
+	compo.user = auth.CheckUser(ctx)
+	if compo.user == nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		return
 	}
-	compo.user = user
 
 	compo.displayAllLessons(ctx)
 }
@@ -139,12 +138,7 @@ func (compo *Lessons) handleSave(ctx app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save lesson
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-	err = compo.c.UpsertLesson(ctx, lesson, accessToken)
+	err = compo.c.UpsertLesson(ctx, lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save lesson: %w", err))
 	}
@@ -173,12 +167,7 @@ func (compo *Lessons) resetForm() {
 
 // displayAllLessons fetch all lessons and display them
 func (compo *Lessons) displayAllLessons(ctx app.Context) {
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-	lessons, err := compo.c.FetchLessons(ctx, accessToken)
+	lessons, err := compo.c.FetchLessons(ctx)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
 	}

@@ -2,12 +2,9 @@ package components
 
 import (
 	"fmt"
-	"log/slog"
-	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
 )
 
@@ -110,13 +107,7 @@ func (compo *ExerciseEdit) handleSave(ctx app.Context, e app.Event) {
 	compo.saveButtonDisabled = true
 
 	// save exercise
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-
-	err = compo.c.UpsertExercise(ctx, exercise, accessToken)
+	err := compo.c.UpsertExercise(ctx, exercise)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to save exercise: %w", err))
 	}

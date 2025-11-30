@@ -17,6 +17,15 @@ type Service interface {
 	DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error
 	PublishGoodAnswer(ctx context.Context, exerciseID int, userID string) error
 	PublishBadAnswer(ctx context.Context, exerciseID int, userID string) error
-	Register(ctx context.Context, name, email, password string) (accessToken string, err error)
-	SignIn(ctx context.Context, email, password string) (accessToken string, err error)
+	Register(ctx context.Context, firstName, lastName, email, password string) (backend.Tokens, error)
+	SignIn(ctx context.Context, email, password string) (backend.Tokens, error)
+	Revoke(ctx context.Context, refreshToken string) error
+}
+
+type TokenRefresher interface {
+	Refresh(ctx context.Context, refreshToken string) (backend.Tokens, error)
+}
+
+type TokenVerifier interface {
+	VerifyAndUser(ctx context.Context, accessToken string) (*backend.User, error)
 }

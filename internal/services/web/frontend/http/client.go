@@ -1,13 +1,13 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"strconv"
 )
 
 // Client is a client for the API
@@ -21,10 +21,10 @@ func NewClient(c Caller) *Client {
 }
 
 // FetchLessons fetches all lessons
-func (s *Client) FetchLessons(ctx context.Context, accessToken string) ([]frontend.Lesson, error) {
+func (s *Client) FetchLessons(ctx app.Context) ([]frontend.Lesson, error) {
 	var lessons []frontend.Lesson
 
-	respBody, err := s.c.Call(ctx, "GET", http.FetchLessons, nil, nil, accessToken)
+	respBody, err := s.c.Call(ctx, "GET", http.FetchLessons, nil, nil)
 	if err != nil {
 		return lessons, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -37,12 +37,12 @@ func (s *Client) FetchLessons(ctx context.Context, accessToken string) ([]fronte
 }
 
 // HydrateLesson hydrates a lesson
-func (s *Client) HydrateLesson(ctx context.Context, lesson *frontend.Lesson, accessToken string) error {
+func (s *Client) HydrateLesson(ctx app.Context, lesson *frontend.Lesson) error {
 	var params = map[string]string{
 		"lesson_id": strconv.Itoa(lesson.Id),
 	}
 
-	respBody, err := s.c.Call(ctx, "GET", http.HydrateLesson, params, nil, accessToken)
+	respBody, err := s.c.Call(ctx, "GET", http.HydrateLesson, params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -55,7 +55,7 @@ func (s *Client) HydrateLesson(ctx context.Context, lesson *frontend.Lesson, acc
 }
 
 // FetchExercises fetches exercises of a lesson
-func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson, oldestExerciseID int, accessToken string) ([]frontend.Exercise, error) {
+func (s *Client) FetchExercises(ctx app.Context, lesson frontend.Lesson, oldestExerciseID int) ([]frontend.Exercise, error) {
 	var exercises []frontend.Exercise
 
 	var params = map[string]string{
@@ -63,7 +63,7 @@ func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson, old
 		"oldest_exercise_id": strconv.Itoa(oldestExerciseID),
 	}
 
-	respBody, err := s.c.Call(ctx, "GET", http.FetchExercises, params, nil, accessToken)
+	respBody, err := s.c.Call(ctx, "GET", http.FetchExercises, params, nil)
 	if err != nil {
 		return exercises, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -76,13 +76,13 @@ func (s *Client) FetchExercises(ctx context.Context, lesson frontend.Lesson, old
 }
 
 // UpsertLesson upserts a lesson
-func (s *Client) UpsertLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error {
+func (s *Client) UpsertLesson(ctx app.Context, lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.UpsertLesson, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.UpsertLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -91,13 +91,13 @@ func (s *Client) UpsertLesson(ctx context.Context, lesson frontend.Lesson, acces
 }
 
 // DeleteLesson deletes a lesson
-func (s *Client) DeleteLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error {
+func (s *Client) DeleteLesson(ctx app.Context, lesson frontend.Lesson) error {
 	body, err := json.Marshal(lesson)
 	if err != nil {
 		return fmt.Errorf("failed to encode lesson: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.DeleteLesson, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.DeleteLesson, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -106,13 +106,13 @@ func (s *Client) DeleteLesson(ctx context.Context, lesson frontend.Lesson, acces
 }
 
 // UpsertExercise upserts an exercise
-func (s *Client) UpsertExercise(ctx context.Context, exercise frontend.Exercise, accessToken string) error {
+func (s *Client) UpsertExercise(ctx app.Context, exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.UpsertExercise, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.UpsertExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -121,13 +121,13 @@ func (s *Client) UpsertExercise(ctx context.Context, exercise frontend.Exercise,
 }
 
 // StoreExercises stores exercises
-func (s *Client) StoreExercises(ctx context.Context, exercises []frontend.Exercise, accessToken string) error {
+func (s *Client) StoreExercises(ctx app.Context, exercises []frontend.Exercise) error {
 	body, err := json.Marshal(exercises)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercises: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.StoreExercises, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.StoreExercises, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -136,13 +136,13 @@ func (s *Client) StoreExercises(ctx context.Context, exercises []frontend.Exerci
 }
 
 // DeleteExercise deletes an exercise
-func (s *Client) DeleteExercise(ctx context.Context, exercise frontend.Exercise, accessToken string) error {
+func (s *Client) DeleteExercise(ctx app.Context, exercise frontend.Exercise) error {
 	body, err := json.Marshal(exercise)
 	if err != nil {
 		return fmt.Errorf("failed to encode exercise: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.DeleteExercise, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.DeleteExercise, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -151,13 +151,13 @@ func (s *Client) DeleteExercise(ctx context.Context, exercise frontend.Exercise,
 }
 
 // StoreResult stores a result
-func (s *Client) StoreResult(ctx context.Context, result frontend.Result, accessToken string) error {
+func (s *Client) StoreResult(ctx app.Context, result frontend.Result) error {
 	body, err := json.Marshal(result)
 	if err != nil {
 		return fmt.Errorf("failed to encode result: %w", err)
 	}
 
-	_, err = s.c.Call(ctx, "POST", http.StoreResult, nil, body, accessToken)
+	_, err = s.c.Call(ctx, "POST", http.StoreResult, nil, body)
 	if err != nil {
 		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
@@ -165,42 +165,54 @@ func (s *Client) StoreResult(ctx context.Context, result frontend.Result, access
 	return nil
 }
 
-func (s *Client) AuthRegister(ctx context.Context, req frontend.RegisterRequest) (frontend.RegisterResponse, error) {
-	res := frontend.RegisterResponse{}
-
+func (s *Client) AuthRegister(ctx app.Context, req frontend.RegisterRequest) error {
 	body, err := json.Marshal(req)
 	if err != nil {
-		return res, fmt.Errorf("failed to encode register request: %w", err)
+		return fmt.Errorf("failed to encode register request: %w", err)
 	}
 
-	respBody, err := s.c.Call(ctx, "POST", http.AuthRegister, nil, body, "")
+	_, err = s.c.Call(ctx, "POST", http.AuthRegister, nil, body)
 	if err != nil {
-		return res, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	if err := json.Unmarshal(respBody, &res); err != nil {
-		return res, fmt.Errorf("failed to decode register response: %w", err)
-	}
-
-	return res, nil
+	return nil
 }
 
-func (s *Client) AuthSignIn(ctx context.Context, req frontend.SignInRequest) (frontend.SignInResponse, error) {
-	res := frontend.SignInResponse{}
-
+func (s *Client) AuthSignIn(ctx app.Context, req frontend.SignInRequest) error {
 	body, err := json.Marshal(req)
 	if err != nil {
-		return res, fmt.Errorf("failed to encode sign in request: %w", err)
+		return fmt.Errorf("failed to encode sign in request: %w", err)
 	}
 
-	respBody, err := s.c.Call(ctx, "POST", http.AuthSignIn, nil, body, "")
+	_, err = s.c.Call(ctx, "POST", http.AuthSignIn, nil, body)
 	if err != nil {
-		return res, fmt.Errorf("failed to perform HTTP request: %w", err)
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	if err := json.Unmarshal(respBody, &res); err != nil {
-		return res, fmt.Errorf("failed to decode sign in response: %w", err)
+	return nil
+}
+
+func (s *Client) AuthLogout(ctx app.Context) error {
+	_, err := s.c.Call(ctx, "POST", http.AuthLogout, nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to perform HTTP request: %w", err)
 	}
 
-	return res, nil
+	return nil
+}
+
+func (s *Client) UserProfile(ctx app.Context) (*frontend.UserProfile, error) {
+	respBody, err := s.c.Call(ctx, "POST", http.UserProfile, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to perform HTTP request: %w", err)
+	}
+
+	user := new(frontend.UserProfile)
+
+	if err := json.Unmarshal(respBody, &user); err != nil {
+		return user, fmt.Errorf("failed to decode exercises: %w", err)
+	}
+
+	return user, nil
 }

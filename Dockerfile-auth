@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.23.2-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -20,8 +20,6 @@ WORKDIR /app
 # Copy files
 COPY --from=builder /app/bin/sm4-auth ./
 COPY --from=builder /app/version ./version
-COPY --from=builder /app/keys/private.pem ./keys/private.pem
-COPY --from=builder /app/keys/public.pem ./keys/public.pem
 
 # Add /app to PATH
 ENV PATH="/app:${PATH}"

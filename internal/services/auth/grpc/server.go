@@ -5,37 +5,90 @@ import (
 	"log/slog"
 
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Server struct {
 	gengrpc.UnimplementedAuthServiceServer
-	s Service
+	s *auth.Service
 }
 
-func NewServer(s Service) *Server {
+func NewServer(s *auth.Service) *Server {
 	return &Server{s: s}
 }
 
-func (s *Server) Register(ctx context.Context, req *gengrpc.RegisterRequest) (*gengrpc.RegisterResponse, error) {
-	accessToken, err := s.s.Register(ctx, req.Name, req.Email, req.Password)
+func (s *Server) Register(ctx context.Context, req *gengrpc.RegisterRequest) (*gengrpc.Tokens, error) {
+	t, err := s.s.Register(ctx, req.FirstName, req.LastName, req.Email, req.Password)
 	if err != nil {
 		slog.Warn("failed to register user", "error", err)
 
 		return nil, status.Errorf(codes.Internal, "failed to register user: %v", err)
 	}
 
-	return &gengrpc.RegisterResponse{AccessToken: accessToken}, nil
+	slog.Info("Auth service - user registered")
+
+	return &gengrpc.Tokens{
+		AccessToken:      t.AccessToken,
+		IdToken:          t.IDToken,
+		ExpiresIn:        int32(t.ExpiresIn),
+		RefreshExpiresIn: int32(t.RefreshExpiresIn),
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
 }
 
-func (s *Server) SignIn(ctx context.Context, req *gengrpc.SignInRequest) (*gengrpc.SignInResponse, error) {
-	accessToken, err := s.s.SignIn(ctx, req.Email, req.Password)
+func (s *Server) SignIn(ctx context.Context, req *gengrpc.SignInRequest) (*gengrpc.Tokens, error) {
+	t, err := s.s.SignIn(ctx, req.Email, req.Password)
 	if err != nil {
 		slog.Warn("failed to sign in user", "error", err)
 
 		return nil, status.Errorf(codes.Internal, "failed to sign in user: %v", err)
 	}
 
-	return &gengrpc.SignInResponse{AccessToken: accessToken}, nil
+	slog.Info("Auth service - user signed in")
+
+	return &gengrpc.Tokens{
+		AccessToken:      t.AccessToken,
+		IdToken:          t.IDToken,
+		ExpiresIn:        int32(t.ExpiresIn),
+		RefreshExpiresIn: int32(t.RefreshExpiresIn),
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
+}
+
+func (s *Server) Refresh(ctx context.Context, req *gengrpc.RefreshRequest) (*gengrpc.Tokens, error) {
+	t, err := s.s.Refresh(ctx, req.RefreshToken)
+	if err != nil {
+		slog.Warn("failed to refresh token", "error", err)
+
+		return nil, status.Errorf(codes.Internal, "failed to refresh token: %v", err)
+	}
+
+	slog.Info("Auth service - token refreshed")
+
+	return &gengrpc.Tokens{
+		AccessToken:      t.AccessToken,
+		IdToken:          t.IDToken,
+		ExpiresIn:        int32(t.ExpiresIn),
+		RefreshExpiresIn: int32(t.RefreshExpiresIn),
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
+}
+
+func (s *Server) Revoke(ctx context.Context, req *gengrpc.RevokeRequest) (*emptypb.Empty, error) {
+	err := s.s.Revoke(ctx, req.RefreshToken)
+	if err != nil {
+		slog.Warn("failed to revoke token", "error", err)
+
+		return nil, status.Errorf(codes.Internal, "failed to revoke token: %v", err)
+	}
+
+	slog.Info("Auth service - token revoked")
+
+	return &emptypb.Empty{}, nil
 }

@@ -31,19 +31,16 @@ func (s *WebReaderSuite) SetupSuite() {
 func (s *WebReaderSuite) TestWebReader_FetchLessons() {
 	ctx := s.T().Context()
 
-	user := &user{
-		Id: 1,
-	}
-	createUser(s.DB, user)
+	userID := randomString()
 
 	lesson := &lesson{
-		UserID: 1,
+		UserID: userID,
 	}
 	createLesson(s.DB, lesson)
 
 	createExercise(s.DB, &exercise{LessonId: lesson.Id})
 
-	res, err := s.reader.FetchLessons(ctx, "1")
+	res, err := s.reader.FetchLessons(ctx, userID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
@@ -57,14 +54,7 @@ func (s *WebReaderSuite) TestWebReader_FetchLessons() {
 func (s *WebReaderSuite) TestWebReader_FetchLessons_otherUser() {
 	ctx := s.T().Context()
 
-	user := &user{
-		Id: 1,
-	}
-	createUser(s.DB, user)
-
-	lesson := &lesson{
-		UserID: 1,
-	}
+	lesson := &lesson{}
 	createLesson(s.DB, lesson)
 
 	createExercise(s.DB, &exercise{LessonId: lesson.Id})

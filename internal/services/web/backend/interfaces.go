@@ -22,6 +22,7 @@ type Publisher interface {
 }
 
 type AuthClient interface {
-	Register(ctx context.Context, name, email, password string) (accessToken string, err error)
-	SignIn(ctx context.Context, email, password string) (accessToken string, err error)
+	Register(ctx context.Context, firstName, lastName, email, password string) (Tokens, error)
+	SignIn(ctx context.Context, email, password string) (Tokens, error)
+	Revoke(ctx context.Context, refreshToken string) error
 }

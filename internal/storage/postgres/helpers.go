@@ -14,7 +14,7 @@ type (
 		Id          int
 		Name        string
 		Description string
-		UserID      int
+		UserID      string
 	}
 
 	exercise struct {
@@ -38,13 +38,6 @@ type (
 		Type       string
 		CreatedAt  time.Time
 	}
-
-	user struct {
-		Id       int
-		Name     string
-		Email    string
-		Password string
-	}
 )
 
 func createLesson(db *sql.DB, lesson *lesson) {
@@ -58,13 +51,8 @@ func createLesson(db *sql.DB, lesson *lesson) {
 		lesson.Description = randomString()
 	}
 
-	if lesson.UserID == 0 {
-		user := user{}
-		user.Name = randomString()
-		user.Email = randomString()
-		user.Password = randomString()
-		createUser(db, &user)
-		lesson.UserID = user.Id
+	if lesson.UserID == "" {
+		lesson.UserID = randomString()
 	}
 
 	err := db.QueryRow(query, &lesson.Name, &lesson.Description, &lesson.UserID).Scan(&lesson.Id)
@@ -226,38 +214,6 @@ func createResult(db *sql.DB, answer *result) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func createUser(db *sql.DB, user *user) {
-	query := `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id;`
-
-	err := db.QueryRow(query, &user.Name, &user.Email, &user.Password).
-		Scan(&user.Id)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func fetchUserByEmail(db *sql.DB, email string) *user {
-	const query = `SELECT id, name, email, password FROM "user" WHERE email = $1;`
-
-	rows, err := db.Query(query, email)
-	if err != nil {
-		panic(err)
-	}
-
-	for rows.Next() {
-		var user user
-
-		err = rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
-		if err != nil {
-			panic(err)
-		}
-
-		return &user
-	}
-
-	return nil
 }
 
 func randomString() string {

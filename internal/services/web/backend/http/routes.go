@@ -6,6 +6,7 @@ const (
 	FetchLessons   = "/fetch-lessons"
 	HydrateLesson  = "/hydrate-lesson"
 	FetchExercises = "/fetch-exercises"
+	UserProfile    = "/user-profile"
 
 	// write
 
@@ -24,4 +25,5 @@ const (
 
 	AuthRegister = "/auth-register"
 	AuthSignIn   = "/auth-sign-in"
+	AuthLogout   = "/auth-logout"
 )

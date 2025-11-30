@@ -10,11 +10,15 @@ import (
 )
 
 type AuthRegisterHandler struct {
-	s Service
+	s      Service
+	secure bool
 }
 
-func NewAuthRegisterHandler(s Service) *AuthRegisterHandler {
-	return &AuthRegisterHandler{s: s}
+func NewAuthRegisterHandler(s Service, secure bool) *AuthRegisterHandler {
+	return &AuthRegisterHandler{
+		s:      s,
+		secure: secure,
+	}
 }
 
 func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -30,7 +34,7 @@ func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	accessToken, err := h.s.Register(ctx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
+	t, err := h.s.Register(ctx, registerRequest.FirstName, registerRequest.LastName, registerRequest.Email, registerRequest.Password)
 
 	if err != nil {
 		log.Print(fmt.Errorf("failed to register user: %w", err))
@@ -38,17 +42,25 @@ func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	registerResponse := backend.RegisterResponse{
-		AccessToken: accessToken,
-	}
+	// set refresh token in HttpOnly cookie
+	http.SetCookie(res, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    t.RefreshToken,
+		Path:     "/",
+		MaxAge:   t.RefreshExpiresIn,
+		Secure:   h.secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
-	encoded, err := json.Marshal(registerResponse)
-
-	if err != nil {
-		log.Print(fmt.Errorf("failed to encode AuthRegisterHandler HTTP response: %w", err))
-		res.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	_, err = res.Write(encoded)
+	// set access token in HttpOnly cookie
+	http.SetCookie(res, &http.Cookie{
+		Name:     "access_token",
+		Value:    t.AccessToken,
+		Path:     "/",
+		MaxAge:   t.ExpiresIn,
+		Secure:   h.secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 }

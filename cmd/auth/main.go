@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"log/slog"
@@ -11,14 +10,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/kelseyhightower/envconfig"
-	_ "github.com/lib/pq"
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
-	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/probe"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -28,11 +26,12 @@ type config struct {
 	ServerAddr      string        `envconfig:"SERVER_ADDRESS" default:":50051"`
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9092"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
-	Db              struct {
-		Driver string `envconfig:"DB_DRIVER" default:"postgres"`
-		DSN    string `envconfig:"DB_DSN" default:"postgres://postgres:postgres@localhost:5430/postgres?sslmode=disable&timezone=Europe/Warsaw"`
+	Keycloak        struct {
+		URL          string `envconfig:"KC_URL" default:"http://localhost:8180"`
+		Realm        string `envconfig:"KC_REALM" default:"realm-dev"`
+		ClientID     string `envconfig:"KC_CLIENT_ID" default:"client-id-dev"`
+		ClientSecret string `envconfig:"KC_CLIENT_SECRET" default:"client-secret-dev"`
 	}
-	Dummies bool `envconfig:"DUMMIES" default:"false"`
 }
 
 func main() {
@@ -78,12 +77,6 @@ func run(ctx context.Context) error {
 	// Use a buffered channel so the goroutine can exit if we don't collect this error.
 	serverErrors := make(chan error, 1)
 
-	// Database connection
-	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
-	if err != nil {
-		return err
-	}
-
 	// =========================================
 	// Start auth gRPC server
 	// =========================================
@@ -100,21 +93,13 @@ func run(ctx context.Context) error {
 	// register health check service
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
 
-	var reader auth.Reader
-	var writer auth.Writer
-
 	// register auth service
-	if cfg.Dummies {
-		// Dummy reader and writer
-		reader = &DummyReader{}
-		writer = &DummyWriter{}
-	} else {
-		// Real reader and writer
-		reader = postgres.NewAuthReader(db)
-		writer = postgres.NewAuthWriter(db)
-	}
-	service := auth.NewService(reader, writer)
-	server := intgrpc.NewServer(service)
+	kc := gocloak.NewClient(cfg.Keycloak.URL)
+	server := intgrpc.NewServer(auth.NewService(kc, auth.Config{
+		Realm:        cfg.Keycloak.Realm,
+		ClientID:     cfg.Keycloak.ClientID,
+		ClientSecret: cfg.Keycloak.ClientSecret,
+	}))
 	gengrpc.RegisterAuthServiceServer(grpcServer, server)
 
 	healthServer.SetServingStatus("sm4-auth", grpc_health_v1.HealthCheckResponse_SERVING)
@@ -128,7 +113,10 @@ func run(ctx context.Context) error {
 	// Start probes
 	// =========================================
 
-	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, nil, nil)
+	probeServer := probe.SetupProbeServer(
+		cfg.ProbeAddr,
+		probe.KeycloakChecker(kc, cfg.Keycloak.Realm, cfg.Keycloak.ClientID, cfg.Keycloak.ClientSecret),
+	)
 
 	// Start probe server and send errors to the channel
 	go func() {

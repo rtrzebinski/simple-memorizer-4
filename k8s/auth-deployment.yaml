@@ -19,6 +19,14 @@ spec:
           env:
             - name: DB_DSN
               value: "postgres://postgres:postgres@sm4-db:5432/postgres?sslmode=disable"
+            - name: KC_URL
+              value: "http://sm-keycloak:8180"
+            - name: KC_REALM
+              value: "realm-live"
+            - name: KC_CLIENT_ID
+              value: "client-id-live"
+            - name: KC_CLIENT_SECRET
+              value: "client-secret-live"
           readinessProbe:
             httpGet:
               path: /readyz

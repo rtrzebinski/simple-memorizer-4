@@ -13,3 +13,12 @@ services:
     ports:
       - "8088:8085"
     entrypoint: gcloud beta emulators pubsub start --project project-dev --host-port 0.0.0.0:8085
+
+  sm-keycloak:
+    image: quay.io/keycloak/keycloak:26.4.1
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: change_me
+    command: ["start-dev", "--http-port=8180"]
+    ports:
+      - "8180:8180"

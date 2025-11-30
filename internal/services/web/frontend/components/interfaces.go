@@ -1,25 +1,25 @@
 package components
 
 import (
-	"context"
-
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
 // APIClient is an interface that defines methods for interacting with the backend API.
 type APIClient interface {
-	FetchLessons(ctx context.Context, accessToken string) ([]frontend.Lesson, error)
-	HydrateLesson(ctx context.Context, lesson *frontend.Lesson, accessToken string) error
-	FetchExercises(ctx context.Context, lesson frontend.Lesson, oldestExerciseID int, accessToken string) ([]frontend.Exercise, error)
-	UpsertLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error
-	DeleteLesson(ctx context.Context, lesson frontend.Lesson, accessToken string) error
-	UpsertExercise(ctx context.Context, exercise frontend.Exercise, accessToken string) error
-	StoreExercises(ctx context.Context, exercises []frontend.Exercise, accessToken string) error
-	DeleteExercise(ctx context.Context, exercise frontend.Exercise, accessToken string) error
-	StoreResult(ctx context.Context, result frontend.Result, accessToken string) error
-	AuthRegister(ctx context.Context, req frontend.RegisterRequest) (frontend.RegisterResponse, error)
-	AuthSignIn(ctx context.Context, req frontend.SignInRequest) (frontend.SignInResponse, error)
+	FetchLessons(ctx app.Context) ([]frontend.Lesson, error)
+	HydrateLesson(ctx app.Context, lesson *frontend.Lesson) error
+	FetchExercises(ctx app.Context, lesson frontend.Lesson, oldestExerciseID int) ([]frontend.Exercise, error)
+	UpsertLesson(ctx app.Context, lesson frontend.Lesson) error
+	DeleteLesson(ctx app.Context, lesson frontend.Lesson) error
+	UpsertExercise(ctx app.Context, exercise frontend.Exercise) error
+	StoreExercises(ctx app.Context, exercises []frontend.Exercise) error
+	DeleteExercise(ctx app.Context, exercise frontend.Exercise) error
+	StoreResult(ctx app.Context, result frontend.Result) error
+	AuthRegister(ctx app.Context, req frontend.RegisterRequest) error
+	AuthSignIn(ctx app.Context, req frontend.SignInRequest) error
+	AuthLogout(ctx app.Context) error
+	UserProfile(ctx app.Context) (*frontend.UserProfile, error)
 }
 
 // ExerciseEditor is an interface that defines methods for components that can edit exercises.

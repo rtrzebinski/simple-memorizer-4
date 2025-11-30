@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -12,11 +11,10 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestUpsertLessonHandler(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.Lesson{
 		Name:        "name",
 		Description: "description",
@@ -28,15 +26,17 @@ func TestUpsertLessonHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", ctx, &input, "100").Return(nil)
+	service.On("UpsertLesson", mock.Anything, &input, "100").Return(nil)
 
-	route := NewUpsertLessonHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewUpsertLessonHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 
@@ -53,13 +53,15 @@ func TestUpsertLessonHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewUpsertLessonHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewUpsertLessonHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 

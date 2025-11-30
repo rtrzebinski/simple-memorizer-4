@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -12,11 +11,10 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestDeleteExerciseHandler(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.Exercise{
 		Id: 123,
 	}
@@ -27,19 +25,22 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", ctx, input, "100").Return(nil)
+	service.On("DeleteExercise", mock.Anything, input, "100").Return(nil)
 
-	route := NewDeleteExerciseHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewDeleteExerciseHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 
 	service.AssertExpectations(t)
+	v.AssertExpectations(t)
 }
 
 func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
@@ -52,13 +53,15 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 
 	service := NewServiceMock()
 
-	route := NewDeleteExerciseHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewDeleteExerciseHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 
@@ -69,4 +72,6 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
+
+	v.AssertExpectations(t)
 }

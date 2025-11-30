@@ -4,34 +4,30 @@ import (
 	"net/http"
 )
 
-func ListenAndServe(s Service, port string) error {
+func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string, secure bool) error {
 	// read
-
-	http.Handle(FetchLessons, NewFetchLessonsHandler(s))
-	http.Handle(HydrateLesson, NewHydrateLessonHandler(s))
-	http.Handle(FetchExercises, NewFetchExercisesOfLessonHandler(s))
+	http.Handle(FetchLessons, Auth(v, rfr, secure)(NewFetchLessonsHandler(s)))
+	http.Handle(HydrateLesson, Auth(v, rfr, secure)(NewHydrateLessonHandler(s)))
+	http.Handle(FetchExercises, Auth(v, rfr, secure)(NewFetchExercisesOfLessonHandler(s)))
+	http.Handle(UserProfile, Auth(v, rfr, secure)(NewUserProfileHandler(v)))
 
 	// write
-
-	http.Handle(UpsertLesson, NewUpsertLessonHandler(s))
-	http.Handle(DeleteLesson, NewDeleteLessonHandler(s))
-	http.Handle(UpsertExercise, NewUpsertExerciseHandler(s))
-	http.Handle(StoreExercises, NewStoreExercisesHandler(s))
-	http.Handle(DeleteExercise, NewDeleteExerciseHandler(s))
-	http.Handle(StoreResult, NewStoreResultHandler(s))
+	http.Handle(UpsertLesson, Auth(v, rfr, secure)(NewUpsertLessonHandler(s)))
+	http.Handle(DeleteLesson, Auth(v, rfr, secure)(NewDeleteLessonHandler(s)))
+	http.Handle(UpsertExercise, Auth(v, rfr, secure)(NewUpsertExerciseHandler(s)))
+	http.Handle(StoreExercises, Auth(v, rfr, secure)(NewStoreExercisesHandler(s)))
+	http.Handle(DeleteExercise, Auth(v, rfr, secure)(NewDeleteExerciseHandler(s)))
+	http.Handle(StoreResult, Auth(v, rfr, secure)(NewStoreResultHandler(s)))
 
 	// download
-
-	http.Handle(ExportLessonCsv, NewExportLessonCsvHandler(s))
+	http.Handle(ExportLessonCsv, Auth(v, rfr, secure)(NewExportLessonCsvHandler(s)))
 
 	// auth
+	http.Handle(AuthRegister, NewAuthRegisterHandler(s, secure))
+	http.Handle(AuthSignIn, NewAuthSignInHandler(s, secure))
+	http.Handle(AuthLogout, NewAuthLogoutHandler(s))
 
-	http.Handle(AuthRegister, NewAuthRegisterHandler(s))
-	http.Handle(AuthSignIn, NewAuthSignInHandler(s))
+	handler := CSRFDynamicHost()(http.DefaultServeMux)
 
-	if err := http.ListenAndServe(port, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return http.ListenAndServe(port, handler)
 }

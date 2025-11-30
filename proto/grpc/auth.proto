@@ -1,22 +1,23 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package grpc;
 
 option go_package = "proto/grpc";
 
 service AuthService {
-  rpc Register(RegisterRequest) returns (RegisterResponse);
-  rpc SignIn(SignInRequest) returns (SignInResponse);
+  rpc Register(RegisterRequest) returns (Tokens);
+  rpc SignIn(SignInRequest) returns (Tokens);
+  rpc Refresh(RefreshRequest) returns (Tokens);
+  rpc Revoke(RevokeRequest) returns (google.protobuf.Empty);
 }
 
 message RegisterRequest {
   string email = 1;
-  string name = 2;
-  string password = 3;
-}
-
-message RegisterResponse {
-  string access_token = 2;
+  string first_name = 2;
+  string last_name = 3;
+  string password = 4;
 }
 
 message SignInRequest {
@@ -24,6 +25,19 @@ message SignInRequest {
   string password = 2;
 }
 
-message SignInResponse {
-  string access_token = 2;
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message RevokeRequest {
+  string refresh_token = 1;
+}
+
+message Tokens {
+  string access_token = 1;
+  string id_token = 2;
+  int32 expires_in = 3;
+  int32 refresh_expires_in = 4;
+  string refresh_token = 5;
+  string token_type = 6;
 }

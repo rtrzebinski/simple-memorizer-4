@@ -57,10 +57,14 @@ func (s *Service) PublishBadAnswer(ctx context.Context, exerciseID int, userID s
 	return s.p.PublishBadAnswer(ctx, exerciseID)
 }
 
-func (s *Service) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
-	return s.a.Register(ctx, name, email, password)
+func (s *Service) Register(ctx context.Context, firstName, lastName, email, password string) (Tokens, error) {
+	return s.a.Register(ctx, firstName, lastName, email, password)
 }
 
-func (s *Service) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
+func (s *Service) SignIn(ctx context.Context, email, password string) (Tokens, error) {
 	return s.a.SignIn(ctx, email, password)
+}
+
+func (s *Service) Revoke(ctx context.Context, refreshToken string) error {
+	return s.a.Revoke(ctx, refreshToken)
 }

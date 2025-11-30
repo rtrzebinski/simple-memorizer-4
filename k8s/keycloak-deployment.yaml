@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sm-keycloak-realm
+data:
+  realm-live.json: |
+    {
+      "realm": "realm-live",
+      "enabled": true,
+      "sslRequired": "NONE",
+      "registrationEmailAsUsername": true,
+      "duplicateEmailsAllowed": false,
+      "editUsernameAllowed": false,
+      "verifyEmail": false,
+      "revokeRefreshToken": true,
+      "refreshTokenMaxReuse": 0,
+      "accessTokenLifespan": 600,
+      "ssoSessionIdleTimeout": 2592000,
+      "ssoSessionMaxLifespan": 2592000,
+      "clients": [
+        {
+          "clientId": "client-id-live",
+          "name": "sm4",
+          "enabled": true,
+          "publicClient": false,
+          "serviceAccountsEnabled": true,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": true,
+          "consentRequired": false,
+          "secret": "client-secret-live",
+          "protocol": "openid-connect",
+          "redirectUris": [ "*" ],
+          "webOrigins": [ "*" ]
+        }
+      ]
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sm-keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sm-keycloak
+  template:
+    metadata:
+      labels:
+        app: sm-keycloak
+    spec:
+      terminationGracePeriodSeconds: 60
+      initContainers:
+        - name: create-keycloak-schema
+          image: postgres:17.0-alpine
+          command: ["sh","-ceu"]
+          args:
+            - |
+              until pg_isready -h sm4-db -p 5432; do sleep 1; done
+              psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@sm4-db:5432/$POSTGRES_DB" -v ON_ERROR_STOP=1 -c "CREATE SCHEMA IF NOT EXISTS keycloak;"
+          envFrom:
+            - configMapRef:
+                name: sm4-db-credentials
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.4.1
+          args:
+            - start-dev
+            - --http-port=8180
+            - --import-realm
+          ports:
+            - containerPort: 8180   # app HTTP
+            - containerPort: 9000   # management/health
+          env:
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: "admin"
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              value: "change_me"
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://sm4-db:5432/postgres"
+            - name: KC_DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: sm4-db-credentials
+                  key: POSTGRES_USER
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: sm4-db-credentials
+                  key: POSTGRES_PASSWORD
+            - name: KC_DB_SCHEMA
+              value: "keycloak"
+            - name: KC_HEALTH_ENABLED
+              value: "true"
+            - name: KC_PROXY_HEADERS
+              value: "xforwarded"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+          volumeMounts:
+            - name: realm-import
+              mountPath: /opt/keycloak/data/import
+              readOnly: true
+
+          # Probes: health is on mgmt port 9000
+          startupProbe:
+            tcpSocket:
+              port: 9000
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 9000
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 6
+
+          # Patch master ssl + grant realm-management roles to service-account-sm4
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    set -e
+
+                    # 1) Login to master as bootstrap admin (retry until ready)
+                    i=0
+                    while [ $i -lt 60 ]; do
+                      if /opt/keycloak/bin/kcadm.sh config credentials \
+                           --server http://127.0.0.1:8180 \
+                           --realm master \
+                           --user "${KC_BOOTSTRAP_ADMIN_USERNAME}" \
+                           --password "${KC_BOOTSTRAP_ADMIN_PASSWORD}"; then
+                        break
+                      fi
+                      i=$((i+1)); sleep 2
+                    done
+
+                    # 2) Relax master realm SSL (best-effort)
+                    /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE || true
+
+                    # 3) Wait until the realm is imported and visible
+                    i=0
+                    while [ $i -lt 60 ]; do
+                      if /opt/keycloak/bin/kcadm.sh get realms/realm-live >/dev/null 2>&1; then
+                        break
+                      fi
+                      i=$((i+1)); sleep 2
+                    done
+
+                    /opt/keycloak/bin/kcadm.sh add-roles -r realm-live \
+                      --uusername service-account-client-id-live \
+                      --cclientid realm-management \
+                      --rolename manage-users || true
+
+                    /opt/keycloak/bin/kcadm.sh add-roles -r realm-live \
+                      --uusername service-account-client-id-live \
+                      --cclientid realm-management \
+                      --rolename view-users || true
+
+                    echo "[postStart] Granted realm-management roles to service-account-client-id-live"
+
+      volumes:
+        - name: realm-import
+          configMap:
+            name: sm-keycloak-realm
+            items:
+              - key: realm-live.json
+                path: realm-live.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-keycloak
+spec:
+  type: NodePort
+  selector:
+    app: sm-keycloak
+  ports:
+    - name: http
+      port: 8180
+      targetPort: 8180
+      nodePort: 30002

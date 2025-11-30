@@ -29,17 +29,14 @@ func (s *WebWriterSuite) SetupSuite() {
 func (s *WebWriterSuite) TestWebWriter_UpsertLesson_createNew() {
 	ctx := s.T().Context()
 
-	user := &user{
-		Id: 1,
-	}
-	createUser(s.DB, user)
+	userID := randomString()
 
 	lesson := backend.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
 
-	err := s.writer.UpsertLesson(ctx, &lesson, "1")
+	err := s.writer.UpsertLesson(ctx, &lesson, userID)
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestLesson(s.DB)
@@ -47,7 +44,7 @@ func (s *WebWriterSuite) TestWebWriter_UpsertLesson_createNew() {
 	assert.Equal(s.T(), lesson.Name, stored.Name)
 	assert.Equal(s.T(), lesson.Description, stored.Description)
 	assert.Equal(s.T(), lesson.Id, stored.Id)
-	assert.Equal(s.T(), user.Id, stored.UserID)
+	assert.Equal(s.T(), userID, stored.UserID)
 }
 
 func (s *WebWriterSuite) TestWebWriter_UpsertLesson_updateExisting() {

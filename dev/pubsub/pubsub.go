@@ -16,9 +16,9 @@ func main() {
 	topicID := "topic-dev"
 	subID := "subscription-dev"
 
-	fmt.Println("Project: " + projectID)
-	fmt.Println("Topic: " + topicID)
-	fmt.Println("Subscription: " + subID)
+	fmt.Println("[PubSub] Project: " + projectID)
+	fmt.Println("[PubSub] Topic: " + topicID)
+	fmt.Println("[PubSub] Subscription: " + subID)
 
 	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {

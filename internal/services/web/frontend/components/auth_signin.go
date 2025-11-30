@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -24,7 +25,7 @@ type SignIn struct {
 // NewSignIn creates a new sign-in component
 func NewSignIn(c APIClient) *SignIn {
 	compo := &SignIn{c: c}
-	compo.inputEmail = "foo@bar.com"
+	compo.inputEmail = "test.user.seeded@example.com"
 	compo.inputPassword = "password"
 
 	return compo
@@ -65,18 +66,23 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 		Password: compo.inputPassword,
 	}
 
-	resp, err := compo.c.AuthSignIn(ctx, req)
+	err := compo.c.AuthSignIn(ctx, req)
 	if err != nil {
 		compo.submitButtonDisabled = false
 		app.Log(fmt.Errorf("failed to sign in: %w", err))
 		return
 	}
 
-	fmt.Println("Response:", resp)
 	compo.submitButtonDisabled = false
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 
-	ctx.SetState("AccessToken", resp.AccessToken).Persist()
+	user, err := compo.c.UserProfile(ctx)
+	if err != nil {
+		slog.Error("failed to fetch user profile", "err", err)
+	}
+
+	ctx.SetState("user", user).Persist()
+
 	ctx.NavigateTo(&url.URL{Path: PathHome})
 }

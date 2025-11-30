@@ -29,6 +29,10 @@ spec:
               value: "sm4-topic"
             - name: AUTH_SERVER_ADDRESS
               value: "sm4-auth:50051"
+            - name: KC_URL
+              value: "http://sm-keycloak:8180"
+            - name: KC_REALM
+              value: "realm-live"
           readinessProbe:
             httpGet:
               path: /readyz

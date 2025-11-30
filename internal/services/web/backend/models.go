@@ -47,13 +47,10 @@ type Result struct {
 }
 
 type RegisterRequest struct {
-	Name     string
-	Email    string
-	Password string
-}
-
-type RegisterResponse struct {
-	AccessToken string
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
 }
 
 type SignInRequest struct {
@@ -61,6 +58,22 @@ type SignInRequest struct {
 	Password string
 }
 
-type SignInResponse struct {
-	AccessToken string
+type Tokens struct {
+	AccessToken      string
+	IDToken          string
+	ExpiresIn        int
+	RefreshExpiresIn int
+	RefreshToken     string
+	TokenType        string
+}
+
+type User struct {
+	ID    string
+	Name  string
+	Email string
+}
+
+type UserProfile struct {
+	Name  string
+	Email string
 }

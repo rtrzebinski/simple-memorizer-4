@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -9,24 +8,25 @@ import (
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestFetchLessonsHandler(t *testing.T) {
-	ctx := context.Background()
-
 	lesson := backend.Lesson{}
 	lessons := backend.Lessons{lesson}
 
 	service := NewServiceMock()
-	service.On("FetchLessons", ctx, "100").Return(lessons, nil)
+	service.On("FetchLessons", mock.Anything, "100").Return(lessons, nil)
 
-	route := NewFetchLessonsHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewFetchLessonsHandler(service))
 
 	res := httptest.NewRecorder()
 	req := &http.Request{}
 	req.Header = make(map[string][]string)
 	// { "sub": "100" }
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	route.ServeHTTP(res, req)
 

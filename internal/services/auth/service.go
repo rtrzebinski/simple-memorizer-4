@@ -2,107 +2,128 @@ package auth
 
 import (
 	"context"
-	"crypto/rsa"
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/Nerzal/gocloak/v13"
 )
 
-const (
-	keys         = "./../../../keys/"
-	daysToExpire = 30
-)
+type Config struct {
+	Realm        string
+	ClientID     string
+	ClientSecret string
+}
+
+type Tokens struct {
+	AccessToken      string
+	IDToken          string
+	ExpiresIn        int
+	RefreshExpiresIn int
+	RefreshToken     string
+	TokenType        string
+}
 
 type Service struct {
-	r Reader
-	w Writer
+	kc  *gocloak.GoCloak
+	cfg Config
 }
 
-func NewService(r Reader, w Writer) *Service {
+func NewService(kc *gocloak.GoCloak, cfg Config) *Service {
 	return &Service{
-		r: r,
-		w: w,
+		kc:  kc,
+		cfg: cfg,
 	}
 }
 
-func (s *Service) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
-	privateKey, err := pk()
+func (s *Service) Register(ctx context.Context, firstName, lastName, email, password string) (Tokens, error) {
+	adminTok, err := s.kc.LoginClient(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
 	if err != nil {
-		return "", fmt.Errorf("failed to get private key: %w", err)
+		return Tokens{}, fmt.Errorf("login client: %w", err)
 	}
 
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", fmt.Errorf("failed to hash password: %w", err)
+	empty := []string{}
+	u := gocloak.User{
+		Username:        gocloak.StringP(email),
+		Email:           gocloak.StringP(email),
+		FirstName:       gocloak.StringP(firstName),
+		LastName:        gocloak.StringP(lastName),
+		Enabled:         gocloak.BoolP(true),
+		EmailVerified:   gocloak.BoolP(true),
+		RequiredActions: &empty,
 	}
 
-	userID, err := s.w.StoreUser(ctx, name, email, string(hashed))
+	userID, err := s.kc.CreateUser(ctx, adminTok.AccessToken, s.cfg.Realm, u)
 	if err != nil {
-		return "", fmt.Errorf("failed to register user: %w", err)
+		return Tokens{}, fmt.Errorf("create user: %w", err)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":   userID,
-		"name":  name,
-		"email": email,
-		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24 * daysToExpire).Unix(),
+	err = s.kc.SetPassword(ctx, adminTok.AccessToken, userID, s.cfg.Realm, password, false)
+	if err != nil {
+		return Tokens{}, fmt.Errorf("set password: %w", err)
+	}
+
+	err = s.kc.UpdateUser(ctx, adminTok.AccessToken, s.cfg.Realm, gocloak.User{
+		ID:              &userID,
+		RequiredActions: &empty,
+		EmailVerified:   gocloak.BoolP(true),
+		Enabled:         gocloak.BoolP(true),
 	})
-
-	accessToken, err = token.SignedString(privateKey)
 	if err != nil {
-		return accessToken, fmt.Errorf("failed to sign token: %w", err)
+		return Tokens{}, fmt.Errorf("clear required actions: %w", err)
 	}
 
-	return accessToken, nil
+	t, err := s.kc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
+	if err != nil {
+		return Tokens{}, fmt.Errorf("login new user: %w", err)
+	}
+
+	return Tokens{
+		AccessToken:      t.AccessToken,
+		IDToken:          t.IDToken,
+		ExpiresIn:        t.ExpiresIn,
+		RefreshExpiresIn: t.RefreshExpiresIn,
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
 }
 
-func (s *Service) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
-	privateKey, err := pk()
+func (s *Service) SignIn(ctx context.Context, email, password string) (Tokens, error) {
+	t, err := s.kc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
 	if err != nil {
-		return "", fmt.Errorf("failed to get private key: %w", err)
+		return Tokens{}, fmt.Errorf("login user: %w", err)
 	}
 
-	name, userID, passwordHash, err := s.r.FetchUser(ctx, email)
-
-	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
-	if err != nil {
-		return "", fmt.Errorf("failed to verify password: %w", err)
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":   userID,
-		"name":  name,
-		"email": email,
-		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24 * daysToExpire).Unix(),
-	})
-
-	accessToken, err = token.SignedString(privateKey)
-	if err != nil {
-		return accessToken, fmt.Errorf("failed to sign token: %w", err)
-	}
-
-	return accessToken, nil
+	return Tokens{
+		AccessToken:      t.AccessToken,
+		IDToken:          t.IDToken,
+		ExpiresIn:        t.ExpiresIn,
+		RefreshExpiresIn: t.RefreshExpiresIn,
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
 }
 
-func pk() (*rsa.PrivateKey, error) {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		return nil, fmt.Errorf("failed to get caller info")
-	}
-
-	dir := filepath.Dir(filename)
-
-	privateKeyBytes, err := os.ReadFile(filepath.Join(dir, keys, "private.pem"))
+func (s *Service) Refresh(ctx context.Context, refreshToken string) (Tokens, error) {
+	t, err := s.kc.RefreshToken(ctx, refreshToken, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read private key: %w", err)
+		return Tokens{}, fmt.Errorf("refresh: %w", err)
 	}
 
-	return jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
+	return Tokens{
+		AccessToken:      t.AccessToken,
+		IDToken:          t.IDToken,
+		ExpiresIn:        t.ExpiresIn,
+		RefreshExpiresIn: t.RefreshExpiresIn,
+		RefreshToken:     t.RefreshToken,
+		TokenType:        t.TokenType,
+	}, nil
+}
+
+// Revoke the refresh token and all access tokens derived from it
+func (s *Service) Revoke(ctx context.Context, refreshToken string) error {
+	err := s.kc.RevokeToken(ctx, s.cfg.Realm, s.cfg.ClientID, s.cfg.ClientSecret, refreshToken)
+	if err != nil {
+		return fmt.Errorf("revoke: %w", err)
+	}
+
+	return nil
 }

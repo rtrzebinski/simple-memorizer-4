@@ -2,13 +2,11 @@ package components
 
 import (
 	"fmt"
-	"log/slog"
 	"net/url"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 )
 
 // LessonRow is a component that displays a row in the lessons table
@@ -58,12 +56,7 @@ func (compo *LessonRow) onDelete(id int) app.EventHandler {
 		}
 
 		// delete lesson
-		accessToken, err := auth.Token(ctx)
-		if err != nil {
-			slog.Error("failed to get token", "err", err)
-			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-		}
-		err = compo.parent.c.DeleteLesson(ctx, frontend.Lesson{Id: id}, accessToken)
+		err := compo.parent.c.DeleteLesson(ctx, frontend.Lesson{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete lesson: %w", err))
 		}

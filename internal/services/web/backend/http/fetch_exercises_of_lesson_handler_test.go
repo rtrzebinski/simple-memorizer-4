@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -14,11 +13,10 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestFetchExercisesOfLessonHandler(t *testing.T) {
-	ctx := context.Background()
-
 	exercise := backend.Exercise{
 		Id:                       1,
 		Question:                 "question",
@@ -40,9 +38,11 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 
 	oldestExerciseID := 1
 
-	service.On("FetchExercises", ctx, backend.Lesson{Id: lessonId}, oldestExerciseID, "100").Return(exercises, nil)
+	service.On("FetchExercises", mock.Anything, backend.Lesson{Id: lessonId}, oldestExerciseID, "100").Return(exercises, nil)
 
-	route := NewFetchExercisesOfLessonHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewFetchExercisesOfLessonHandler(service))
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -53,7 +53,7 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	req := &http.Request{}
 	req.URL = u
 	req.Header = make(map[string][]string)
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	res := httptest.NewRecorder()
 
@@ -80,14 +80,16 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
-	route := NewFetchExercisesOfLessonHandler(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
+	route := RequireAuth(v)(NewFetchExercisesOfLessonHandler(service))
 
 	u, _ := url.Parse("/")
 
 	req := &http.Request{}
 	req.URL = u
 	req.Header = make(map[string][]string)
-	req.Header.Set("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
 
 	res := httptest.NewRecorder()
 

@@ -17,7 +17,7 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
-	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/probe"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
@@ -120,7 +120,11 @@ func run(ctx context.Context) error {
 	// Start probes
 	// =========================================
 
-	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db, nil)
+	probeServer := probe.SetupProbeServer(
+		cfg.ProbeAddr,
+		probe.DBChecker(db),
+		probe.PubSubChecker(cfg.PubSub.ProjectID),
+	)
 
 	// Start probe server and send errors to the channel
 	go func() {

@@ -8,9 +8,12 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/Nerzal/gocloak/v13"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
@@ -41,7 +44,14 @@ func main() {
 }
 
 func execute(db *sql.DB, seedMethodNames ...string) {
-	s := Seeder{db, postgres.NewWebWriter(db), postgres.NewWorkerWriter(db), postgres.NewAuthWriter(db)}
+	kc := gocloak.NewClient("http://localhost:8180")
+	authSvc := auth.NewService(kc, auth.Config{
+		Realm:        "realm-dev",
+		ClientID:     "client-id-dev",
+		ClientSecret: "client-secret-dev",
+	})
+
+	s := Seeder{db, postgres.NewWebWriter(db), postgres.NewWorkerWriter(db), authSvc}
 
 	seedType := reflect.TypeOf(s)
 
@@ -71,7 +81,7 @@ type Seeder struct {
 	db            *sql.DB
 	backendWriter *postgres.WebWriter
 	workerWriter  *postgres.WorkerWriter
-	authWriter    *postgres.AuthWriter
+	authSvc       *auth.Service
 }
 
 func seed(s Seeder, seedMethodName string) {
@@ -88,23 +98,24 @@ func seed(s Seeder, seedMethodName string) {
 func (s Seeder) CapitalsSeed() {
 	ctx := context.Background()
 
-	user := backend.RegisterRequest{
-		Name:     "seeder",
-		Email:    "",
-		Password: "",
-	}
+	uEmail := "test.user.seeded@example.com"
+	uPassword := "password"
+	uFirstName := "Test User"
+	uLastName := "Seeded"
 
-	userID, err := s.authWriter.StoreUser(ctx, user.Name, user.Email, user.Password)
+	t, err := s.authSvc.Register(ctx, uFirstName, uLastName, uEmail, uPassword)
 	if err != nil {
 		panic(err)
 	}
+
+	uID := userID(t.AccessToken)
 
 	lesson := backend.Lesson{
 		Name:        "Capitals",
 		Description: "What is the capital of given country?",
 	}
 
-	err = s.backendWriter.UpsertLesson(ctx, &lesson, userID)
+	err = s.backendWriter.UpsertLesson(ctx, &lesson, uID)
 	if err != nil {
 		panic(err)
 	}
@@ -138,7 +149,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.backendWriter.UpsertExercise(ctx, &exercise, userID)
+		err := s.backendWriter.UpsertExercise(ctx, &exercise, uID)
 		if err != nil {
 			panic(err)
 		}
@@ -199,4 +210,18 @@ func (s Seeder) LargeLessonSeed() {
 			}
 		}
 	}
+}
+
+func userID(accessToken string) string {
+	token, _, err := new(jwt.Parser).ParseUnverified(accessToken, jwt.MapClaims{})
+	if err != nil {
+		panic(err)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		panic(err)
+	}
+
+	return claims["sub"].(string)
 }

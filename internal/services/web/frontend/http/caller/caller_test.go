@@ -23,7 +23,7 @@ func TestCaller_Call(t *testing.T) {
 		assert.Equal(t, "request body", reqBody)
 		assert.Equal(t, "/route?foo=bar", r.URL.String())
 		assert.Equal(t, "application/json", r.Header.Get("content-type"))
-		assert.Equal(t, "accessToken", r.Header.Get("authorization"))
+		assert.Equal(t, "Bearer accessToken", r.Header.Get("authorization"))
 
 		w.WriteHeader(http.StatusOK)
 		_, err = w.Write([]byte(`response body`))

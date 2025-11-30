@@ -65,12 +65,25 @@ func (m *ServiceMock) PublishBadAnswer(ctx context.Context, exerciseID int, user
 	return args.Error(0)
 }
 
-func (m *ServiceMock) Register(ctx context.Context, name, email, password string) (accessToken string, err error) {
-	args := m.Called(ctx, name, email, password)
-	return args.String(0), args.Error(1)
+func (m *ServiceMock) Register(ctx context.Context, firstName, lastName, email, password string) (backend.Tokens, error) {
+	args := m.Called(ctx, firstName, lastName, email, password)
+	return args.Get(0).(backend.Tokens), args.Error(1)
 }
 
-func (m *ServiceMock) SignIn(ctx context.Context, email, password string) (accessToken string, err error) {
+func (m *ServiceMock) SignIn(ctx context.Context, email, password string) (backend.Tokens, error) {
 	args := m.Called(ctx, email, password)
+	return args.Get(0).(backend.Tokens), args.Error(1)
+}
+
+type TokenVerifierMock struct {
+	mock.Mock
+}
+
+func NewTokenVerifierMock() *TokenVerifierMock {
+	return &TokenVerifierMock{}
+}
+
+func (m *TokenVerifierMock) VerifyAndUser(ctx context.Context, accessToken string) (string, error) {
+	args := m.Called(ctx, accessToken)
 	return args.String(0), args.Error(1)
 }

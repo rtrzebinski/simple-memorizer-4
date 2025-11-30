@@ -1,7 +1,6 @@
 package components
 
 import (
-	"log/slog"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -14,16 +13,18 @@ const PathHome = "/"
 // Home is a component that displays the home page
 type Home struct {
 	app.Compo
+	c APIClient
 
 	// component vars
 	showHome bool
-	user     *frontend.User
+	user     *frontend.UserProfile
 }
 
 // NewHome creates a new Home component
-func NewHome() *Home {
+func NewHome(c APIClient) *Home {
 	return &Home{
-		user: &frontend.User{},
+		user: &frontend.UserProfile{},
+		c:    c,
 	}
 }
 
@@ -52,10 +53,9 @@ func (compo *Home) Render() app.UI {
 // The OnMount method is run once component is mounted
 func (compo *Home) OnMount(ctx app.Context) {
 	// auth check
-	user, err := auth.User(ctx)
-	if err != nil {
-		slog.Error("failed to get user", "err", err)
+	compo.user = auth.CheckUser(ctx)
+	if compo.user == nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		return
 	}
-	compo.user = user
 }

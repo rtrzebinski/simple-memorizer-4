@@ -2,13 +2,11 @@ package components
 
 import (
 	"fmt"
-	"log/slog"
 	"net/url"
 	"strconv"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
 )
 
 // ExerciseRow is a component that displays a single row of the exercises table
@@ -52,13 +50,8 @@ func (compo *ExerciseRow) onDelete(id int) app.EventHandler {
 			return
 		}
 
-		accessToken, err := auth.Token(ctx)
-		if err != nil {
-			slog.Error("failed to get token", "err", err)
-			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-		}
 		// delete exercise
-		err = compo.parent.c.DeleteExercise(ctx, frontend.Exercise{Id: id}, accessToken)
+		err := compo.parent.c.DeleteExercise(ctx, frontend.Exercise{Id: id})
 		if err != nil {
 			app.Log(fmt.Errorf("failed to delete exercise: %w", err))
 		}

@@ -2,7 +2,6 @@ package components
 
 import (
 	"fmt"
-	"log/slog"
 	"net/url"
 	"slices"
 	"strconv"
@@ -24,7 +23,7 @@ type Exercises struct {
 	// component vars
 	lesson frontend.Lesson
 	rows   []*ExerciseRow
-	user   *frontend.User
+	user   *frontend.UserProfile
 	edit   *ExerciseEdit
 }
 
@@ -32,7 +31,7 @@ type Exercises struct {
 func NewExercises(c APIClient) *Exercises {
 	exercises := &Exercises{
 		c:    c,
-		user: &frontend.User{},
+		user: &frontend.UserProfile{},
 	}
 
 	exercises.edit = NewExerciseEdit(c, exercises)
@@ -43,11 +42,11 @@ func NewExercises(c APIClient) *Exercises {
 // The OnMount method is run once component is mounted
 func (compo *Exercises) OnMount(ctx app.Context) {
 	// auth check
-	user, err := auth.User(ctx)
-	if err != nil {
+	compo.user = auth.CheckUser(ctx)
+	if compo.user == nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		return
 	}
-	compo.user = user
 
 	u := app.Window().URL()
 
@@ -66,12 +65,7 @@ func (compo *Exercises) OnMount(ctx app.Context) {
 
 // hydrateLesson fetch lesson details
 func (compo *Exercises) hydrateLesson(ctx app.Context) {
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-	err = compo.c.HydrateLesson(ctx, &compo.lesson, accessToken)
+	err := compo.c.HydrateLesson(ctx, &compo.lesson)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to hydrate lesson: %w", err))
 	}
@@ -176,12 +170,7 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	}
 
 	// store uploaded exercises
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
-	err = compo.c.StoreExercises(ctx, exercises, accessToken)
+	err = compo.c.StoreExercises(ctx, exercises)
 	if err != nil {
 		app.Log(err)
 		return
@@ -223,13 +212,8 @@ func readFile(file app.Value) (data []byte, err error) {
 
 // displayExercisesOfLesson fetch exercises and display them
 func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
-	accessToken, err := auth.Token(ctx)
-	if err != nil {
-		slog.Error("failed to get token", "err", err)
-		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
-	}
 	oldestExerciseID := 1 // Set the oldest exercise ID to 1, as we are displaying all exercises
-	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID, accessToken)
+	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
 	}

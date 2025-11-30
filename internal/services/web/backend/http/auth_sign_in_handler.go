@@ -10,11 +10,15 @@ import (
 )
 
 type AuthSignInHandler struct {
-	s Service
+	s      Service
+	secure bool
 }
 
-func NewAuthSignInHandler(s Service) *AuthSignInHandler {
-	return &AuthSignInHandler{s: s}
+func NewAuthSignInHandler(s Service, secure bool) *AuthSignInHandler {
+	return &AuthSignInHandler{
+		s:      s,
+		secure: secure,
+	}
 }
 
 func (h *AuthSignInHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -30,25 +34,32 @@ func (h *AuthSignInHandler) ServeHTTP(res http.ResponseWriter, req *http.Request
 		return
 	}
 
-	accessToken, err := h.s.SignIn(ctx, signInRequest.Email, signInRequest.Password)
-
+	t, err := h.s.SignIn(ctx, signInRequest.Email, signInRequest.Password)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to sign in user: %w", err))
 		res.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	signInResponse := backend.SignInResponse{
-		AccessToken: accessToken,
-	}
+	// set refresh token in HttpOnly cookie
+	http.SetCookie(res, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    t.RefreshToken,
+		Path:     "/",
+		MaxAge:   t.RefreshExpiresIn,
+		Secure:   h.secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
-	encoded, err := json.Marshal(signInResponse)
-
-	if err != nil {
-		log.Print(fmt.Errorf("failed to encode AuthSignInHandler HTTP response: %w", err))
-		res.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	_, err = res.Write(encoded)
+	// set access token in HttpOnly cookie
+	http.SetCookie(res, &http.Cookie{
+		Name:     "access_token",
+		Value:    t.AccessToken,
+		Path:     "/",
+		MaxAge:   t.ExpiresIn,
+		Secure:   h.secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 }

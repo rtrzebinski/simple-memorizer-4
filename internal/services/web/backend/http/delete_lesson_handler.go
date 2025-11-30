@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/auth"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
@@ -22,25 +22,15 @@ func NewDeleteLessonHandler(s Service) *DeleteLessonHandler {
 func (h *DeleteLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
-	accessToken := req.Header.Get("authorization")
-	if accessToken == "" {
-		log.Print("missing authorization header")
-		res.WriteHeader(http.StatusUnauthorized)
-
-		return
-	}
-
-	userID, err := auth.UserID(accessToken)
-	if err != nil {
-		log.Print(fmt.Errorf("failed to get user ID from access token: %w", err))
-		res.WriteHeader(http.StatusUnauthorized)
-
+	userID, ok := auth.UserIDFromContext(ctx)
+	if !ok || userID == "" {
+		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	var lesson backend.Lesson
 
-	err = json.NewDecoder(req.Body).Decode(&lesson)
+	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to decode DeleteLessonHandler HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)

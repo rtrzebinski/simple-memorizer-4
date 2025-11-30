@@ -18,9 +18,10 @@ func TestAuthRegisterHandler(t *testing.T) {
 	ctx := context.Background()
 
 	input := backend.RegisterRequest{
-		Name:     "name",
-		Email:    "email",
-		Password: "password",
+		FirstName: "firstname",
+		LastName:  "lastname",
+		Email:     "email",
+		Password:  "password",
 	}
 
 	body, err := json.Marshal(input)
@@ -29,7 +30,7 @@ func TestAuthRegisterHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("Register", ctx, input.Name, input.Email, input.Password).Return("accessToken", nil)
+	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return("accessToken", nil)
 
 	handler := NewAuthRegisterHandler(service)
 
@@ -50,9 +51,10 @@ func TestAuthRegisterHandler_unauthorized(t *testing.T) {
 	ctx := context.Background()
 
 	input := backend.RegisterRequest{
-		Name:     "name",
-		Email:    "email",
-		Password: "password",
+		FirstName: "firstname",
+		LastName:  "lastname",
+		Email:     "email",
+		Password:  "password",
 	}
 
 	body, err := json.Marshal(input)
@@ -61,7 +63,7 @@ func TestAuthRegisterHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("Register", ctx, input.Name, input.Email, input.Password).Return("", errors.New("unauthorized"))
+	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return("", errors.New("unauthorized"))
 
 	handler := NewAuthRegisterHandler(service)
 

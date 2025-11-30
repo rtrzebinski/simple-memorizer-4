@@ -19,9 +19,9 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
-	probes "github.com/rtrzebinski/simple-memorizer-4/internal/probes"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/probe"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/grpc"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/pubsub"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
@@ -47,6 +47,11 @@ type config struct {
 	PubSub struct {
 		ProjectID string `envconfig:"PUBSUB_PROJECT_ID" default:"project-dev"`
 		TopicID   string `envconfig:"PUBSUB_TOPIC_ID" default:"topic-dev"`
+	}
+	Keycloak struct {
+		URL    string `envconfig:"KC_URL" default:"http://localhost:8180"`
+		Realm  string `envconfig:"KC_REALM" default:"realm-dev"`
+		Secure bool   `envconfig:"KC_COOKIES_SECURE" default:"false"`
 	}
 	ProbeAddr       string        `envconfig:"PROBE_ADDRESS" default:"0.0.0.0:9090"`
 	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
@@ -80,12 +85,12 @@ func run(ctx context.Context) error {
 	//
 	// This is done by calling the Route() function, which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route(components.PathHome, func() app.Composer { return components.NewHome() })
+	app.Route(components.PathHome, func() app.Composer { return components.NewHome(apiClient) })
 
 	// Associate other frontend routes
 	app.Route(components.PathAuthRegister, func() app.Composer { return components.NewRegister(apiClient) })
 	app.Route(components.PathAuthSignIn, func() app.Composer { return components.NewSignIn(apiClient) })
-	app.Route(components.PathAuthLogout, func() app.Composer { return components.NewLogout() })
+	app.Route(components.PathAuthLogout, func() app.Composer { return components.NewLogout(apiClient) })
 	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient) })
 	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient) })
 	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient) })
@@ -201,19 +206,24 @@ func run(ctx context.Context) error {
 	reader := postgres.NewWebReader(db)
 	writer := postgres.NewWebWriter(db)
 	publisher := pubsub.NewPublisher(ceClient)
-	authClient := intgrpc.NewAuthClient(grpcClient)
+	authClient := auth.NewClient(grpcClient)
 	service := backend.NewService(reader, writer, publisher, authClient)
+	verifier := auth.NewTokenVerifier(cfg.Keycloak.URL, cfg.Keycloak.Realm)
 
 	go func() {
 		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
-		serverErrors <- bhttp.ListenAndServe(service, cfg.Web.Port)
+		serverErrors <- bhttp.ListenAndServe(service, verifier, authClient, cfg.Web.Port, cfg.Keycloak.Secure)
 	}()
 
 	// =========================================
 	// Start probes
 	// =========================================
 
-	probeServer := probes.SetupProbeServer(cfg.ProbeAddr, db, conn)
+	probeServer := probe.SetupProbeServer(
+		cfg.ProbeAddr,
+		probe.DBChecker(db),
+		probe.GrpcChecker(cfg.Auth.ServerAddr),
+	)
 
 	// Start probe server and send errors to the channel
 	go func() {
