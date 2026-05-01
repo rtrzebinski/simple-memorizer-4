@@ -29,10 +29,15 @@ func TestAuthRegisterHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewServiceMock()
-	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return("accessToken", nil)
+	tokens := backend.Tokens{
+		AccessToken:  "accessToken",
+		RefreshToken: "refreshToken",
+	}
 
-	handler := NewAuthRegisterHandler(service)
+	service := NewServiceMock()
+	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return(tokens, nil)
+
+	handler := NewAuthRegisterHandler(service, true)
 
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	res := httptest.NewRecorder()
@@ -41,10 +46,20 @@ func TestAuthRegisterHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.Code)
 	service.AssertExpectations(t)
-	var registerResponse backend.RegisterResponse
-	err = json.Unmarshal(res.Body.Bytes(), &registerResponse)
-	assert.NoError(t, err)
-	assert.Equal(t, "accessToken", registerResponse.AccessToken)
+
+	refreshTokenCookie := res.Result().Cookies()[0]
+	assert.Equal(t, "refresh_token", refreshTokenCookie.Name)
+	assert.Equal(t, "refreshToken", refreshTokenCookie.Value)
+	assert.True(t, refreshTokenCookie.HttpOnly)
+	assert.True(t, refreshTokenCookie.Secure)
+	assert.Equal(t, http.SameSiteStrictMode, refreshTokenCookie.SameSite)
+
+	accessTokenCookie := res.Result().Cookies()[1]
+	assert.Equal(t, "access_token", accessTokenCookie.Name)
+	assert.Equal(t, "accessToken", accessTokenCookie.Value)
+	assert.True(t, accessTokenCookie.HttpOnly)
+	assert.True(t, accessTokenCookie.Secure)
+	assert.Equal(t, http.SameSiteStrictMode, accessTokenCookie.SameSite)
 }
 
 func TestAuthRegisterHandler_unauthorized(t *testing.T) {
@@ -63,9 +78,9 @@ func TestAuthRegisterHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return("", errors.New("unauthorized"))
+	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
-	handler := NewAuthRegisterHandler(service)
+	handler := NewAuthRegisterHandler(service, true)
 
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	res := httptest.NewRecorder()

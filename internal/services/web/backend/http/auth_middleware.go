@@ -27,7 +27,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 
 				t, err := r.Refresh(req.Context(), cr.Value)
 				if err != nil {
-					slog.Error("refresh failed", err.Error())
+					slog.Error("refresh failed", "error", err.Error())
 					http.Error(res, "unauthorized", http.StatusUnauthorized)
 
 					// clear cookies
@@ -71,7 +71,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 
 				user, err := v.VerifyAndUser(req.Context(), t.AccessToken)
 				if err != nil {
-					slog.Error("verify after refresh failed", err.Error())
+					slog.Error("verify after refresh failed", "error", err.Error())
 					http.Error(res, "unauthorized", http.StatusUnauthorized)
 
 					return
@@ -90,7 +90,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 				cr, rerr := req.Cookie("refresh_token")
 
 				if rerr != nil || cr.Value == "" {
-					slog.Error("verify failed and no refresh_token cookie", err.Error())
+					slog.Error("verify failed and no refresh_token cookie", "error", err.Error())
 					http.Error(res, "unauthorized", http.StatusUnauthorized)
 
 					return
@@ -98,7 +98,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 
 				t, rerr := r.Refresh(req.Context(), cr.Value)
 				if rerr != nil {
-					slog.Error("refresh failed", rerr.Error())
+					slog.Error("refresh failed", "error", rerr.Error())
 					http.Error(res, "unauthorized", http.StatusUnauthorized)
 
 					return
@@ -126,7 +126,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 
 				user, err = v.VerifyAndUser(req.Context(), t.AccessToken)
 				if err != nil {
-					slog.Error("verify after refresh failed", err.Error())
+					slog.Error("verify after refresh failed", "error", err.Error())
 					http.Error(res, "unauthorized", http.StatusUnauthorized)
 
 					return

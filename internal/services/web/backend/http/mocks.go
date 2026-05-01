@@ -75,6 +75,11 @@ func (m *ServiceMock) SignIn(ctx context.Context, email, password string) (backe
 	return args.Get(0).(backend.Tokens), args.Error(1)
 }
 
+func (m *ServiceMock) Revoke(ctx context.Context, refreshToken string) error {
+	args := m.Called(ctx, refreshToken)
+	return args.Error(0)
+}
+
 type TokenVerifierMock struct {
 	mock.Mock
 }
@@ -83,7 +88,20 @@ func NewTokenVerifierMock() *TokenVerifierMock {
 	return &TokenVerifierMock{}
 }
 
-func (m *TokenVerifierMock) VerifyAndUser(ctx context.Context, accessToken string) (string, error) {
+func (m *TokenVerifierMock) VerifyAndUser(ctx context.Context, accessToken string) (*backend.User, error) {
 	args := m.Called(ctx, accessToken)
-	return args.String(0), args.Error(1)
+	return args.Get(0).(*backend.User), args.Error(1)
+}
+
+type TokenRefresherMock struct {
+	mock.Mock
+}
+
+func NewTokenRefresherMock() *TokenRefresherMock {
+	return &TokenRefresherMock{}
+}
+
+func (m *TokenRefresherMock) Refresh(ctx context.Context, refreshToken string) (backend.Tokens, error) {
+	args := m.Called(ctx, refreshToken)
+	return args.Get(0).(backend.Tokens), args.Error(1)
 }

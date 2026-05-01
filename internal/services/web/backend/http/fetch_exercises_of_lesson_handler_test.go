@@ -41,8 +41,9 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	service.On("FetchExercises", mock.Anything, backend.Lesson{Id: lessonId}, oldestExerciseID, "100").Return(exercises, nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewFetchExercisesOfLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
 
 	u, _ := url.Parse("/")
 	params := u.Query()
@@ -50,10 +51,8 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	params.Add("oldest_exercise_id", strconv.Itoa(oldestExerciseID))
 	u.RawQuery = params.Encode()
 
-	req := &http.Request{}
-	req.URL = u
-	req.Header = make(map[string][]string)
-	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 
@@ -75,21 +74,24 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	assert.Equal(t, exercises[0].GoodAnswersToday, result[0].GoodAnswersToday)
 	assert.Equal(t, exercises[0].LatestGoodAnswer.Time.Format("Mon Jan 2 15:04:05"), result[0].LatestGoodAnswer.Time.Format("Mon Jan 2 15:04:05"))
 	assert.Equal(t, exercises[0].LatestGoodAnswerWasToday, result[0].LatestGoodAnswerWasToday)
+
+	service.AssertExpectations(t)
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
 }
 
 func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewFetchExercisesOfLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
 
 	u, _ := url.Parse("/")
 
-	req := &http.Request{}
-	req.URL = u
-	req.Header = make(map[string][]string)
-	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 

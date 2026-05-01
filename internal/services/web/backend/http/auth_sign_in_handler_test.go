@@ -27,10 +27,15 @@ func TestNewAuthSignInHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	service := NewServiceMock()
-	service.On("SignIn", ctx, input.Email, input.Password).Return("accessToken", nil)
+	tokens := backend.Tokens{
+		AccessToken:  "accessToken",
+		RefreshToken: "refreshToken",
+	}
 
-	handler := NewAuthSignInHandler(service)
+	service := NewServiceMock()
+	service.On("SignIn", ctx, input.Email, input.Password).Return(tokens, nil)
+
+	handler := NewAuthSignInHandler(service, true)
 
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	res := httptest.NewRecorder()
@@ -39,10 +44,20 @@ func TestNewAuthSignInHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.Code)
 	service.AssertExpectations(t)
-	var signInResponse backend.SignInResponse
-	err = json.Unmarshal(res.Body.Bytes(), &signInResponse)
-	assert.NoError(t, err)
-	assert.Equal(t, "accessToken", signInResponse.AccessToken)
+
+	refreshTokenCookie := res.Result().Cookies()[0]
+	assert.Equal(t, "refresh_token", refreshTokenCookie.Name)
+	assert.Equal(t, "refreshToken", refreshTokenCookie.Value)
+	assert.True(t, refreshTokenCookie.HttpOnly)
+	assert.True(t, refreshTokenCookie.Secure)
+	assert.Equal(t, http.SameSiteStrictMode, refreshTokenCookie.SameSite)
+
+	accessTokenCookie := res.Result().Cookies()[1]
+	assert.Equal(t, "access_token", accessTokenCookie.Name)
+	assert.Equal(t, "accessToken", accessTokenCookie.Value)
+	assert.True(t, accessTokenCookie.HttpOnly)
+	assert.True(t, accessTokenCookie.Secure)
+	assert.Equal(t, http.SameSiteStrictMode, accessTokenCookie.SameSite)
 }
 
 func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
@@ -59,9 +74,9 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", ctx, input.Email, input.Password).Return("", errors.New("unauthorized"))
+	service.On("SignIn", ctx, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
-	handler := NewAuthSignInHandler(service)
+	handler := NewAuthSignInHandler(service, true)
 
 	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
 	res := httptest.NewRecorder()

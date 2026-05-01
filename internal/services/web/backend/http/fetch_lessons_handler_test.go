@@ -19,14 +19,13 @@ func TestFetchLessonsHandler(t *testing.T) {
 	service.On("FetchLessons", mock.Anything, "100").Return(lessons, nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewFetchLessonsHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewFetchLessonsHandler(service))
 
 	res := httptest.NewRecorder()
-	req := &http.Request{}
-	req.Header = make(map[string][]string)
-	// { "sub": "100" }
-	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
 
@@ -35,6 +34,9 @@ func TestFetchLessonsHandler(t *testing.T) {
 	var result backend.Lessons
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-
 	assert.Equal(t, lessons, result)
+
+	service.AssertExpectations(t)
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
 }

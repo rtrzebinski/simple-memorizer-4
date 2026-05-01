@@ -23,41 +23,41 @@ func TestHydrateLessonHandler(t *testing.T) {
 	service.On("HydrateLesson", mock.Anything, lesson, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewHydrateLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHydrateLessonHandler(service))
 
 	u, _ := url.Parse("/")
 	params := u.Query()
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
-	req := &http.Request{}
-	req.URL = u
-	req.Header = make(map[string][]string)
-	// { "sub": "100" }
-	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 
 	route.ServeHTTP(res, req)
 
 	assert.Equal(t, http.StatusOK, res.Code)
+
+	service.AssertExpectations(t)
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
 }
 
 func TestHydrateLessonHandler_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewHydrateLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHydrateLessonHandler(service))
 
 	u, _ := url.Parse("/")
 
-	req := &http.Request{}
-	req.URL = u
-	req.Header = make(map[string][]string)
-	// { "sub": "100" }
-	req.Header.Set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 
@@ -70,4 +70,8 @@ func TestHydrateLessonHandler_invalidInput(t *testing.T) {
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
+
+	service.AssertExpectations(t)
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
 }

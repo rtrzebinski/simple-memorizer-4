@@ -1,12 +1,12 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/guregu/null/v5"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 	"github.com/stretchr/testify/suite"
@@ -28,7 +28,7 @@ func TestClientSuite(t *testing.T) {
 }
 
 func (suite *ClientSuite) TestClient_FetchLessons() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	lessons := []frontend.Lesson{{Name: "name"}}
 
@@ -39,17 +39,16 @@ func (suite *ClientSuite) TestClient_FetchLessons() {
 	route := http.FetchLessons
 	params := map[string]string(nil)
 	reqBody := []byte(nil)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.client.FetchLessons(ctx, accessToken)
+	result, err := suite.client.FetchLessons(ctx)
 	suite.Assert().NoError(err)
 	suite.Assert().Equal(lessons, result)
 }
 
 func (suite *ClientSuite) TestClient_HydrateLesson() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	lesson := &frontend.Lesson{Id: 10}
 
@@ -60,16 +59,15 @@ func (suite *ClientSuite) TestClient_HydrateLesson() {
 	route := http.HydrateLesson
 	params := map[string]string{"lesson_id": "10"}
 	reqBody := []byte(nil)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody)
 
-	err = suite.client.HydrateLesson(ctx, lesson, accessToken)
+	err = suite.client.HydrateLesson(ctx, lesson)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_FetchExercises() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	lesson := frontend.Lesson{Id: 1}
 	exercises := []frontend.Exercise{
@@ -113,11 +111,10 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 	route := http.FetchExercises
 	params := map[string]string{"lesson_id": "1", "oldest_exercise_id": "1"}
 	reqBody := []byte(nil)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody)
 
-	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, oldestExerciseID, accessToken)
+	result, err := suite.client.FetchExercises(ctx, frontend.Lesson{Id: lesson.Id}, oldestExerciseID)
 
 	suite.Nil(err)
 	suite.Equal(expectedExercises[0].Id, result[0].Id)
@@ -135,7 +132,7 @@ func (suite *ClientSuite) TestClient_FetchExercises() {
 }
 
 func (suite *ClientSuite) TestClient_UpsertLesson() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	lesson := frontend.Lesson{}
 
@@ -144,16 +141,15 @@ func (suite *ClientSuite) TestClient_UpsertLesson() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.UpsertLesson(ctx, lesson, accessToken)
+	err = suite.client.UpsertLesson(ctx, lesson)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_DeleteLesson() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	lesson := frontend.Lesson{}
 
@@ -162,16 +158,15 @@ func (suite *ClientSuite) TestClient_DeleteLesson() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(lesson)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.DeleteLesson(ctx, lesson, accessToken)
+	err = suite.client.DeleteLesson(ctx, lesson)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_UpsertExercise() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	exercise := frontend.Exercise{}
 
@@ -180,16 +175,15 @@ func (suite *ClientSuite) TestClient_UpsertExercise() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.UpsertExercise(ctx, exercise, accessToken)
+	err = suite.client.UpsertExercise(ctx, exercise)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_StoreExercises() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	var exercises []frontend.Exercise
 
@@ -198,16 +192,15 @@ func (suite *ClientSuite) TestClient_StoreExercises() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercises)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.StoreExercises(ctx, exercises, accessToken)
+	err = suite.client.StoreExercises(ctx, exercises)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_DeleteExercise() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	exercise := frontend.Exercise{}
 
@@ -216,16 +209,15 @@ func (suite *ClientSuite) TestClient_DeleteExercise() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(exercise)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.DeleteExercise(ctx, exercise, accessToken)
+	err = suite.client.DeleteExercise(ctx, exercise)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_StoreResult() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	result := frontend.Result{}
 
@@ -234,22 +226,17 @@ func (suite *ClientSuite) TestClient_StoreResult() {
 	params := map[string]string(nil)
 	reqBody, err := json.Marshal(result)
 	suite.Assert().NoError(err)
-	accessToken := "accessToken"
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, accessToken).Return([]byte(""))
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""))
 
-	err = suite.client.StoreResult(ctx, result, accessToken)
+	err = suite.client.StoreResult(ctx, result)
 	suite.Assert().NoError(err)
 }
 
 func (suite *ClientSuite) TestClient_AuthRegister() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	req := frontend.RegisterRequest{}
-	resp := frontend.RegisterResponse{}
-
-	responseBody, err := json.Marshal(resp)
-	suite.Assert().NoError(err)
 
 	method := "POST"
 	route := http.AuthRegister
@@ -257,21 +244,16 @@ func (suite *ClientSuite) TestClient_AuthRegister() {
 	reqBody, err := json.Marshal(req)
 	suite.Assert().NoError(err)
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, "").Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""), nil)
 
-	result, err := suite.client.AuthRegister(ctx, req)
+	err = suite.client.AuthRegister(ctx, req)
 	suite.Assert().NoError(err)
-	suite.Assert().Equal(resp, result)
 }
 
 func (suite *ClientSuite) TestClient_AuthSignIn() {
-	ctx := context.Background()
+	ctx := app.Context{Context: suite.T().Context()}
 
 	req := frontend.SignInRequest{}
-	resp := frontend.SignInResponse{}
-
-	responseBody, err := json.Marshal(resp)
-	suite.Assert().NoError(err)
 
 	method := "POST"
 	route := http.AuthSignIn
@@ -279,9 +261,45 @@ func (suite *ClientSuite) TestClient_AuthSignIn() {
 	reqBody, err := json.Marshal(req)
 	suite.Assert().NoError(err)
 
-	suite.caller.On("Call", ctx, method, route, params, reqBody, "").Return(responseBody)
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""), nil)
 
-	result, err := suite.client.AuthSignIn(ctx, req)
+	err = suite.client.AuthSignIn(ctx, req)
 	suite.Assert().NoError(err)
-	suite.Assert().Equal(resp, result)
+}
+
+func (suite *ClientSuite) TestClient_AuthLogout() {
+	ctx := app.Context{Context: suite.T().Context()}
+
+	method := "POST"
+	route := http.AuthLogout
+	params := map[string]string(nil)
+	reqBody := []byte(nil)
+
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return([]byte(""), nil)
+
+	err := suite.client.AuthLogout(ctx)
+	suite.Assert().NoError(err)
+}
+
+func (suite *ClientSuite) TestClient_UserProfile() {
+	ctx := app.Context{Context: suite.T().Context()}
+
+	user := &frontend.UserProfile{
+		Name:  "John Doe",
+		Email: "john@example.com",
+	}
+
+	responseBody, err := json.Marshal(user)
+	suite.Assert().NoError(err)
+
+	method := "POST"
+	route := http.UserProfile
+	params := map[string]string(nil)
+	reqBody := []byte(nil)
+
+	suite.caller.On("Call", ctx, method, route, params, reqBody).Return(responseBody, nil)
+
+	result, err := suite.client.UserProfile(ctx)
+	suite.Assert().NoError(err)
+	suite.Assert().Equal(user, result)
 }

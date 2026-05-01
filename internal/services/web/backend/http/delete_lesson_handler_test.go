@@ -28,18 +28,19 @@ func TestDeleteLessonHandler(t *testing.T) {
 	service.On("DeleteLesson", mock.Anything, input, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewDeleteLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewDeleteLessonHandler(service))
 
 	res := httptest.NewRecorder()
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
-	req.Header = make(map[string][]string)
-	// { "sub": "100" }
-	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodDelete, "/", io.NopCloser(strings.NewReader(string(body))))
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
 
 	service.AssertExpectations(t)
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
 }
 
 func TestDeleteLessonHandler_invalidInput(t *testing.T) {
@@ -53,14 +54,13 @@ func TestDeleteLessonHandler_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUserID", mock.Anything, mock.Anything).Return("100", nil)
-	route := RequireAuth(v)(NewDeleteLessonHandler(service))
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewDeleteLessonHandler(service))
 
 	res := httptest.NewRecorder()
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
-	req.Header = make(map[string][]string)
-	// { "sub": "100" }
-	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAifQ.bEOa2kaRwC1f7Ow-7WgSltYq-Vz9JUDCo3EPe7KEXd8")
+	req, _ := http.NewRequest(http.MethodDelete, "/", io.NopCloser(strings.NewReader(string(body))))
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
 
@@ -71,4 +71,8 @@ func TestDeleteLessonHandler_invalidInput(t *testing.T) {
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateLessonIdentified(input).Error(), result)
+
+	v.AssertExpectations(t)
+	r.AssertExpectations(t)
+	service.AssertExpectations(t)
 }
