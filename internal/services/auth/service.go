@@ -23,19 +23,20 @@ type Tokens struct {
 }
 
 type Service struct {
-	kc  *gocloak.GoCloak
+	gc  GoCloak
 	cfg Config
 }
 
-func NewService(kc *gocloak.GoCloak, cfg Config) *Service {
+func NewService(kc GoCloak, cfg Config) *Service {
 	return &Service{
-		kc:  kc,
+		gc:  kc,
 		cfg: cfg,
 	}
 }
 
+// Register a new user and return tokens for the new user
 func (s *Service) Register(ctx context.Context, firstName, lastName, email, password string) (Tokens, error) {
-	adminTok, err := s.kc.LoginClient(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
+	adminTok, err := s.gc.LoginClient(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("login client: %w", err)
 	}
@@ -51,17 +52,17 @@ func (s *Service) Register(ctx context.Context, firstName, lastName, email, pass
 		RequiredActions: &empty,
 	}
 
-	userID, err := s.kc.CreateUser(ctx, adminTok.AccessToken, s.cfg.Realm, u)
+	userID, err := s.gc.CreateUser(ctx, adminTok.AccessToken, s.cfg.Realm, u)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("create user: %w", err)
 	}
 
-	err = s.kc.SetPassword(ctx, adminTok.AccessToken, userID, s.cfg.Realm, password, false)
+	err = s.gc.SetPassword(ctx, adminTok.AccessToken, userID, s.cfg.Realm, password, false)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("set password: %w", err)
 	}
 
-	err = s.kc.UpdateUser(ctx, adminTok.AccessToken, s.cfg.Realm, gocloak.User{
+	err = s.gc.UpdateUser(ctx, adminTok.AccessToken, s.cfg.Realm, gocloak.User{
 		ID:              &userID,
 		RequiredActions: &empty,
 		EmailVerified:   gocloak.BoolP(true),
@@ -71,7 +72,7 @@ func (s *Service) Register(ctx context.Context, firstName, lastName, email, pass
 		return Tokens{}, fmt.Errorf("clear required actions: %w", err)
 	}
 
-	t, err := s.kc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
+	t, err := s.gc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("login new user: %w", err)
 	}
@@ -86,8 +87,9 @@ func (s *Service) Register(ctx context.Context, firstName, lastName, email, pass
 	}, nil
 }
 
+// SignIn an existing user and return tokens
 func (s *Service) SignIn(ctx context.Context, email, password string) (Tokens, error) {
-	t, err := s.kc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
+	t, err := s.gc.Login(ctx, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm, email, password)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("login user: %w", err)
 	}
@@ -102,8 +104,9 @@ func (s *Service) SignIn(ctx context.Context, email, password string) (Tokens, e
 	}, nil
 }
 
+// Refresh the access token using the refresh token and return new tokens
 func (s *Service) Refresh(ctx context.Context, refreshToken string) (Tokens, error) {
-	t, err := s.kc.RefreshToken(ctx, refreshToken, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
+	t, err := s.gc.RefreshToken(ctx, refreshToken, s.cfg.ClientID, s.cfg.ClientSecret, s.cfg.Realm)
 	if err != nil {
 		return Tokens{}, fmt.Errorf("refresh: %w", err)
 	}
@@ -120,7 +123,7 @@ func (s *Service) Refresh(ctx context.Context, refreshToken string) (Tokens, err
 
 // Revoke the refresh token and all access tokens derived from it
 func (s *Service) Revoke(ctx context.Context, refreshToken string) error {
-	err := s.kc.RevokeToken(ctx, s.cfg.Realm, s.cfg.ClientID, s.cfg.ClientSecret, refreshToken)
+	err := s.gc.RevokeToken(ctx, s.cfg.Realm, s.cfg.ClientID, s.cfg.ClientSecret, refreshToken)
 	if err != nil {
 		return fmt.Errorf("revoke: %w", err)
 	}
