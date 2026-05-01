@@ -24,6 +24,11 @@ func NewAuthRegisterHandler(s Service, secure bool) *AuthRegisterHandler {
 func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
+	if req.Method != http.MethodPost {
+		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	var registerRequest backend.RegisterRequest
 
 	err := json.NewDecoder(req.Body).Decode(&registerRequest)

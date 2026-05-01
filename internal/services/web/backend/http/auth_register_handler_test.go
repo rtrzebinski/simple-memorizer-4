@@ -39,7 +39,8 @@ func TestAuthRegisterHandler(t *testing.T) {
 
 	handler := NewAuthRegisterHandler(service, true)
 
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
+	req, err := http.NewRequest(http.MethodPost, AuthRegister, io.NopCloser(strings.NewReader(string(body))))
+	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 
 	handler.ServeHTTP(res, req)
@@ -82,7 +83,8 @@ func TestAuthRegisterHandler_unauthorized(t *testing.T) {
 
 	handler := NewAuthRegisterHandler(service, true)
 
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
+	req, err := http.NewRequest(http.MethodPost, AuthRegister, io.NopCloser(strings.NewReader(string(body))))
+	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 
 	handler.ServeHTTP(res, req)

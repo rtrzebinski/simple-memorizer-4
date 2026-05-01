@@ -34,7 +34,7 @@ func TestUpsertExerciseHandler(t *testing.T) {
 	route := Auth(v, r, false)(NewUpsertExerciseHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -60,7 +60,7 @@ func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
 	route := Auth(v, r, false)(NewUpsertExerciseHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)

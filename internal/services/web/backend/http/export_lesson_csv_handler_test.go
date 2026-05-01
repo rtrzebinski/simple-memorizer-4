@@ -43,13 +43,13 @@ func TestExportLessonCsvHandler(t *testing.T) {
 
 	route := NewExportLessonCsvHandler(service)
 
-	u, _ := url.Parse("/")
+	u, _ := url.Parse(ExportLessonCsv)
 	params := u.Query()
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
 
-	req := &http.Request{}
-	req.URL = u
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	assert.NoError(t, err)
 
 	res := httptest.NewRecorder()
 
@@ -67,10 +67,8 @@ func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
 
 	route := NewExportLessonCsvHandler(service)
 
-	u, _ := url.Parse("/")
-
-	req := &http.Request{}
-	req.URL = u
+	req, err := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
+	assert.NoError(t, err)
 
 	res := httptest.NewRecorder()
 
@@ -80,7 +78,7 @@ func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
 
 	var result string
 
-	err := json.Unmarshal(res.Body.Bytes(), &result)
+	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
 }

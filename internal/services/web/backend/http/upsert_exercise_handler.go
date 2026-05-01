@@ -22,6 +22,11 @@ func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
 func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
+	if req.Method != http.MethodPost {
+		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	userID, ok := auth.UserIDFromContext(ctx)
 	if !ok || userID == "" {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)

@@ -203,7 +203,7 @@ func (s *Client) AuthLogout(ctx app.Context) error {
 }
 
 func (s *Client) UserProfile(ctx app.Context) (*frontend.UserProfile, error) {
-	respBody, err := s.c.Call(ctx, "POST", http.UserProfile, nil, nil)
+	respBody, err := s.c.Call(ctx, "GET", http.UserProfile, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to perform HTTP request: %w", err)
 	}

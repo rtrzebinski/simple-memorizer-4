@@ -292,7 +292,7 @@ func (suite *ClientSuite) TestClient_UserProfile() {
 	responseBody, err := json.Marshal(user)
 	suite.Assert().NoError(err)
 
-	method := "POST"
+	method := "GET"
 	route := http.UserProfile
 	params := map[string]string(nil)
 	reqBody := []byte(nil)

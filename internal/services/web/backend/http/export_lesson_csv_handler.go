@@ -24,6 +24,11 @@ func NewExportLessonCsvHandler(s Service) *ExportLessonCsvHandler {
 func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
+	if req.Method != http.MethodGet {
+		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	lessonId, err := strconv.Atoi(req.URL.Query().Get("lesson_id"))
 	if err != nil {
 		log.Print(fmt.Errorf("failed to get a lesson_id: %w", err))

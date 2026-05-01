@@ -33,7 +33,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	route := Auth(v, r, false)(NewDeleteExerciseHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/", io.NopCloser(strings.NewReader(string(body))))
+	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -59,7 +59,7 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 	route := Auth(v, r, false)(NewDeleteExerciseHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/", io.NopCloser(strings.NewReader(string(body))))
+	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)

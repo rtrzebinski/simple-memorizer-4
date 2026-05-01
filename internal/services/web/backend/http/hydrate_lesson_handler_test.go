@@ -27,7 +27,7 @@ func TestHydrateLessonHandler(t *testing.T) {
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHydrateLessonHandler(service))
 
-	u, _ := url.Parse("/")
+	u, _ := url.Parse(HydrateLesson)
 	params := u.Query()
 	params.Add("lesson_id", strconv.Itoa(lesson.Id))
 	u.RawQuery = params.Encode()
@@ -54,9 +54,7 @@ func TestHydrateLessonHandler_invalidInput(t *testing.T) {
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHydrateLessonHandler(service))
 
-	u, _ := url.Parse("/")
-
-	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, _ := http.NewRequest(http.MethodGet, HydrateLesson, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()

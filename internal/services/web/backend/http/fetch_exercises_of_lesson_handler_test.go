@@ -45,7 +45,7 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
 
-	u, _ := url.Parse("/")
+	u, _ := url.Parse(FetchExercises)
 	params := u.Query()
 	params.Add("lesson_id", strconv.Itoa(lessonId))
 	params.Add("oldest_exercise_id", strconv.Itoa(oldestExerciseID))
@@ -88,9 +88,7 @@ func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
 
-	u, _ := url.Parse("/")
-
-	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, _ := http.NewRequest(http.MethodGet, FetchExercises, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()

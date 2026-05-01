@@ -37,7 +37,8 @@ func TestNewAuthSignInHandler(t *testing.T) {
 
 	handler := NewAuthSignInHandler(service, true)
 
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
+	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
+	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 
 	handler.ServeHTTP(res, req)
@@ -78,7 +79,8 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 
 	handler := NewAuthSignInHandler(service, true)
 
-	req := &http.Request{Body: io.NopCloser(strings.NewReader(string(body)))}
+	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
+	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 
 	handler.ServeHTTP(res, req)

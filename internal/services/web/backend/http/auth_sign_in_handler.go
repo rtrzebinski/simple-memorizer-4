@@ -24,6 +24,11 @@ func NewAuthSignInHandler(s Service, secure bool) *AuthSignInHandler {
 func (h *AuthSignInHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
+	if req.Method != http.MethodPost {
+		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	var signInRequest backend.SignInRequest
 
 	err := json.NewDecoder(req.Body).Decode(&signInRequest)

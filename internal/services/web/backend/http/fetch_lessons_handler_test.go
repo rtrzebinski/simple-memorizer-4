@@ -24,7 +24,7 @@ func TestFetchLessonsHandler(t *testing.T) {
 	route := Auth(v, r, false)(NewFetchLessonsHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, FetchLessons, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)

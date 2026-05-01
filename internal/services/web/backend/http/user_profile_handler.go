@@ -20,6 +20,11 @@ func NewUserProfileHandler(v TokenVerifier) *UserProfileHandler {
 }
 
 func (h *UserProfileHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	profile, ok := auth.UserProfileFromContext(req.Context())
 	if !ok || profile == nil {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)

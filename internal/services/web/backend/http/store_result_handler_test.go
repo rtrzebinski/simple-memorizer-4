@@ -35,7 +35,7 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 	route := Auth(v, r, false)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -67,7 +67,7 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 	route := Auth(v, r, false)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -93,7 +93,7 @@ func TestStoreResultHandler_invalidInput(t *testing.T) {
 	route := Auth(v, r, false)(NewStoreResultHandler(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
