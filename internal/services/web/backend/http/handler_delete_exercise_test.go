@@ -76,3 +76,18 @@ func TestHandlerDeleteExercise_invalidInput(t *testing.T) {
 	r.AssertExpectations(t)
 	service.AssertExpectations(t)
 }
+
+func TestHandlerDeleteExercise_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerDeleteExercise(service))
+
+	res := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(`{}`)))
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}

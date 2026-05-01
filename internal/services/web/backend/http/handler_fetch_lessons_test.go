@@ -40,3 +40,18 @@ func TestHandlerFetchLessons(t *testing.T) {
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
+
+func TestHandlerFetchLessons_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerFetchLessons(service))
+
+	res := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, FetchLessons, nil)
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}

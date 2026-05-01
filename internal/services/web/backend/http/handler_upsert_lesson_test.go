@@ -76,3 +76,18 @@ func TestHandlerUpsertLesson_invalidInput(t *testing.T) {
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
+
+func TestHandlerUpsertLesson_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerUpsertLesson(service))
+
+	res := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, UpsertLesson, strings.NewReader(`{}`))
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}

@@ -73,3 +73,19 @@ func TestHandlerHydrateLesson_invalidInput(t *testing.T) {
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
+
+func TestHandlerHydrateLesson_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
+
+	req, _ := http.NewRequest(http.MethodGet, HydrateLesson, nil)
+
+	res := httptest.NewRecorder()
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}

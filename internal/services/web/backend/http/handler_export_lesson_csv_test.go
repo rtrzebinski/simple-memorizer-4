@@ -79,3 +79,19 @@ func TestHandlerExportLessonCsv_invalidInput(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
 }
+
+func TestHandlerExportLessonCsv_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
+
+	req, _ := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
+
+	res := httptest.NewRecorder()
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}

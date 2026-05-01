@@ -61,7 +61,8 @@ func TestHandlerFetchExercisesOfLesson(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.Code)
 
 	var result backend.Exercises
-	json.Unmarshal(res.Body.Bytes(), &result)
+	err := json.Unmarshal(res.Body.Bytes(), &result)
+	assert.NoError(t, err)
 
 	assert.Equal(t, exercises[0].Id, result[0].Id)
 	assert.Equal(t, exercises[0].Question, result[0].Question)
@@ -102,4 +103,20 @@ func TestHandlerFetchExercisesOfLesson_invalidInput(t *testing.T) {
 	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
 	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
+}
+
+func TestHandlerFetchExercisesOfLesson_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerFetchExercisesOfLesson(service))
+
+	req, _ := http.NewRequest(http.MethodGet, FetchExercises, nil)
+
+	res := httptest.NewRecorder()
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
 }

@@ -110,3 +110,18 @@ func TestHandlerStoreResult_invalidInput(t *testing.T) {
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
+
+func TestHandlerStoreResult_unauthorized(t *testing.T) {
+	service := NewServiceMock()
+
+	v := NewTokenVerifierMock()
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerStoreResult(service))
+
+	res := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(`{}`))
+
+	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}
