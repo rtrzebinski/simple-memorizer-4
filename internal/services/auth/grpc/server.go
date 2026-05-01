@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/keycloak"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -13,10 +12,10 @@ import (
 
 type Server struct {
 	gengrpc.UnimplementedAuthServiceServer
-	s *keycloak.Service
+	s KeycloakService
 }
 
-func NewServer(s *keycloak.Service) *Server {
+func NewServer(s KeycloakService) *Server {
 	return &Server{s: s}
 }
 
