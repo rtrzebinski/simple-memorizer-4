@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/keycloak"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/storage/postgres"
@@ -45,7 +45,7 @@ func main() {
 
 func execute(db *sql.DB, seedMethodNames ...string) {
 	kc := gocloak.NewClient("http://localhost:8180")
-	authSvc := auth.NewService(kc, auth.Config{
+	authSvc := keycloak.NewService(kc, keycloak.Config{
 		Realm:        "realm-dev",
 		ClientID:     "client-id-dev",
 		ClientSecret: "client-secret-dev",
@@ -81,7 +81,7 @@ type Seeder struct {
 	db            *sql.DB
 	backendWriter *postgres.WebWriter
 	workerWriter  *postgres.WorkerWriter
-	authSvc       *auth.Service
+	authSvc       *keycloak.Service
 }
 
 func seed(s Seeder, seedMethodName string) {

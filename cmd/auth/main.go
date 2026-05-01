@@ -14,8 +14,8 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	gengrpc "github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/probe"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth"
 	intgrpc "github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/grpc"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/auth/keycloak"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -95,7 +95,7 @@ func run(ctx context.Context) error {
 
 	// register auth service
 	kc := gocloak.NewClient(cfg.Keycloak.URL)
-	server := intgrpc.NewServer(auth.NewService(kc, auth.Config{
+	server := intgrpc.NewServer(keycloak.NewService(kc, keycloak.Config{
 		Realm:        cfg.Keycloak.Realm,
 		ClientID:     cfg.Keycloak.ClientID,
 		ClientSecret: cfg.Keycloak.ClientSecret,
