@@ -1,7 +1,6 @@
 package grpc
 
 import (
-	"context"
 	"testing"
 
 	"github.com/rtrzebinski/simple-memorizer-4/generated/proto/grpc"
@@ -12,7 +11,7 @@ import (
 func TestServer_Register(t *testing.T) {
 	mockSvc := new(KeycloakServiceMock)
 	s := NewServer(mockSvc)
-	ctx := context.Background()
+	ctx := t.Context()
 	request := &grpc.RegisterRequest{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -44,7 +43,7 @@ func TestServer_Register(t *testing.T) {
 func TestServer_SignIn(t *testing.T) {
 	mockSvc := new(KeycloakServiceMock)
 	s := NewServer(mockSvc)
-	ctx := context.Background()
+	ctx := t.Context()
 	request := &grpc.SignInRequest{
 		Email:    "john@example.com",
 		Password: "password123",
@@ -74,7 +73,7 @@ func TestServer_SignIn(t *testing.T) {
 func TestServer_Refresh(t *testing.T) {
 	mockSvc := new(KeycloakServiceMock)
 	s := NewServer(mockSvc)
-	ctx := context.Background()
+	ctx := t.Context()
 	request := &grpc.RefreshRequest{
 		RefreshToken: "refresh",
 	}
@@ -103,7 +102,7 @@ func TestServer_Refresh(t *testing.T) {
 func TestServer_Revoke(t *testing.T) {
 	mockSvc := new(KeycloakServiceMock)
 	s := NewServer(mockSvc)
-	ctx := context.Background()
+	ctx := t.Context()
 	request := &grpc.RevokeRequest{
 		RefreshToken: "refresh",
 	}

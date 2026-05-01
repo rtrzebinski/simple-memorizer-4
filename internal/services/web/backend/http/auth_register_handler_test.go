@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -12,11 +11,10 @@ import (
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAuthRegisterHandler(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.RegisterRequest{
 		FirstName: "firstname",
 		LastName:  "lastname",
@@ -35,7 +33,7 @@ func TestAuthRegisterHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return(tokens, nil)
+	service.On("Register", mock.Anything, input.FirstName, input.LastName, input.Email, input.Password).Return(tokens, nil)
 
 	handler := NewAuthRegisterHandler(service, true)
 
@@ -64,8 +62,6 @@ func TestAuthRegisterHandler(t *testing.T) {
 }
 
 func TestAuthRegisterHandler_unauthorized(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.RegisterRequest{
 		FirstName: "firstname",
 		LastName:  "lastname",
@@ -79,7 +75,7 @@ func TestAuthRegisterHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("Register", ctx, input.FirstName, input.LastName, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
+	service.On("Register", mock.Anything, input.FirstName, input.LastName, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
 	handler := NewAuthRegisterHandler(service, true)
 

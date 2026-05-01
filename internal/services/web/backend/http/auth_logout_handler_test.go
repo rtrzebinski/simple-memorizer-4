@@ -1,20 +1,18 @@
 package http
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAuthLogoutHandler(t *testing.T) {
-	ctx := context.Background()
-
 	service := NewServiceMock()
-	service.On("Revoke", ctx, "refreshToken").Return(nil)
+	service.On("Revoke", mock.Anything, "refreshToken").Return(nil)
 
 	handler := NewAuthLogoutHandler(service)
 
@@ -54,10 +52,8 @@ func TestAuthLogoutHandler_noRefreshCookie(t *testing.T) {
 }
 
 func TestAuthLogoutHandler_revokeFailed(t *testing.T) {
-	ctx := context.Background()
-
 	service := NewServiceMock()
-	service.On("Revoke", ctx, "refreshToken").Return(errors.New("revoke failed"))
+	service.On("Revoke", mock.Anything, "refreshToken").Return(errors.New("revoke failed"))
 
 	handler := NewAuthLogoutHandler(service)
 

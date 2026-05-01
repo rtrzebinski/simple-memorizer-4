@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -16,8 +15,6 @@ import (
 )
 
 func TestExportLessonCsvHandler(t *testing.T) {
-	ctx := context.Background()
-
 	exercise1 := backend.Exercise{
 		Id:       1,
 		Question: "question1",
@@ -36,8 +33,8 @@ func TestExportLessonCsvHandler(t *testing.T) {
 
 	oldestExerciseID := 1
 
-	service.On("FetchExercises", ctx, lesson, oldestExerciseID, "").Return(exercises, nil)
-	service.On("HydrateLesson", ctx, &lesson, "").Run(func(args mock.Arguments) {
+	service.On("FetchExercises", mock.Anything, lesson, oldestExerciseID, "").Return(exercises, nil)
+	service.On("HydrateLesson", mock.Anything, &lesson, "").Run(func(args mock.Arguments) {
 		args.Get(1).(*backend.Lesson).Name = "lesson name"
 	}).Return(nil)
 

@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-	"context"
 	"testing"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -24,7 +23,7 @@ func (suite *PublisherSuite) SetupTest() {
 }
 
 func (suite *PublisherSuite) TestPublisher_Publish_GoodAnswer() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 123
 
 	suite.senderMock.On("Send", ctx, mock.MatchedBy(func(e event.Event) bool {
@@ -48,7 +47,7 @@ func (suite *PublisherSuite) TestPublisher_Publish_GoodAnswer() {
 }
 
 func (suite *PublisherSuite) TestPublisher_Publish_BadAnswer() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 456
 
 	suite.senderMock.On("Send", ctx, mock.MatchedBy(func(e event.Event) bool {

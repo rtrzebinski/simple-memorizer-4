@@ -1,7 +1,6 @@
 package keycloak
 
 import (
-	"context"
 	"testing"
 
 	"github.com/Nerzal/gocloak/v13"
@@ -13,7 +12,7 @@ func TestService_Register(t *testing.T) {
 	mockKC := new(GoCloakMock)
 	cfg := Config{Realm: "realm", ClientID: "cid", ClientSecret: "csecret"}
 	service := NewService(mockKC, cfg)
-	ctx := context.Background()
+	ctx := t.Context()
 
 	adminJWT := &gocloak.JWT{AccessToken: "admin-token"}
 	mockKC.On("LoginClient", ctx, cfg.ClientID, cfg.ClientSecret, cfg.Realm).Return(adminJWT, nil)
@@ -39,7 +38,7 @@ func TestService_SignIn(t *testing.T) {
 	mockKC := new(GoCloakMock)
 	cfg := Config{Realm: "realm", ClientID: "cid", ClientSecret: "csecret"}
 	service := NewService(mockKC, cfg)
-	ctx := context.Background()
+	ctx := t.Context()
 	jwt := &gocloak.JWT{AccessToken: "at", IDToken: "idt", ExpiresIn: 1, RefreshExpiresIn: 2, RefreshToken: "rt", TokenType: "tt"}
 	mockKC.On("Login", ctx, cfg.ClientID, cfg.ClientSecret, cfg.Realm, "email", "pass").Return(jwt, nil)
 
@@ -59,7 +58,7 @@ func TestService_Refresh(t *testing.T) {
 	mockKC := new(GoCloakMock)
 	cfg := Config{Realm: "realm", ClientID: "cid", ClientSecret: "csecret"}
 	service := NewService(mockKC, cfg)
-	ctx := context.Background()
+	ctx := t.Context()
 	jwt := &gocloak.JWT{AccessToken: "at", IDToken: "idt", ExpiresIn: 1, RefreshExpiresIn: 2, RefreshToken: "rt", TokenType: "tt"}
 	mockKC.On("RefreshToken", ctx, "refresh", cfg.ClientID, cfg.ClientSecret, cfg.Realm).Return(jwt, nil)
 
@@ -79,7 +78,7 @@ func TestService_Revoke(t *testing.T) {
 	mockKC := new(GoCloakMock)
 	cfg := Config{Realm: "realm", ClientID: "cid", ClientSecret: "csecret"}
 	service := NewService(mockKC, cfg)
-	ctx := context.Background()
+	ctx := t.Context()
 	mockKC.On("RevokeToken", ctx, cfg.Realm, cfg.ClientID, cfg.ClientSecret, "refresh").Return(nil)
 
 	err := service.Revoke(ctx, "refresh")

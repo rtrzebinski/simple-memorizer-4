@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
@@ -28,7 +27,7 @@ func TestServiceSuite(t *testing.T) {
 }
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 
 	exerciseID := 1
 	result := Result{
@@ -59,7 +58,7 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Success() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 
 	exerciseID := 1
 	result := Result{
@@ -78,7 +77,7 @@ func (suite *ServiceSuite) TestService_ProcessGoodAnswer_Error() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 
 	exerciseID := 2
 	result := Result{
@@ -109,7 +108,7 @@ func (suite *ServiceSuite) TestService_ProcessBadAnswer_Success() {
 }
 
 func (suite *ServiceSuite) TestService_ProcessBadAnswer_Error() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 
 	exerciseID := 2
 	result := Result{

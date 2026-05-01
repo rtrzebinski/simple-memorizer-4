@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -12,11 +11,10 @@ import (
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNewAuthSignInHandler(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.SignInRequest{
 		Email:    "email",
 		Password: "password",
@@ -33,7 +31,7 @@ func TestNewAuthSignInHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", ctx, input.Email, input.Password).Return(tokens, nil)
+	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(tokens, nil)
 
 	handler := NewAuthSignInHandler(service, true)
 
@@ -62,8 +60,6 @@ func TestNewAuthSignInHandler(t *testing.T) {
 }
 
 func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
-	ctx := context.Background()
-
 	input := backend.SignInRequest{
 		Email:    "email",
 		Password: "password",
@@ -75,7 +71,7 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", ctx, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
+	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
 	handler := NewAuthSignInHandler(service, true)
 

@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-	"context"
 	"testing"
 
 	cprotobuf "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
@@ -31,7 +30,7 @@ func (suite *HandlerSuite) SetupTest() {
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Success() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 1
 	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
@@ -50,7 +49,7 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Success() {
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 1
 	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
@@ -69,7 +68,7 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Success() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 2
 	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
@@ -88,7 +87,7 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Success() {
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	exerciseID := 2
 	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
 	e := event.New()
@@ -107,7 +106,7 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_UnknownEventType() {
-	ctx := context.Background()
+	ctx := suite.T().Context()
 	e := event.New()
 	e.SetType("unknown_event_type")
 
