@@ -25,7 +25,7 @@ func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string,
 	// read
 	http.Handle(FetchLessons, Auth(v, rfr, secure)(NewHandlerFetchLessons(s)))
 	http.Handle(HydrateLesson, Auth(v, rfr, secure)(NewHandlerHydrateLesson(s)))
-	http.Handle(FetchExercises, Auth(v, rfr, secure)(NewHandlerFetchExercisesOfLesson(s)))
+	http.Handle(FetchExercises, Auth(v, rfr, secure)(NewHandlerFetchExercises(s)))
 	http.Handle(UserProfile, Auth(v, rfr, secure)(NewUserProfileHandler(v)))
 
 	// write

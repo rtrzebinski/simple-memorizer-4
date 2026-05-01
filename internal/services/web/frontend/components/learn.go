@@ -69,20 +69,20 @@ func (compo *Learn) OnMount(ctx app.Context) {
 		oldestExerciseID = 1
 	}
 
-	exercisesOfLesson, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID)
+	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID)
 	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
+		app.Log(fmt.Errorf("failed to fetch exercises: %w", err))
 
 		return
 	}
 
 	// convert into map that is needed for a memorizer service
-	var exercises = make(map[int]frontend.Exercise)
-	for _, e := range exercisesOfLesson {
-		exercises[e.Id] = e
+	var exercisesMap = make(map[int]frontend.Exercise)
+	for _, e := range exercises {
+		exercisesMap[e.Id] = e
 	}
 
-	compo.memorizer.Init(exercises)
+	compo.memorizer.Init(exercisesMap)
 
 	compo.handleNextExercise()
 	compo.bindKeys(ctx)

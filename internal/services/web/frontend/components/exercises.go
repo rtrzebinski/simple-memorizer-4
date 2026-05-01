@@ -60,7 +60,7 @@ func (compo *Exercises) OnMount(ctx app.Context) {
 	compo.lesson = frontend.Lesson{Id: lessonId}
 
 	compo.hydrateLesson(ctx)
-	compo.displayExercisesOfLesson(ctx)
+	compo.displayExercises(ctx)
 }
 
 // hydrateLesson fetch lesson details
@@ -180,7 +180,7 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	e.Get("target").Set("value", "")
 
 	compo.hydrateLesson(ctx)
-	compo.displayExercisesOfLesson(ctx)
+	compo.displayExercises(ctx)
 }
 
 // readFile some JS magic converting uploaded file to a slice of bytes
@@ -210,12 +210,12 @@ func readFile(file app.Value) (data []byte, err error) {
 	return data, err
 }
 
-// displayExercisesOfLesson fetch exercises and display them
-func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
+// displayExercises fetch exercises of a lesson and display them
+func (compo *Exercises) displayExercises(ctx app.Context) {
 	oldestExerciseID := 1 // Set the oldest exercise ID to 1, as we are displaying all exercises
 	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID)
 	if err != nil {
-		app.Log(fmt.Errorf("failed to fetch exercises of lesson: %w", err))
+		app.Log(fmt.Errorf("failed to fetch exercises: %w", err))
 	}
 
 	// no entries
@@ -246,7 +246,7 @@ func (compo *Exercises) displayExercisesOfLesson(ctx app.Context) {
 // exerciseEditDone is called when the edit form is submitted or cancelled
 func (compo *Exercises) exerciseEditDone(ctx app.Context) {
 	compo.hydrateLesson(ctx)
-	compo.displayExercisesOfLesson(ctx)
+	compo.displayExercises(ctx)
 }
 
 // getLesson returns the lesson associated with the Exercises component
