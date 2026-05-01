@@ -12,15 +12,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type FetchExercisesOfLessonHandler struct {
+type HandlerFetchExercisesOfLesson struct {
 	s Service
 }
 
-func NewFetchExercisesOfLessonHandler(s Service) *FetchExercisesOfLessonHandler {
-	return &FetchExercisesOfLessonHandler{s: s}
+func NewHandlerFetchExercisesOfLesson(s Service) *HandlerFetchExercisesOfLesson {
+	return &HandlerFetchExercisesOfLesson{s: s}
 }
 
-func (h *FetchExercisesOfLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerFetchExercisesOfLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodGet {

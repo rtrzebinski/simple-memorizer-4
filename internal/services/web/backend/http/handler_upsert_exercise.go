@@ -11,15 +11,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type DeleteExerciseHandler struct {
+type HandlerUpsertExercise struct {
 	s Service
 }
 
-func NewDeleteExerciseHandler(s Service) *DeleteExerciseHandler {
-	return &DeleteExerciseHandler{s: s}
+func NewHandlerUpsertExercise(s Service) *HandlerUpsertExercise {
+	return &HandlerUpsertExercise{s: s}
 }
 
-func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerUpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -37,13 +37,13 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 	err := json.NewDecoder(req.Body).Decode(&exercise)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode DeleteExerciseHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerUpsertExercise HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateExerciseIdentified(exercise)
+	validator := validation.ValidateUpsertExercise(exercise, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -51,7 +51,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode DeleteExerciseHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode HandlerUpsertExercise HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -59,7 +59,7 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write DeleteExerciseHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write HandlerUpsertExercise HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -68,9 +68,9 @@ func (h *DeleteExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.DeleteExercise(ctx, exercise, userID)
+	err = h.s.UpsertExercise(ctx, &exercise, userID)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
+		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

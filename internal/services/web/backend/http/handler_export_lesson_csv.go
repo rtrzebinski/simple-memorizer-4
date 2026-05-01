@@ -13,15 +13,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type ExportLessonCsvHandler struct {
+type HandlerExportLessonCsv struct {
 	s Service
 }
 
-func NewExportLessonCsvHandler(s Service) *ExportLessonCsvHandler {
-	return &ExportLessonCsvHandler{s: s}
+func NewHandlerExportLessonCsv(s Service) *HandlerExportLessonCsv {
+	return &HandlerExportLessonCsv{s: s}
 }
 
-func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodGet {
@@ -43,7 +43,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
-				log.Print(fmt.Errorf("failed to encode ExportLessonCsvHandler HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to encode HandlerExportLessonCsv HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -51,7 +51,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 			_, err = res.Write(encoded)
 			if err != nil {
-				log.Print(fmt.Errorf("failed to write ExportLessonCsvHandler HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to write HandlerExportLessonCsv HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -119,7 +119,7 @@ func (h *ExportLessonCsvHandler) ServeHTTP(res http.ResponseWriter, req *http.Re
 	// Write the file content to the response
 	_, err = res.Write(fileContent)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write ExportLessonCsvHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write HandlerExportLessonCsv HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

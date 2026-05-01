@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
@@ -13,54 +14,50 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestUpsertLessonHandler(t *testing.T) {
-	input := backend.Lesson{
-		Name:        "name",
-		Description: "description",
-	}
-
-	body, err := json.Marshal(input)
-	if err != nil {
-		t.Fatal(err)
+func TestHandlerHydrateLesson(t *testing.T) {
+	lesson := &backend.Lesson{
+		Id: 1,
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", mock.Anything, &input, "100").Return(nil)
+	service.On("HydrateLesson", mock.Anything, lesson, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewUpsertLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
 
-	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, UpsertLesson, strings.NewReader(string(body)))
+	u, _ := url.Parse(HydrateLesson)
+	params := u.Query()
+	params.Add("lesson_id", strconv.Itoa(lesson.Id))
+	u.RawQuery = params.Encode()
+
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
+	res := httptest.NewRecorder()
+
 	route.ServeHTTP(res, req)
+
+	assert.Equal(t, http.StatusOK, res.Code)
 
 	service.AssertExpectations(t)
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
 
-func TestUpsertLessonHandler_invalidInput(t *testing.T) {
-	input := backend.Lesson{}
-
-	body, err := json.Marshal(input)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func TestHandlerHydrateLesson_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewUpsertLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
+
+	req, _ := http.NewRequest(http.MethodGet, HydrateLesson, nil)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, UpsertLesson, strings.NewReader(string(body)))
-	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
 
@@ -68,9 +65,9 @@ func TestUpsertLessonHandler_invalidInput(t *testing.T) {
 
 	var result string
 
-	err = json.Unmarshal(res.Body.Bytes(), &result)
+	err := json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateLessonIdentified(backend.Lesson{}).Error(), result)
 
 	service.AssertExpectations(t)
 	v.AssertExpectations(t)

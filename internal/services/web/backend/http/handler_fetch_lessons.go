@@ -9,15 +9,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 )
 
-type FetchLessonsHandler struct {
+type HandlerFetchLessons struct {
 	s Service
 }
 
-func NewFetchLessonsHandler(s Service) *FetchLessonsHandler {
-	return &FetchLessonsHandler{s: s}
+func NewHandlerFetchLessons(s Service) *HandlerFetchLessons {
+	return &HandlerFetchLessons{s: s}
 }
 
-func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerFetchLessons) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodGet {
@@ -41,7 +41,7 @@ func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	encoded, err := json.Marshal(lessons)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode FetchLessonsHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode HandlerFetchLessons HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -49,7 +49,7 @@ func (h *FetchLessonsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write FetchLessonsHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write HandlerFetchLessons HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

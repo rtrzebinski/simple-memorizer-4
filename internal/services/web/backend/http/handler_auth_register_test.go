@@ -14,10 +14,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestNewAuthSignInHandler(t *testing.T) {
-	input := backend.SignInRequest{
-		Email:    "email",
-		Password: "password",
+func TestHandlerAuthRegister(t *testing.T) {
+	input := backend.RegisterRequest{
+		FirstName: "firstname",
+		LastName:  "lastname",
+		Email:     "email",
+		Password:  "password",
 	}
 
 	body, err := json.Marshal(input)
@@ -31,11 +33,11 @@ func TestNewAuthSignInHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(tokens, nil)
+	service.On("Register", mock.Anything, input.FirstName, input.LastName, input.Email, input.Password).Return(tokens, nil)
 
-	handler := NewAuthSignInHandler(service, true)
+	handler := NewHandlerAuthRegister(service, true)
 
-	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
+	req, err := http.NewRequest(http.MethodPost, AuthRegister, io.NopCloser(strings.NewReader(string(body))))
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 
@@ -59,10 +61,12 @@ func TestNewAuthSignInHandler(t *testing.T) {
 	assert.Equal(t, http.SameSiteStrictMode, accessTokenCookie.SameSite)
 }
 
-func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
-	input := backend.SignInRequest{
-		Email:    "email",
-		Password: "password",
+func TestHandlerAuthRegister_unauthorized(t *testing.T) {
+	input := backend.RegisterRequest{
+		FirstName: "firstname",
+		LastName:  "lastname",
+		Email:     "email",
+		Password:  "password",
 	}
 
 	body, err := json.Marshal(input)
@@ -71,11 +75,11 @@ func TestNewAuthSignInHandler_unauthorized(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
+	service.On("Register", mock.Anything, input.FirstName, input.LastName, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
-	handler := NewAuthSignInHandler(service, true)
+	handler := NewHandlerAuthRegister(service, true)
 
-	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
+	req, err := http.NewRequest(http.MethodPost, AuthRegister, io.NopCloser(strings.NewReader(string(body))))
 	assert.NoError(t, err)
 	res := httptest.NewRecorder()
 

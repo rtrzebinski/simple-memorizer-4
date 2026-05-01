@@ -9,19 +9,19 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
 
-type AuthRegisterHandler struct {
+type HandlerAuthRegister struct {
 	s      Service
 	secure bool
 }
 
-func NewAuthRegisterHandler(s Service, secure bool) *AuthRegisterHandler {
-	return &AuthRegisterHandler{
+func NewHandlerAuthRegister(s Service, secure bool) *HandlerAuthRegister {
+	return &HandlerAuthRegister{
 		s:      s,
 		secure: secure,
 	}
 }
 
-func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerAuthRegister) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -33,7 +33,7 @@ func (h *AuthRegisterHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 	err := json.NewDecoder(req.Body).Decode(&registerRequest)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode AuthRegisterHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerAuthRegister HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return

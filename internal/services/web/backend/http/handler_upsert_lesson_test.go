@@ -13,11 +13,10 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestUpsertExerciseHandler(t *testing.T) {
-	input := backend.Exercise{
-		Question: "question",
-		Answer:   "answer",
-		Lesson:   &backend.Lesson{Id: 10},
+func TestHandlerUpsertLesson(t *testing.T) {
+	input := backend.Lesson{
+		Name:        "name",
+		Description: "description",
 	}
 
 	body, err := json.Marshal(input)
@@ -26,15 +25,15 @@ func TestUpsertExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertExercise", mock.Anything, &input, "100").Return(nil)
+	service.On("UpsertLesson", mock.Anything, &input, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewUpsertExerciseHandler(service))
+	route := Auth(v, r, false)(NewHandlerUpsertLesson(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, UpsertLesson, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -44,8 +43,8 @@ func TestUpsertExerciseHandler(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
-	input := backend.Exercise{}
+func TestHandlerUpsertLesson_invalidInput(t *testing.T) {
+	input := backend.Lesson{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -57,10 +56,10 @@ func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewUpsertExerciseHandler(service))
+	route := Auth(v, r, false)(NewHandlerUpsertLesson(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, UpsertLesson, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -71,7 +70,7 @@ func TestUpsertExerciseHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateUpsertExercise(input, nil).Error(), result)
+	assert.Equal(t, validation.ValidateUpsertLesson(input, nil).Error(), result)
 
 	service.AssertExpectations(t)
 	v.AssertExpectations(t)

@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,12 +14,9 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestStoreExercises(t *testing.T) {
-	input := backend.Exercises{
-		backend.Exercise{
-			Question: "question",
-			Answer:   "answer",
-		},
+func TestHandlerDeleteExercise(t *testing.T) {
+	input := backend.Exercise{
+		Id: 123,
 	}
 
 	body, err := json.Marshal(input)
@@ -27,15 +25,15 @@ func TestStoreExercises(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("StoreExercises", mock.Anything, input, "100").Return(nil)
+	service.On("DeleteExercise", mock.Anything, input, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewStoreExercisesHandler(service))
+	route := Auth(v, r, false)(NewHandlerDeleteExercise(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, StoreExercises, strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -45,10 +43,8 @@ func TestStoreExercises(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestStoreExercisesHandler_invalidInput(t *testing.T) {
-	input := backend.Exercises{
-		backend.Exercise{},
-	}
+func TestHandlerDeleteExercise_invalidInput(t *testing.T) {
+	input := backend.Exercise{}
 
 	body, err := json.Marshal(input)
 	if err != nil {
@@ -60,10 +56,10 @@ func TestStoreExercisesHandler_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewStoreExercisesHandler(service))
+	route := Auth(v, r, false)(NewHandlerDeleteExercise(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, StoreExercises, strings.NewReader(string(body)))
+	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -74,9 +70,9 @@ func TestStoreExercisesHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateStoreExercises(input).Error(), result)
+	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
 
-	service.AssertExpectations(t)
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
+	service.AssertExpectations(t)
 }

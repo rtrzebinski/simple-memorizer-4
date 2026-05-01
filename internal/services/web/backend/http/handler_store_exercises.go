@@ -11,15 +11,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type UpsertLessonHandler struct {
+type HandlerStoreExercises struct {
 	s Service
 }
 
-func NewUpsertLessonHandler(s Service) *UpsertLessonHandler {
-	return &UpsertLessonHandler{s: s}
+func NewHandlerStoreExercises(s Service) *HandlerStoreExercises {
+	return &HandlerStoreExercises{s: s}
 }
 
-func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerStoreExercises) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -27,23 +27,23 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	userID, ok := auth.UserIDFromContext(ctx)
+	userID, ok := auth.UserIDFromContext(req.Context())
 	if !ok || userID == "" {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	var lesson backend.Lesson
+	var exercises backend.Exercises
 
-	err := json.NewDecoder(req.Body).Decode(&lesson)
+	err := json.NewDecoder(req.Body).Decode(&exercises)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode UpsertLessonHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerStoreExercises HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateUpsertLesson(lesson, nil)
+	validator := validation.ValidateStoreExercises(exercises)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -51,7 +51,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode UpsertLessonHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode HandlerStoreExercises HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -59,7 +59,7 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write UpsertLessonHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write HandlerStoreExercises HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -68,9 +68,9 @@ func (h *UpsertLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(ctx, &lesson, userID)
+	err = h.s.StoreExercises(ctx, exercises, userID)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
+		log.Print(fmt.Errorf("failed to store exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

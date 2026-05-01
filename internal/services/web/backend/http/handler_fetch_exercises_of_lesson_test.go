@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestFetchExercisesOfLessonHandler(t *testing.T) {
+func TestHandlerFetchExercisesOfLesson(t *testing.T) {
 	exercise := backend.Exercise{
 		Id:                       1,
 		Question:                 "question",
@@ -43,7 +43,7 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerFetchExercisesOfLesson(service))
 
 	u, _ := url.Parse(FetchExercises)
 	params := u.Query()
@@ -80,13 +80,13 @@ func TestFetchExercisesOfLessonHandler(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestFetchExercisesOfLessonHandler_invalidInput(t *testing.T) {
+func TestHandlerFetchExercisesOfLesson_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewFetchExercisesOfLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerFetchExercisesOfLesson(service))
 
 	req, _ := http.NewRequest(http.MethodGet, FetchExercises, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})

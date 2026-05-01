@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -14,9 +13,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestDeleteExerciseHandler(t *testing.T) {
+func TestHandlerUpsertExercise(t *testing.T) {
 	input := backend.Exercise{
-		Id: 123,
+		Question: "question",
+		Answer:   "answer",
+		Lesson:   &backend.Lesson{Id: 10},
 	}
 
 	body, err := json.Marshal(input)
@@ -25,15 +26,15 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", mock.Anything, input, "100").Return(nil)
+	service.On("UpsertExercise", mock.Anything, &input, "100").Return(nil)
 
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewDeleteExerciseHandler(service))
+	route := Auth(v, r, false)(NewHandlerUpsertExercise(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
+	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -43,7 +44,7 @@ func TestDeleteExerciseHandler(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
+func TestHandlerUpsertExercise_invalidInput(t *testing.T) {
 	input := backend.Exercise{}
 
 	body, err := json.Marshal(input)
@@ -56,10 +57,10 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewDeleteExerciseHandler(service))
+	route := Auth(v, r, false)(NewHandlerUpsertExercise(service))
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, DeleteExercise, io.NopCloser(strings.NewReader(string(body))))
+	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	route.ServeHTTP(res, req)
@@ -70,9 +71,9 @@ func TestDeleteExerciseHandler_invalidInput(t *testing.T) {
 
 	err = json.Unmarshal(res.Body.Bytes(), &result)
 	assert.NoError(t, err)
-	assert.Equal(t, validation.ValidateExerciseIdentified(input).Error(), result)
+	assert.Equal(t, validation.ValidateUpsertExercise(input, nil).Error(), result)
 
+	service.AssertExpectations(t)
 	v.AssertExpectations(t)
 	r.AssertExpectations(t)
-	service.AssertExpectations(t)
 }

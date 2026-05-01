@@ -12,15 +12,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type HydrateLessonHandler struct {
+type HandlerHydrateLesson struct {
 	s Service
 }
 
-func NewHydrateLessonHandler(s Service) *HydrateLessonHandler {
-	return &HydrateLessonHandler{s: s}
+func NewHandlerHydrateLesson(s Service) *HandlerHydrateLesson {
+	return &HandlerHydrateLesson{s: s}
 }
 
-func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerHydrateLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodGet {
@@ -47,7 +47,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 			encoded, err := json.Marshal(validator.Error())
 			if err != nil {
-				log.Print(fmt.Errorf("failed to encode HydrateLessonHandler HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to encode HandlerHydrateLesson HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -55,7 +55,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 			_, err = res.Write(encoded)
 			if err != nil {
-				log.Print(fmt.Errorf("failed to write HydrateLessonHandler HTTP response: %w", err))
+				log.Print(fmt.Errorf("failed to write HandlerHydrateLesson HTTP response: %w", err))
 				res.WriteHeader(http.StatusInternalServerError)
 
 				return
@@ -77,7 +77,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 	encoded, err := json.Marshal(lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode HydrateLessonHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode HandlerHydrateLesson HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -85,7 +85,7 @@ func (h *HydrateLessonHandler) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write HydrateLessonHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write HandlerHydrateLesson HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestDeleteLessonHandler(t *testing.T) {
+func TestHandlerDeleteLesson(t *testing.T) {
 	input := backend.Lesson{
 		Id: 123,
 	}
@@ -30,7 +30,7 @@ func TestDeleteLessonHandler(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewDeleteLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerDeleteLesson(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, DeleteLesson, io.NopCloser(strings.NewReader(string(body))))
@@ -43,7 +43,7 @@ func TestDeleteLessonHandler(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestDeleteLessonHandler_invalidInput(t *testing.T) {
+func TestHandlerDeleteLesson_invalidInput(t *testing.T) {
 	input := backend.Lesson{}
 
 	body, err := json.Marshal(input)
@@ -56,7 +56,7 @@ func TestDeleteLessonHandler_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewDeleteLessonHandler(service))
+	route := Auth(v, r, false)(NewHandlerDeleteLesson(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, DeleteLesson, io.NopCloser(strings.NewReader(string(body))))

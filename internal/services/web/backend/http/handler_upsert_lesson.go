@@ -11,15 +11,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type UpsertExerciseHandler struct {
+type HandlerUpsertLesson struct {
 	s Service
 }
 
-func NewUpsertExerciseHandler(s Service) *UpsertExerciseHandler {
-	return &UpsertExerciseHandler{s: s}
+func NewHandlerUpsertLesson(s Service) *HandlerUpsertLesson {
+	return &HandlerUpsertLesson{s: s}
 }
 
-func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerUpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -33,17 +33,17 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	var exercise backend.Exercise
+	var lesson backend.Lesson
 
-	err := json.NewDecoder(req.Body).Decode(&exercise)
+	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode UpsertExerciseHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerUpsertLesson HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateUpsertExercise(exercise, nil)
+	validator := validation.ValidateUpsertLesson(lesson, nil)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -51,7 +51,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode UpsertExerciseHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode HandlerUpsertLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -59,7 +59,7 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write UpsertExerciseHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write HandlerUpsertLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -68,9 +68,9 @@ func (h *UpsertExerciseHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.UpsertExercise(ctx, &exercise, userID)
+	err = h.s.UpsertLesson(ctx, &lesson, userID)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
+		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestExportLessonCsvHandler(t *testing.T) {
+func TestHandlerExportLessonCsv(t *testing.T) {
 	exercise1 := backend.Exercise{
 		Id:       1,
 		Question: "question1",
@@ -38,7 +38,7 @@ func TestExportLessonCsvHandler(t *testing.T) {
 		args.Get(1).(*backend.Lesson).Name = "lesson name"
 	}).Return(nil)
 
-	route := NewExportLessonCsvHandler(service)
+	route := NewHandlerExportLessonCsv(service)
 
 	u, _ := url.Parse(ExportLessonCsv)
 	params := u.Query()
@@ -59,10 +59,10 @@ func TestExportLessonCsvHandler(t *testing.T) {
 	assert.Equal(t, "36", res.Header().Get("Content-Length"))
 }
 
-func TestExportLessonCsvHandler_invalidInput(t *testing.T) {
+func TestHandlerExportLessonCsv_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
-	route := NewExportLessonCsvHandler(service)
+	route := NewHandlerExportLessonCsv(service)
 
 	req, err := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
 	assert.NoError(t, err)

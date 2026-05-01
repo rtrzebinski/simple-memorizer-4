@@ -10,11 +10,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestAuthLogoutHandler(t *testing.T) {
+func TestHandlerAuthLogout(t *testing.T) {
 	service := NewServiceMock()
 	service.On("Revoke", mock.Anything, "refreshToken").Return(nil)
 
-	handler := NewAuthLogoutHandler(service)
+	handler := NewHandlerAuthLogout(service)
 
 	req, err := http.NewRequest(http.MethodPost, AuthLogout, nil)
 	assert.NoError(t, err)
@@ -39,8 +39,8 @@ func TestAuthLogoutHandler(t *testing.T) {
 	assert.Equal(t, -1, accessTokenCookie.MaxAge)
 }
 
-func TestAuthLogoutHandler_noRefreshCookie(t *testing.T) {
-	handler := NewAuthLogoutHandler(NewServiceMock())
+func TestHandlerAuthLogout_noRefreshCookie(t *testing.T) {
+	handler := NewHandlerAuthLogout(NewServiceMock())
 
 	req, err := http.NewRequest(http.MethodPost, AuthLogout, nil)
 	assert.NoError(t, err)
@@ -51,11 +51,11 @@ func TestAuthLogoutHandler_noRefreshCookie(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.Code)
 }
 
-func TestAuthLogoutHandler_revokeFailed(t *testing.T) {
+func TestHandlerAuthLogout_revokeFailed(t *testing.T) {
 	service := NewServiceMock()
 	service.On("Revoke", mock.Anything, "refreshToken").Return(errors.New("revoke failed"))
 
-	handler := NewAuthLogoutHandler(service)
+	handler := NewHandlerAuthLogout(service)
 
 	req, err := http.NewRequest(http.MethodPost, AuthLogout, nil)
 	assert.NoError(t, err)

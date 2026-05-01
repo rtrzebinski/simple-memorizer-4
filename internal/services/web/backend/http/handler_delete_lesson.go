@@ -11,15 +11,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type StoreExercisesHandler struct {
+type HandlerDeleteLesson struct {
 	s Service
 }
 
-func NewStoreExercisesHandler(s Service) *StoreExercisesHandler {
-	return &StoreExercisesHandler{s: s}
+func NewHandlerDeleteLesson(s Service) *HandlerDeleteLesson {
+	return &HandlerDeleteLesson{s: s}
 }
 
-func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerDeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -27,23 +27,23 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	userID, ok := auth.UserIDFromContext(req.Context())
+	userID, ok := auth.UserIDFromContext(ctx)
 	if !ok || userID == "" {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	var exercises backend.Exercises
+	var lesson backend.Lesson
 
-	err := json.NewDecoder(req.Body).Decode(&exercises)
+	err := json.NewDecoder(req.Body).Decode(&lesson)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreExercisesHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerDeleteLesson HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	validator := validation.ValidateStoreExercises(exercises)
+	validator := validation.ValidateLessonIdentified(lesson)
 	if validator.Failed() {
 		log.Print(fmt.Errorf("invalid input: %w", validator))
 
@@ -51,7 +51,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreExercisesHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode HandlerDeleteLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -59,7 +59,7 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreExercisesHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write HandlerDeleteLesson HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -68,9 +68,9 @@ func (h *StoreExercisesHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.StoreExercises(ctx, exercises, userID)
+	err = h.s.DeleteLesson(ctx, lesson, userID)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to store exercises: %w", err))
+		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

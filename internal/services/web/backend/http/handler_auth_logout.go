@@ -5,17 +5,17 @@ import (
 	"net/http"
 )
 
-type AuthLogoutHandler struct {
+type HandlerAuthLogout struct {
 	s Service
 }
 
-func NewAuthLogoutHandler(s Service) *AuthLogoutHandler {
-	return &AuthLogoutHandler{
+func NewHandlerAuthLogout(s Service) *HandlerAuthLogout {
+	return &HandlerAuthLogout{
 		s: s,
 	}
 }
 
-func (h *AuthLogoutHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerAuthLogout) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return

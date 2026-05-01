@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestFetchLessonsHandler(t *testing.T) {
+func TestHandlerFetchLessons(t *testing.T) {
 	lesson := backend.Lesson{}
 	lessons := backend.Lessons{lesson}
 
@@ -21,7 +21,7 @@ func TestFetchLessonsHandler(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewFetchLessonsHandler(service))
+	route := Auth(v, r, false)(NewHandlerFetchLessons(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, FetchLessons, nil)

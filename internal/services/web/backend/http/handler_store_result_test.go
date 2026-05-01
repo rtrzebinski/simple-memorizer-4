@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestStoreResultHandler_goodAnswer(t *testing.T) {
+func TestHandlerStoreResult_goodAnswer(t *testing.T) {
 	input := backend.Result{
 		Exercise: &backend.Exercise{
 			Id: 10,
@@ -32,7 +32,7 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewStoreResultHandler(service))
+	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
@@ -45,7 +45,7 @@ func TestStoreResultHandler_goodAnswer(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestStoreResultHandler_badAnswer(t *testing.T) {
+func TestHandlerStoreResult_badAnswer(t *testing.T) {
 	input := backend.Result{
 		Exercise: &backend.Exercise{
 			Id: 10,
@@ -64,7 +64,7 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewStoreResultHandler(service))
+	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
@@ -77,7 +77,7 @@ func TestStoreResultHandler_badAnswer(t *testing.T) {
 	r.AssertExpectations(t)
 }
 
-func TestStoreResultHandler_invalidInput(t *testing.T) {
+func TestHandlerStoreResult_invalidInput(t *testing.T) {
 	input := backend.Result{}
 
 	body, err := json.Marshal(input)
@@ -90,7 +90,7 @@ func TestStoreResultHandler_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewStoreResultHandler(service))
+	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))

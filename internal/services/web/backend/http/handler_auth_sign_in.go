@@ -14,7 +14,7 @@ type AuthSignInHandler struct {
 	secure bool
 }
 
-func NewAuthSignInHandler(s Service, secure bool) *AuthSignInHandler {
+func HandlerNewAuthSignIn(s Service, secure bool) *AuthSignInHandler {
 	return &AuthSignInHandler{
 		s:      s,
 		secure: secure,

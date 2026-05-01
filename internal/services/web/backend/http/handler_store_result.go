@@ -11,15 +11,15 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
-type StoreResultHandler struct {
+type HandlerStoreResult struct {
 	s Service
 }
 
-func NewStoreResultHandler(s Service) *StoreResultHandler {
-	return &StoreResultHandler{s: s}
+func NewHandlerStoreResult(s Service) *HandlerStoreResult {
+	return &HandlerStoreResult{s: s}
 }
 
-func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerStoreResult) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -37,7 +37,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	err := json.NewDecoder(req.Body).Decode(&result)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode StoreResultHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerStoreResult HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -51,7 +51,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 		encoded, err := json.Marshal(validator.Error())
 		if err != nil {
-			log.Print(fmt.Errorf("failed to encode StoreResultHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to encode HandlerStoreResult HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
@@ -59,7 +59,7 @@ func (h *StoreResultHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 		_, err = res.Write(encoded)
 		if err != nil {
-			log.Print(fmt.Errorf("failed to write StoreResultHandler HTTP response: %w", err))
+			log.Print(fmt.Errorf("failed to write HandlerStoreResult HTTP response: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
 
 			return
