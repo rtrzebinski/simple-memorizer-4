@@ -1,4 +1,4 @@
-package components
+package component
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/csv"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/auth"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/csv"
 )
 
 const PathExercises = "/exercises"
@@ -153,7 +153,7 @@ func (compo *Exercises) handleCsvUpload(ctx app.Context, e app.Event) {
 	}
 
 	// extract records from bytes slice
-	records, err := csv.ReadAll(data)
+	records, err := csv.BytesToRecords(data)
 	if err != nil {
 		app.Log(err)
 		return

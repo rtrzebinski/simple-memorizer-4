@@ -1,11 +1,11 @@
-package components
+package component
 
 import (
 	"fmt"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/validation"
 )
 
 // ExerciseEdit is a component that allows creating or editing an exercise

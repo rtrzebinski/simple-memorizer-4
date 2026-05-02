@@ -24,7 +24,7 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 	bhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/pubsub"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component"
 	fhttp "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/http/caller"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/signal"
@@ -85,15 +85,15 @@ func run(ctx context.Context) error {
 	//
 	// This is done by calling the Route() function, which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route(components.PathHome, func() app.Composer { return components.NewHome(apiClient) })
+	app.Route(component.PathHome, func() app.Composer { return component.NewHome(apiClient) })
 
 	// Associate other frontend routes
-	app.Route(components.PathAuthRegister, func() app.Composer { return components.NewRegister(apiClient) })
-	app.Route(components.PathAuthSignIn, func() app.Composer { return components.NewSignIn(apiClient) })
-	app.Route(components.PathAuthLogout, func() app.Composer { return components.NewLogout(apiClient) })
-	app.Route(components.PathLessons, func() app.Composer { return components.NewLessons(apiClient) })
-	app.Route(components.PathExercises, func() app.Composer { return components.NewExercises(apiClient) })
-	app.Route(components.PathLearn, func() app.Composer { return components.NewLearn(apiClient) })
+	app.Route(component.PathAuthRegister, func() app.Composer { return component.NewRegister(apiClient) })
+	app.Route(component.PathAuthSignIn, func() app.Composer { return component.NewSignIn(apiClient) })
+	app.Route(component.PathAuthLogout, func() app.Composer { return component.NewLogout(apiClient) })
+	app.Route(component.PathLessons, func() app.Composer { return component.NewLessons(apiClient) })
+	app.Route(component.PathExercises, func() app.Composer { return component.NewExercises(apiClient) })
+	app.Route(component.PathLearn, func() app.Composer { return component.NewLearn(apiClient) })
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.

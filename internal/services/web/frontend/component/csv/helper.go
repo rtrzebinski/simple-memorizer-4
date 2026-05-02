@@ -7,8 +7,8 @@ import (
 	"io"
 )
 
-// ReadAll converts a slice of bytes to records
-func ReadAll(data []byte) ([][]string, error) {
+// BytesToRecords converts a slice of bytes to records
+func BytesToRecords(data []byte) ([][]string, error) {
 	reader := bytes.NewReader(data)
 	csvReader := csv.NewReader(reader)
 

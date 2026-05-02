@@ -1,4 +1,4 @@
-package components
+package component
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/auth"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/components/validation"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/auth"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/validation"
 )
 
 const PathLessons = "/lessons"

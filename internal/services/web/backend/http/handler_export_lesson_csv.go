@@ -103,7 +103,7 @@ func (h *HandlerExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Re
 	}
 
 	// Create CSV file content from records
-	fileContent, err := csv.WriteAll(records)
+	fileContent, err := csv.RecordsToBytes(records)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to create a CSV from exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

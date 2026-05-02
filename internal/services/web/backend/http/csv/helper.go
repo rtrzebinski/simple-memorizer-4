@@ -6,8 +6,8 @@ import (
 	"errors"
 )
 
-// WriteAll converts records to a slice of bytes
-func WriteAll(records [][]string) ([]byte, error) {
+// RecordsToBytes converts records to a slice of bytes
+func RecordsToBytes(records [][]string) ([]byte, error) {
 	if records == nil || len(records) == 0 {
 		return nil, errors.New("records cannot be nil or empty")
 	}

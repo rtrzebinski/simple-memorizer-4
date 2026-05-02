@@ -14,17 +14,17 @@ func TestReadAll(t *testing.T) {
 		{"Bob", "30", "San Francisco"},
 	}
 
-	validOutput, err := ReadAll(validInput)
+	validOutput, err := BytesToRecords(validInput)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 	if !reflect.DeepEqual(validOutput, expectedValidOutput) {
-		t.Errorf("ReadAll(validInput) = %v, expected %v", validOutput, expectedValidOutput)
+		t.Errorf("BytesToRecords(validInput) = %v, expected %v", validOutput, expectedValidOutput)
 	}
 
 	// Test case 2: Invalid CSV data
 	invalidInput := []byte("Name,Age,City\nAlice,25\nBob,30,San Francisco\n")
-	_, invalidErr := ReadAll(invalidInput)
+	_, invalidErr := BytesToRecords(invalidInput)
 	if invalidErr == nil {
 		t.Error("Expected error for invalid CSV data, but got nil")
 	} else if invalidErr.Error() != "failed to read CSV: record on line 2: wrong number of fields" {
@@ -33,11 +33,11 @@ func TestReadAll(t *testing.T) {
 
 	// Test case 3: Empty input
 	emptyInput := []byte("")
-	emptyOutput, emptyErr := ReadAll(emptyInput)
+	emptyOutput, emptyErr := BytesToRecords(emptyInput)
 	if emptyErr != nil {
 		t.Errorf("Unexpected error for empty input: %v", emptyErr)
 	}
 	if len(emptyOutput) != 0 {
-		t.Errorf("ReadAll(emptyInput) = %v, expected empty slice", emptyOutput)
+		t.Errorf("BytesToRecords(emptyInput) = %v, expected empty slice", emptyOutput)
 	}
 }
