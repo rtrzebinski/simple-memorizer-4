@@ -33,12 +33,15 @@ func TestHandlerExportLessonCsv(t *testing.T) {
 
 	oldestExerciseID := 1
 
-	service.On("FetchExercises", mock.Anything, "", lesson, oldestExerciseID).Return(exercises, nil)
-	service.On("HydrateLesson", mock.Anything, "", &lesson).Run(func(args mock.Arguments) {
+	service.On("FetchExercises", mock.Anything, "userID", lesson, oldestExerciseID).Return(exercises, nil)
+	service.On("HydrateLesson", mock.Anything, "userID", &lesson).Run(func(args mock.Arguments) {
 		args.Get(2).(*backend.Lesson).Name = "lesson name"
 	}).Return(nil)
 
-	route := NewHandlerExportLessonCsv(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
 
 	u, _ := url.Parse(ExportLessonCsv)
 	params := u.Query()
@@ -47,6 +50,7 @@ func TestHandlerExportLessonCsv(t *testing.T) {
 
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	assert.NoError(t, err)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 
@@ -62,10 +66,14 @@ func TestHandlerExportLessonCsv(t *testing.T) {
 func TestHandlerExportLessonCsv_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
-	route := NewHandlerExportLessonCsv(service)
+	v := NewTokenVerifierMock()
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
+	r := NewTokenRefresherMock()
+	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
 
 	req, err := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
 	assert.NoError(t, err)
+	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
 
 	res := httptest.NewRecorder()
 

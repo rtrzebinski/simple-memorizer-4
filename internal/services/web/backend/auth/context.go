@@ -14,14 +14,22 @@ func ContextWithUser(ctx context.Context, user *backend.User) context.Context {
 	return context.WithValue(ctx, userIDKey, user)
 }
 
-func UserIDFromContext(ctx context.Context) (string, bool) {
+func UserIDFromContext(ctx context.Context) (userId string, ok bool) {
 	user, ok := ctx.Value(userIDKey).(*backend.User)
+
+	if !ok || user == nil {
+		return "", false
+	}
 
 	return user.ID, ok
 }
 
-func UserProfileFromContext(ctx context.Context) (*backend.UserProfile, bool) {
+func UserProfileFromContext(ctx context.Context) (userProfile *backend.UserProfile, ok bool) {
 	user, ok := ctx.Value(userIDKey).(*backend.User)
+
+	if !ok || user == nil {
+		return nil, false
+	}
 
 	return &backend.UserProfile{
 		Name:  user.Name,

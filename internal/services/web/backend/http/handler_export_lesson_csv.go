@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/csv"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
@@ -26,6 +27,12 @@ func (h *HandlerExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	if req.Method != http.MethodGet {
 		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	userID, ok := auth.UserIDFromContext(ctx)
+	if !ok || userID == "" {
+		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -63,7 +70,7 @@ func (h *HandlerExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Re
 
 	// Hydrate lesson
 	lesson := backend.Lesson{Id: lessonId}
-	err = h.s.HydrateLesson(ctx, "", &lesson)
+	err = h.s.HydrateLesson(ctx, userID, &lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
@@ -75,7 +82,7 @@ func (h *HandlerExportLessonCsv) ServeHTTP(res http.ResponseWriter, req *http.Re
 	oldestExerciseID := 1
 
 	// Fetch exercises of the lesson
-	exercises, err := h.s.FetchExercises(ctx, "", backend.Lesson{Id: lessonId}, oldestExerciseID)
+	exercises, err := h.s.FetchExercises(ctx, userID, backend.Lesson{Id: lessonId}, oldestExerciseID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
