@@ -21,6 +21,7 @@ type SignIn struct {
 	inputEmail           string
 	inputPassword        string
 	submitButtonDisabled bool
+	errorVisible         bool
 }
 
 // NewSignIn creates a new sign-in component
@@ -46,6 +47,11 @@ func (compo *SignIn) Render() app.UI {
 		),
 		app.P().Body(
 			app.Div().Body(
+				app.H3().Text("Sign In"),
+				app.P().Body(
+					app.Text("Unable to sign in!"),
+					app.Br(),
+				).Style("color", "red").Hidden(!compo.errorVisible),
 				app.Input().Type("text").Placeholder("Email").OnInput(compo.ValueTo(&compo.inputEmail)).Value(compo.inputEmail).Size(30),
 				app.Br(),
 				app.Br(),
@@ -70,11 +76,13 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 	err := compo.c.AuthSignIn(ctx, req)
 	if err != nil {
 		compo.submitButtonDisabled = false
+		compo.errorVisible = true
 		app.Log(fmt.Errorf("failed to sign in: %w", err))
 		return
 	}
 
 	compo.submitButtonDisabled = false
+	compo.errorVisible = false
 	compo.inputEmail = ""
 	compo.inputPassword = ""
 

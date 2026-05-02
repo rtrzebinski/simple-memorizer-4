@@ -23,6 +23,7 @@ type Register struct {
 	inputEmail             string
 	inputPassword          string
 	registerButtonDisabled bool
+	errorVisible           bool
 }
 
 // NewRegister creates a new Register component
@@ -50,6 +51,11 @@ func (compo *Register) Render() app.UI {
 		),
 		app.P().Body(
 			app.Div().Body(
+				app.H3().Text("Register"),
+				app.P().Body(
+					app.Text("Unable to register!"),
+					app.Br(),
+				).Style("color", "red").Hidden(!compo.errorVisible),
 				app.Input().Type("text").Placeholder("First Name").OnInput(compo.ValueTo(&compo.inputFirstName)).Value(compo.inputFirstName).Size(30),
 				app.Br(),
 				app.Br(),
@@ -86,11 +92,13 @@ func (compo *Register) handleRegister(ctx app.Context, e app.Event) {
 	err := compo.c.AuthRegister(ctx, req)
 	if err != nil {
 		compo.registerButtonDisabled = false
+		compo.errorVisible = true
 		fmt.Println("Error:", err)
 		return
 	}
 
 	compo.registerButtonDisabled = false
+	compo.errorVisible = false
 	compo.inputFirstName = ""
 	compo.inputLastName = ""
 	compo.inputEmail = ""
