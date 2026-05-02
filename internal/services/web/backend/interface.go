@@ -17,8 +17,8 @@ type Writer interface {
 }
 
 type Publisher interface {
-	PublishGoodAnswer(ctx context.Context, exerciseID int) error
-	PublishBadAnswer(ctx context.Context, exerciseID int) error
+	PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error
+	PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error
 }
 
 type AuthClient interface {

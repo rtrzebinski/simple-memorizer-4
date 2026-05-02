@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/worker"
@@ -16,20 +17,22 @@ func NewWorkerWriter(db *sql.DB) *WorkerWriter {
 	return &WorkerWriter{db: db}
 }
 
-func (w *WorkerWriter) StoreResult(ctx context.Context, result worker.Result) error {
-	const query = `INSERT INTO result (type, exercise_id) VALUES ($1, $2) RETURNING id;`
+func (w *WorkerWriter) StoreResult(ctx context.Context, userID string, result worker.Result) error {
+	const query = `
+		INSERT INTO result (type, exercise_id)
+		SELECT $1, $2
+		FROM exercise e
+		JOIN lesson l ON e.lesson_id = l.id
+		WHERE e.id = $2 AND l.user_id = $3
+		RETURNING id;
+	`
 
-	rows, err := w.db.QueryContext(ctx, query, result.Type, result.ExerciseId)
+	err := w.db.QueryRowContext(ctx, query, result.Type, result.ExerciseId, userID).Scan(&result.Id)
 	if err != nil {
-		return fmt.Errorf("failed to execute 'INSERT INTO result' query: %w", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&result.Id)
-		if err != nil {
-			return fmt.Errorf("failed to scan result insert id: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("exercise not found or user is not authorized")
 		}
+		return fmt.Errorf("failed to execute 'INSERT INTO result' query: %w", err)
 	}
 
 	return nil

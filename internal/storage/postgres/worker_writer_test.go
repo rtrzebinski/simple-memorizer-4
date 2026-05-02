@@ -27,7 +27,33 @@ func (s *WorkerWriterSuite) SetupSuite() {
 	s.Suite.SetupSuite()
 	s.writer = NewWorkerWriter(s.DB)
 }
+
 func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {
+	ctx := s.T().Context()
+
+	lesson := &lesson{}
+	createLesson(s.DB, lesson)
+
+	exercise := &exercise{
+		LessonId: lesson.Id,
+	}
+	createExercise(s.DB, exercise)
+
+	result := worker.Result{
+		Type:       worker.Good,
+		ExerciseId: exercise.Id,
+	}
+
+	err := s.writer.StoreResult(ctx, lesson.UserID, result)
+	assert.NoError(s.T(), err)
+
+	stored := fetchLatestResult(s.DB)
+
+	assert.Equal(s.T(), string(result.Type), stored.Type)
+	assert.Equal(s.T(), result.ExerciseId, stored.ExerciseId)
+}
+
+func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer_userIDnotMatching() {
 	ctx := s.T().Context()
 
 	exercise := &exercise{}
@@ -38,13 +64,8 @@ func (s *WorkerWriterSuite) TestWorkerWriter_StoreAnswer() {
 		ExerciseId: exercise.Id,
 	}
 
-	err := s.writer.StoreResult(ctx, result)
-	assert.NoError(s.T(), err)
-
-	stored := fetchLatestResult(s.DB)
-
-	assert.Equal(s.T(), string(result.Type), stored.Type)
-	assert.Equal(s.T(), result.ExerciseId, stored.ExerciseId)
+	err := s.writer.StoreResult(ctx, "userID", result)
+	assert.Error(s.T(), err, "expected error when userID does not match exercise's lesson user_id")
 }
 
 func (s *WorkerWriterSuite) TestWorkerWriter_UpdateExerciseProjection_allProjections() {

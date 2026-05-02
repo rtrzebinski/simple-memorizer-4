@@ -28,8 +28,9 @@ func NewPublisher(s Sender) *Publisher {
 	}
 }
 
-func (p *Publisher) PublishGoodAnswer(ctx context.Context, exerciseID int) error {
+func (p *Publisher) PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
 	message := events.GoodAnswer{
+		UserID:     userID,
 		ExerciseID: uint32(exerciseID),
 	}
 
@@ -43,8 +44,9 @@ func (p *Publisher) PublishGoodAnswer(ctx context.Context, exerciseID int) error
 	return nil
 }
 
-func (p *Publisher) PublishBadAnswer(ctx context.Context, exerciseID int) error {
+func (p *Publisher) PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error {
 	message := events.BadAnswer{
+		UserID:     userID,
 		ExerciseID: uint32(exerciseID),
 	}
 

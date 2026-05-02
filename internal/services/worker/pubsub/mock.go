@@ -10,12 +10,12 @@ type ServiceMock struct {
 	mock.Mock
 }
 
-func (m *ServiceMock) ProcessGoodAnswer(ctx context.Context, exerciseID int) error {
-	args := m.Called(ctx, exerciseID)
+func (m *ServiceMock) ProcessGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
+	args := m.Called(ctx, userID, exerciseID)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) ProcessBadAnswer(ctx context.Context, exerciseID int) error {
-	args := m.Called(ctx, exerciseID)
+func (m *ServiceMock) ProcessBadAnswer(ctx context.Context, userID string, exerciseID int) error {
+	args := m.Called(ctx, userID, exerciseID)
 	return args.Error(0)
 }

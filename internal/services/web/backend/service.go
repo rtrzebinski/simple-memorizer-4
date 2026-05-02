@@ -45,16 +45,12 @@ func (s *Service) DeleteExercise(ctx context.Context, exercise Exercise, userID 
 	return s.w.DeleteExercise(ctx, exercise, userID)
 }
 
-func (s *Service) PublishGoodAnswer(ctx context.Context, exerciseID int, userID string) error {
-	// todo check if userID is the owner of the exercise
-
-	return s.p.PublishGoodAnswer(ctx, exerciseID)
+func (s *Service) PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
+	return s.p.PublishGoodAnswer(ctx, userID, exerciseID)
 }
 
-func (s *Service) PublishBadAnswer(ctx context.Context, exerciseID int, userID string) error {
-	// todo check if userID is the owner of the exercise
-
-	return s.p.PublishBadAnswer(ctx, exerciseID)
+func (s *Service) PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error {
+	return s.p.PublishBadAnswer(ctx, userID, exerciseID)
 }
 
 func (s *Service) Register(ctx context.Context, firstName, lastName, email, password string) (Tokens, error) {

@@ -44,7 +44,7 @@ func (h *Handler) handleGoodAnswer(ctx context.Context, e event.Event) error {
 		return err
 	}
 
-	err = h.s.ProcessGoodAnswer(ctx, int(message.ExerciseID))
+	err = h.s.ProcessGoodAnswer(ctx, message.UserID, int(message.ExerciseID))
 	if err != nil {
 		slog.Error("process good answer", slog.String("error", err.Error()), slog.String("service", "worker"))
 	}
@@ -62,7 +62,7 @@ func (h *Handler) handleBadAnswer(ctx context.Context, e event.Event) error {
 		return err
 	}
 
-	err = h.s.ProcessBadAnswer(ctx, int(message.ExerciseID))
+	err = h.s.ProcessBadAnswer(ctx, message.UserID, int(message.ExerciseID))
 	if err != nil {
 		slog.Error("process bad answer", slog.String("error", err.Error()), slog.String("service", "worker"))
 	}

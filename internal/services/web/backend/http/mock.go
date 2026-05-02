@@ -55,13 +55,13 @@ func (m *ServiceMock) DeleteExercise(ctx context.Context, exercise backend.Exerc
 	return args.Error(0)
 }
 
-func (m *ServiceMock) PublishGoodAnswer(ctx context.Context, exerciseID int, userID string) error {
-	args := m.Called(ctx, exerciseID, userID)
+func (m *ServiceMock) PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
+	args := m.Called(ctx, userID, exerciseID)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) PublishBadAnswer(ctx context.Context, exerciseID int, userID string) error {
-	args := m.Called(ctx, exerciseID, userID)
+func (m *ServiceMock) PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error {
+	args := m.Called(ctx, userID, exerciseID)
 	return args.Error(0)
 }
 

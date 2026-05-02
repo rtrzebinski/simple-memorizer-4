@@ -7,6 +7,6 @@ type Reader interface {
 }
 
 type Writer interface {
-	StoreResult(ctx context.Context, result Result) error
+	StoreResult(ctx context.Context, userID string, result Result) error
 	UpdateExerciseProjection(ctx context.Context, exerciseID int, projection ResultsProjection) error
 }

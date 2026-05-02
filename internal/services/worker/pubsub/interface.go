@@ -5,6 +5,6 @@ import (
 )
 
 type Service interface {
-	ProcessGoodAnswer(ctx context.Context, exerciseID int) error
-	ProcessBadAnswer(ctx context.Context, exerciseID int) error
+	ProcessGoodAnswer(ctx context.Context, userID string, exerciseID int) error
+	ProcessBadAnswer(ctx context.Context, userID string, exerciseID int) error
 }

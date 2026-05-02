@@ -70,7 +70,7 @@ func (h *HandlerStoreResult) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	switch result.Type {
 	case backend.Good:
-		err = h.s.PublishGoodAnswer(ctx, result.Exercise.Id, userID)
+		err = h.s.PublishGoodAnswer(ctx, userID, result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish good answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func (h *HandlerStoreResult) ServeHTTP(res http.ResponseWriter, req *http.Reques
 			return
 		}
 	case backend.Bad:
-		err = h.s.PublishBadAnswer(ctx, result.Exercise.Id, userID)
+		err = h.s.PublishBadAnswer(ctx, userID, result.Exercise.Id)
 		if err != nil {
 			log.Print(fmt.Errorf("failed to publish bad answer event: %w", err))
 			res.WriteHeader(http.StatusInternalServerError)

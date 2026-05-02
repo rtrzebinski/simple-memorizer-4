@@ -5,5 +5,6 @@ package events;
 option go_package = "proto/events";
 
 message GoodAnswer {
-  uint32 exerciseID = 1;
+  string userID = 1;
+  uint32 exerciseID = 2;
 }

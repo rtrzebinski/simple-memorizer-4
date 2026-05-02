@@ -39,7 +39,7 @@ func main() {
 		log.Fatalf("Error opening DB: %v", err)
 	}
 	execute(db, "CapitalsSeed")
-	//execute(db, "LargeLessonSeed")
+	execute(db, "LargeLessonSeed")
 	os.Exit(0)
 }
 
@@ -159,15 +159,30 @@ func (s Seeder) CapitalsSeed() {
 func (s Seeder) LargeLessonSeed() {
 	ctx := context.Background()
 
-	exercisesCount := 100
-	answersCount := 100
+	uEmail := "test.user.seeded@example.com"
+	uPassword := "password"
+
+	t, err := s.authSvc.SignIn(ctx, uEmail, uPassword)
+	if err != nil {
+		panic(err)
+	}
+
+	uID := userID(t.AccessToken)
 
 	lesson := backend.Lesson{
 		Name:        "Large lesson",
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err := s.backendWriter.UpsertLesson(ctx, &lesson, "1")
+	err = s.backendWriter.UpsertLesson(ctx, &lesson, uID)
+	if err != nil {
+		panic(err)
+	}
+
+	exercisesCount := 100
+	answersCount := 100
+
+	err = s.backendWriter.UpsertLesson(ctx, &lesson, "1")
 	if err != nil {
 		panic(err)
 	}
@@ -204,7 +219,7 @@ func (s Seeder) LargeLessonSeed() {
 				r.Type = worker.Bad
 			}
 
-			err := s.workerWriter.StoreResult(ctx, r)
+			err := s.workerWriter.StoreResult(ctx, uID, r)
 			if err != nil {
 				panic(err)
 			}

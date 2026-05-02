@@ -15,8 +15,8 @@ type Service interface {
 	UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error
 	StoreExercises(ctx context.Context, exercise backend.Exercises, userID string) error
 	DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error
-	PublishGoodAnswer(ctx context.Context, exerciseID int, userID string) error
-	PublishBadAnswer(ctx context.Context, exerciseID int, userID string) error
+	PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error
+	PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error
 	Register(ctx context.Context, firstName, lastName, email, password string) (backend.Tokens, error)
 	SignIn(ctx context.Context, email, password string) (backend.Tokens, error)
 	Revoke(ctx context.Context, refreshToken string) error

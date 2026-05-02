@@ -24,6 +24,7 @@ func (suite *PublisherSuite) SetupTest() {
 
 func (suite *PublisherSuite) TestPublisher_Publish_GoodAnswer() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 123
 
 	suite.senderMock.On("Send", ctx, mock.MatchedBy(func(e event.Event) bool {
@@ -36,11 +37,12 @@ func (suite *PublisherSuite) TestPublisher_Publish_GoodAnswer() {
 		err := e.DataAs(&goodAnswer)
 		suite.NoError(err)
 		assert.EqualValues(suite.T(), uint32(exerciseID), goodAnswer.ExerciseID)
+		assert.Equal(suite.T(), userID, goodAnswer.UserID)
 
 		return true
 	})).Return(cloudevents.ResultACK)
 
-	err := suite.publisher.PublishGoodAnswer(ctx, exerciseID)
+	err := suite.publisher.PublishGoodAnswer(ctx, userID, exerciseID)
 	suite.NoError(err)
 
 	suite.senderMock.AssertExpectations(suite.T())
@@ -48,6 +50,7 @@ func (suite *PublisherSuite) TestPublisher_Publish_GoodAnswer() {
 
 func (suite *PublisherSuite) TestPublisher_Publish_BadAnswer() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 456
 
 	suite.senderMock.On("Send", ctx, mock.MatchedBy(func(e event.Event) bool {
@@ -60,11 +63,12 @@ func (suite *PublisherSuite) TestPublisher_Publish_BadAnswer() {
 		err := e.DataAs(&badAnswer)
 		suite.NoError(err)
 		assert.EqualValues(suite.T(), uint32(exerciseID), badAnswer.ExerciseID)
+		assert.Equal(suite.T(), userID, badAnswer.UserID)
 
 		return true
 	})).Return(cloudevents.ResultACK)
 
-	err := suite.publisher.PublishBadAnswer(ctx, exerciseID)
+	err := suite.publisher.PublishBadAnswer(ctx, userID, exerciseID)
 	suite.NoError(err)
 
 	suite.senderMock.AssertExpectations(suite.T())

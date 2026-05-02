@@ -27,10 +27,10 @@ func TestHandlerStoreResult_goodAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishGoodAnswer", mock.Anything, 10, "100").Return(nil)
+	service.On("PublishGoodAnswer", mock.Anything, "userID", input.Exercise.Id).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 
@@ -59,10 +59,10 @@ func TestHandlerStoreResult_badAnswer(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("PublishBadAnswer", mock.Anything, 10, "100").Return(nil)
+	service.On("PublishBadAnswer", mock.Anything, "userID", input.Exercise.Id).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 
@@ -88,7 +88,7 @@ func TestHandlerStoreResult_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerStoreResult(service))
 

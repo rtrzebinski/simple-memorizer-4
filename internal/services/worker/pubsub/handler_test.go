@@ -31,8 +31,12 @@ func (suite *HandlerSuite) SetupTest() {
 
 func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Success() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 1
-	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
+	message := events.BadAnswer{
+		UserID:     userID,
+		ExerciseID: uint32(exerciseID),
+	}
 	e := event.New()
 	e.SetType(GoodAnswerType)
 	protobufData, err := cprotobuf.EncodeData(ctx, &message)
@@ -40,18 +44,22 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Success() {
 	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
-	suite.serviceMock.On("ProcessGoodAnswer", ctx, exerciseID).Return(nil)
+	suite.serviceMock.On("ProcessGoodAnswer", ctx, userID, exerciseID).Return(nil)
 
 	err = suite.handler.Handle(ctx, e)
 
 	suite.NoError(err)
-	suite.serviceMock.AssertCalled(suite.T(), "ProcessGoodAnswer", ctx, exerciseID)
+	suite.serviceMock.AssertExpectations(suite.T())
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 1
-	message := events.GoodAnswer{ExerciseID: uint32(exerciseID)}
+	message := events.BadAnswer{
+		UserID:     userID,
+		ExerciseID: uint32(exerciseID),
+	}
 	e := event.New()
 	e.SetType(GoodAnswerType)
 	protobufData, err := cprotobuf.EncodeData(ctx, &message)
@@ -59,18 +67,22 @@ func (suite *HandlerSuite) TestHandler_Handle_GoodAnswer_Error() {
 	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
-	suite.serviceMock.On("ProcessGoodAnswer", ctx, exerciseID).Return(assert.AnError)
+	suite.serviceMock.On("ProcessGoodAnswer", ctx, userID, exerciseID).Return(assert.AnError)
 
 	err = suite.handler.Handle(ctx, e)
 
 	suite.NoError(err)
-	suite.serviceMock.AssertCalled(suite.T(), "ProcessGoodAnswer", ctx, exerciseID)
+	suite.serviceMock.AssertExpectations(suite.T())
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Success() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 2
-	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
+	message := events.BadAnswer{
+		UserID:     userID,
+		ExerciseID: uint32(exerciseID),
+	}
 	e := event.New()
 	e.SetType(BadAnswerType)
 	protobufData, err := cprotobuf.EncodeData(ctx, &message)
@@ -78,18 +90,22 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Success() {
 	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
-	suite.serviceMock.On("ProcessBadAnswer", ctx, exerciseID).Return(nil)
+	suite.serviceMock.On("ProcessBadAnswer", ctx, userID, exerciseID).Return(nil)
 
 	err = suite.handler.Handle(ctx, e)
 
 	suite.NoError(err)
-	suite.serviceMock.AssertCalled(suite.T(), "ProcessBadAnswer", ctx, exerciseID)
+	suite.serviceMock.AssertExpectations(suite.T())
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
 	ctx := suite.T().Context()
+	userID := "userID"
 	exerciseID := 2
-	message := events.BadAnswer{ExerciseID: uint32(exerciseID)}
+	message := events.BadAnswer{
+		UserID:     userID,
+		ExerciseID: uint32(exerciseID),
+	}
 	e := event.New()
 	e.SetType(BadAnswerType)
 	protobufData, err := cprotobuf.EncodeData(ctx, &message)
@@ -97,12 +113,12 @@ func (suite *HandlerSuite) TestHandler_Handle_BadAnswer_Error() {
 	err = e.SetData(ContentType, protobufData)
 	suite.NoError(err)
 
-	suite.serviceMock.On("ProcessBadAnswer", ctx, exerciseID).Return(assert.AnError)
+	suite.serviceMock.On("ProcessBadAnswer", ctx, userID, exerciseID).Return(assert.AnError)
 
 	err = suite.handler.Handle(ctx, e)
 
 	suite.NoError(err)
-	suite.serviceMock.AssertCalled(suite.T(), "ProcessBadAnswer", ctx, exerciseID)
+	suite.serviceMock.AssertExpectations(suite.T())
 }
 
 func (suite *HandlerSuite) TestHandler_Handle_UnknownEventType() {

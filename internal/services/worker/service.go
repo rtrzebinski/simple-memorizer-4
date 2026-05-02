@@ -20,13 +20,13 @@ func NewService(r Reader, w Writer) *Service {
 	}
 }
 
-func (s *Service) ProcessGoodAnswer(ctx context.Context, exerciseID int) error {
+func (s *Service) ProcessGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
 	result := Result{
 		Type:       Good,
 		ExerciseId: exerciseID,
 	}
 
-	err := s.processAnswer(ctx, result)
+	err := s.processAnswer(ctx, userID, result)
 	if err != nil {
 		return fmt.Errorf("process good answer: %w", err)
 	}
@@ -34,13 +34,13 @@ func (s *Service) ProcessGoodAnswer(ctx context.Context, exerciseID int) error {
 	return nil
 }
 
-func (s *Service) ProcessBadAnswer(ctx context.Context, exerciseID int) error {
+func (s *Service) ProcessBadAnswer(ctx context.Context, userID string, exerciseID int) error {
 	result := Result{
 		Type:       Bad,
 		ExerciseId: exerciseID,
 	}
 
-	err := s.processAnswer(ctx, result)
+	err := s.processAnswer(ctx, userID, result)
 	if err != nil {
 		return fmt.Errorf("process bad answer: %w", err)
 	}
@@ -48,8 +48,8 @@ func (s *Service) ProcessBadAnswer(ctx context.Context, exerciseID int) error {
 	return nil
 }
 
-func (s *Service) processAnswer(ctx context.Context, result Result) error {
-	err := s.w.StoreResult(ctx, result)
+func (s *Service) processAnswer(ctx context.Context, userID string, result Result) error {
+	err := s.w.StoreResult(ctx, userID, result)
 	if err != nil {
 		return fmt.Errorf("store result: %w", err)
 	}
