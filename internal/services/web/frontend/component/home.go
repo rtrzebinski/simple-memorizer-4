@@ -1,6 +1,8 @@
 package component
 
 import (
+	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
@@ -16,15 +18,15 @@ type Home struct {
 	c APIClient
 
 	// component vars
-	showHome bool
-	user     *frontend.UserProfile
+	showHome    bool
+	userProfile *frontend.UserProfile
 }
 
 // NewHome creates a new Home component
 func NewHome(c APIClient) *Home {
 	return &Home{
-		user: &frontend.UserProfile{},
-		c:    c,
+		userProfile: &frontend.UserProfile{},
+		c:           c,
 	}
 }
 
@@ -42,7 +44,7 @@ func (compo *Home) Render() app.UI {
 				app.Text(app.Getenv("version")),
 			),
 		),
-		app.Text("Welcome "+compo.user.Name),
+		app.Text("Welcome "+compo.userProfile.Name),
 		app.Br(),
 		app.P().Body(
 			app.Text("Home page"),
@@ -53,9 +55,25 @@ func (compo *Home) Render() app.UI {
 // The OnMount method is run once component is mounted
 func (compo *Home) OnMount(ctx app.Context) {
 	// auth check
-	compo.user = auth.GetUser(ctx)
-	if compo.user == nil {
+	compo.userProfile = auth.GetUser(ctx)
+	if compo.userProfile == nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 		return
 	}
+
+	compo.displayProfile(ctx)
+}
+
+func (compo *Home) displayProfile(ctx app.Context) {
+	userProfile, err := compo.c.UserProfile(ctx)
+	if err != nil {
+		app.Log(fmt.Errorf("failed to fetch userProfile profile: %w", err))
+		if errors.Is(err, frontend.ErrUnauthorized) {
+			auth.DelUser(ctx)
+			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		}
+		return
+	}
+
+	compo.userProfile = userProfile
 }

@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
 // Caller is an HTTP caller
@@ -69,6 +70,10 @@ func (c *Caller) Call(ctx app.Context, method, route string, params map[string]s
 
 	// check if status is OK
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusUnauthorized {
+			return nil, frontend.ErrUnauthorized
+		}
+
 		return nil, fmt.Errorf("server returned with the status code '%d': %w",
 			resp.StatusCode, errors.New(string(respBody)))
 	}

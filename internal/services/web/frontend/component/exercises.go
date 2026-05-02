@@ -1,6 +1,7 @@
 package component
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"slices"
@@ -216,6 +217,11 @@ func (compo *Exercises) displayExercises(ctx app.Context) {
 	exercises, err := compo.c.FetchExercises(ctx, compo.lesson, oldestExerciseID)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch exercises: %w", err))
+		if errors.Is(err, frontend.ErrUnauthorized) {
+			auth.DelUser(ctx)
+			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		}
+		return
 	}
 
 	// no entries

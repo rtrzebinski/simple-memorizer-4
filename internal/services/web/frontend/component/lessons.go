@@ -1,6 +1,7 @@
 package component
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -170,6 +171,11 @@ func (compo *Lessons) displayAllLessons(ctx app.Context) {
 	lessons, err := compo.c.FetchLessons(ctx)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to fetch all lessons: %w", err))
+		if errors.Is(err, frontend.ErrUnauthorized) {
+			auth.DelUser(ctx)
+			ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
+		}
+		return
 	}
 
 	// no entries
