@@ -33,7 +33,7 @@ func TestHandlerNewAuthSignIn(t *testing.T) {
 	service := NewServiceMock()
 	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(tokens, nil)
 
-	handler := HandlerNewAuthSignIn(service, true)
+	handler := NewHandlerAuthSignIn(service, true)
 
 	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
 	assert.NoError(t, err)
@@ -73,7 +73,7 @@ func TestHandlerNewAuthSignIn_unauthorized(t *testing.T) {
 	service := NewServiceMock()
 	service.On("SignIn", mock.Anything, input.Email, input.Password).Return(backend.Tokens{}, errors.New("unauthorized"))
 
-	handler := HandlerNewAuthSignIn(service, true)
+	handler := NewHandlerAuthSignIn(service, true)
 
 	req, err := http.NewRequest(http.MethodPost, AuthSignIn, io.NopCloser(strings.NewReader(string(body))))
 	assert.NoError(t, err)

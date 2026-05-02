@@ -17,7 +17,7 @@ func TestHandlerUserProfile_success(t *testing.T) {
 	r := NewTokenRefresherMock()
 	r.On("Refresh", mock.Anything, mock.Anything).Return(backend.Tokens{}, nil).Maybe()
 
-	route := Auth(v, r, false)(NewUserProfileHandler(v))
+	route := Auth(v, r, false)(NewHandlerUserProfile(v))
 
 	res := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, UserProfile, nil)
@@ -42,7 +42,7 @@ func TestHandlerUserProfile_unauthorized(t *testing.T) {
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
 
-	route := Auth(v, r, false)(NewUserProfileHandler(v))
+	route := Auth(v, r, false)(NewHandlerUserProfile(v))
 
 	res := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, UserProfile, nil)

@@ -9,17 +9,17 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 )
 
-type UserProfileHandler struct {
+type HandlerUserProfile struct {
 	v TokenVerifier
 }
 
-func NewUserProfileHandler(v TokenVerifier) *UserProfileHandler {
-	return &UserProfileHandler{
+func NewHandlerUserProfile(v TokenVerifier) *HandlerUserProfile {
+	return &HandlerUserProfile{
 		v: v,
 	}
 }
 
-func (h *UserProfileHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerUserProfile) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		http.Error(res, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
@@ -33,7 +33,7 @@ func (h *UserProfileHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	encoded, err := json.Marshal(profile)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to encode UserProfileHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to encode HandlerUserProfile HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -41,7 +41,7 @@ func (h *UserProfileHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	_, err = res.Write(encoded)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to write UserProfileHandler HTTP response: %w", err))
+		log.Print(fmt.Errorf("failed to write HandlerUserProfile HTTP response: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
 
 		return

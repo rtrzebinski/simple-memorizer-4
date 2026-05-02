@@ -26,7 +26,7 @@ func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string,
 	http.Handle(FetchLessons, Auth(v, rfr, secure)(NewHandlerFetchLessons(s)))
 	http.Handle(HydrateLesson, Auth(v, rfr, secure)(NewHandlerHydrateLesson(s)))
 	http.Handle(FetchExercises, Auth(v, rfr, secure)(NewHandlerFetchExercises(s)))
-	http.Handle(UserProfile, Auth(v, rfr, secure)(NewUserProfileHandler(v)))
+	http.Handle(UserProfile, Auth(v, rfr, secure)(NewHandlerUserProfile(v)))
 
 	// write
 	http.Handle(UpsertLesson, Auth(v, rfr, secure)(NewHandlerUpsertLesson(s)))
@@ -41,7 +41,7 @@ func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string,
 
 	// auth
 	http.Handle(AuthRegister, NewHandlerAuthRegister(s, secure))
-	http.Handle(AuthSignIn, HandlerNewAuthSignIn(s, secure))
+	http.Handle(AuthSignIn, NewHandlerAuthSignIn(s, secure))
 	http.Handle(AuthLogout, NewHandlerAuthLogout(s))
 
 	handler := CSRFDynamicHost()(http.DefaultServeMux)

@@ -9,19 +9,19 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
 )
 
-type AuthSignInHandler struct {
+type HandlerAuthSignIn struct {
 	s      Service
 	secure bool
 }
 
-func HandlerNewAuthSignIn(s Service, secure bool) *AuthSignInHandler {
-	return &AuthSignInHandler{
+func NewHandlerAuthSignIn(s Service, secure bool) *HandlerAuthSignIn {
+	return &HandlerAuthSignIn{
 		s:      s,
 		secure: secure,
 	}
 }
 
-func (h *AuthSignInHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *HandlerAuthSignIn) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	if req.Method != http.MethodPost {
@@ -33,7 +33,7 @@ func (h *AuthSignInHandler) ServeHTTP(res http.ResponseWriter, req *http.Request
 
 	err := json.NewDecoder(req.Body).Decode(&signInRequest)
 	if err != nil {
-		log.Print(fmt.Errorf("failed to decode AuthSignInHandler HTTP request: %w", err))
+		log.Print(fmt.Errorf("failed to decode HandlerAuthSignIn HTTP request: %w", err))
 		res.WriteHeader(http.StatusBadRequest)
 
 		return
