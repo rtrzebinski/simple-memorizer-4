@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/auth"
 )
 
 const PathAuthLogout = "/logout"
@@ -21,7 +22,9 @@ func NewLogout(c APIClient) *Logout {
 }
 
 func (compo *Logout) OnMount(ctx app.Context) {
-	ctx.DelState("user")
+	// delete user from the local storage, so the user is logged out on the frontend
+	auth.DelUser(ctx)
+	// make a logout call to the backend to delete the session cookie and revoke the token
 	err := compo.c.AuthLogout(ctx)
 	if err != nil {
 		app.Log(fmt.Errorf("failed to make a logout call: %w", err))

@@ -7,6 +7,7 @@ import (
 
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
+	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend/component/auth"
 )
 
 const PathAuthSignIn = "/sign-in"
@@ -82,7 +83,8 @@ func (compo *SignIn) handleSubmit(ctx app.Context, e app.Event) {
 		slog.Error("failed to fetch user profile", "err", err)
 	}
 
-	ctx.SetState("user", user).Persist()
+	// persist user in local storage, so it can be used in other components
+	auth.PersistUser(ctx, user)
 
 	ctx.NavigateTo(&url.URL{Path: PathHome})
 }

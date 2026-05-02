@@ -46,7 +46,7 @@ stop: ## Stop docker-compose containers
 
 database: start ## Migrate the database when it's ready
 	@until docker exec dev-sm-db-1 pg_isready 2>&1 | grep -q "accepting connections"; do \
-          sleep 1; \
+          sleep 2; \
           echo "[Database] Waiting for Postgres.."; \
          done
 	@make migrate

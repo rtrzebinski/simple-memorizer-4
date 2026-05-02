@@ -53,7 +53,7 @@ func (compo *Home) Render() app.UI {
 // The OnMount method is run once component is mounted
 func (compo *Home) OnMount(ctx app.Context) {
 	// auth check
-	compo.user = auth.CheckUser(ctx)
+	compo.user = auth.GetUser(ctx)
 	if compo.user == nil {
 		ctx.NavigateTo(&url.URL{Path: PathAuthSignIn})
 		return

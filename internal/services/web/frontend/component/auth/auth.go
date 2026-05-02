@@ -5,7 +5,11 @@ import (
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/frontend"
 )
 
-func CheckUser(ctx app.Context) *frontend.UserProfile {
+func PersistUser(ctx app.Context, user *frontend.UserProfile) {
+	ctx.SetState("user", user).Persist()
+}
+
+func GetUser(ctx app.Context) *frontend.UserProfile {
 	user := new(frontend.UserProfile)
 	ctx.GetState("user", user)
 
@@ -14,4 +18,8 @@ func CheckUser(ctx app.Context) *frontend.UserProfile {
 	}
 
 	return user
+}
+
+func DelUser(ctx app.Context) {
+	ctx.DelState("user")
 }
