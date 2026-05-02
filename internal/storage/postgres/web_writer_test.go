@@ -36,7 +36,7 @@ func (s *WebWriterSuite) TestWebWriter_UpsertLesson_createNew() {
 		Description: "description",
 	}
 
-	err := s.writer.UpsertLesson(ctx, &lesson, userID)
+	err := s.writer.UpsertLesson(ctx, userID, &lesson)
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestLesson(s.DB)
@@ -53,11 +53,11 @@ func (s *WebWriterSuite) TestWebWriter_UpsertLesson_updateExisting() {
 	lesson := &lesson{}
 	createLesson(s.DB, lesson)
 
-	err := s.writer.UpsertLesson(ctx, &backend.Lesson{
+	err := s.writer.UpsertLesson(ctx, "userID", &backend.Lesson{
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
-	}, "userID")
+	})
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestLesson(s.DB)
@@ -77,7 +77,7 @@ func (s *WebWriterSuite) TestWebWriter_DeleteLesson() {
 	})
 	another := fetchLatestLesson(s.DB)
 
-	err := s.writer.DeleteLesson(ctx, backend.Lesson{Id: stored.Id}, "userID")
+	err := s.writer.DeleteLesson(ctx, "userID", backend.Lesson{Id: stored.Id})
 	assert.NoError(s.T(), err)
 
 	assert.Nil(s.T(), findLessonById(s.DB, stored.Id))
@@ -98,7 +98,7 @@ func (s *WebWriterSuite) TestWebWriter_UpsertExercise_createNew() {
 		Answer:   "answer",
 	}
 
-	err := s.writer.UpsertExercise(ctx, &exercise, "userID")
+	err := s.writer.UpsertExercise(ctx, "userID", &exercise)
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestExercise(s.DB)
@@ -118,11 +118,11 @@ func (s *WebWriterSuite) TestWebWriter_UpsertExercise_updateExisting() {
 	exercise := exercise{LessonId: lesson.Id}
 	createExercise(s.DB, &exercise)
 
-	err := s.writer.UpsertExercise(ctx, &backend.Exercise{
+	err := s.writer.UpsertExercise(ctx, "userID", &backend.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",
-	}, "userID")
+	})
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestExercise(s.DB)
@@ -165,7 +165,7 @@ func (s *WebWriterSuite) TestWebWriter_StoreExercises() {
 
 	exercises := backend.Exercises{exercise1, exercise2}
 
-	err := s.writer.StoreExercises(ctx, exercises, "userID")
+	err := s.writer.StoreExercises(ctx, "userID", exercises)
 	assert.NoError(s.T(), err)
 
 	ex1 := findExerciseById(s.DB, 1)
@@ -199,7 +199,7 @@ func (s *WebWriterSuite) TestWebWriter_DeleteExercise() {
 	})
 	another := fetchLatestExercise(s.DB)
 
-	err := s.writer.DeleteExercise(ctx, backend.Exercise{Id: stored.Id}, "userID")
+	err := s.writer.DeleteExercise(ctx, "userID", backend.Exercise{Id: stored.Id})
 	assert.NoError(s.T(), err)
 
 	assert.Nil(s.T(), findExerciseById(s.DB, stored.Id))

@@ -51,7 +51,7 @@ func (r *WebReader) FetchLessons(ctx context.Context, userID string) (backend.Le
 	return lessons, nil
 }
 
-func (r *WebReader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+func (r *WebReader) HydrateLesson(ctx context.Context, userID string, lesson *backend.Lesson) error {
 	slog.Debug("WebReader HydrateLesson", "userID", userID)
 
 	query := `
@@ -69,7 +69,7 @@ func (r *WebReader) HydrateLesson(ctx context.Context, lesson *backend.Lesson, u
 	return nil
 }
 
-func (r *WebReader) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
+func (r *WebReader) FetchExercises(ctx context.Context, userID string, lesson backend.Lesson, oldestExerciseID int) (backend.Exercises, error) {
 	slog.Debug("WebReader FetchExercises", "userID", userID)
 
 	const query = `

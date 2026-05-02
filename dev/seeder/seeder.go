@@ -115,7 +115,7 @@ func (s Seeder) CapitalsSeed() {
 		Description: "What is the capital of given country?",
 	}
 
-	err = s.backendWriter.UpsertLesson(ctx, &lesson, uID)
+	err = s.backendWriter.UpsertLesson(ctx, uID, &lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -149,7 +149,7 @@ func (s Seeder) CapitalsSeed() {
 	}
 
 	for _, exercise := range exercises {
-		err := s.backendWriter.UpsertExercise(ctx, &exercise, uID)
+		err := s.backendWriter.UpsertExercise(ctx, uID, &exercise)
 		if err != nil {
 			panic(err)
 		}
@@ -174,7 +174,7 @@ func (s Seeder) LargeLessonSeed() {
 		Description: "This lesson has plenty of exercises and answers",
 	}
 
-	err = s.backendWriter.UpsertLesson(ctx, &lesson, uID)
+	err = s.backendWriter.UpsertLesson(ctx, uID, &lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -182,7 +182,7 @@ func (s Seeder) LargeLessonSeed() {
 	exercisesCount := 100
 	answersCount := 100
 
-	err = s.backendWriter.UpsertLesson(ctx, &lesson, "1")
+	err = s.backendWriter.UpsertLesson(ctx, "1", &lesson)
 	if err != nil {
 		panic(err)
 	}
@@ -198,7 +198,7 @@ func (s Seeder) LargeLessonSeed() {
 	}
 
 	for k := range exercises {
-		err := s.backendWriter.UpsertExercise(ctx, &exercises[k], "1")
+		err := s.backendWriter.UpsertExercise(ctx, "1", &exercises[k])
 		if err != nil {
 			panic(err)
 		}

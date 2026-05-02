@@ -76,7 +76,7 @@ func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
 		Id: l.Id,
 	}
 
-	err := s.reader.HydrateLesson(ctx, lesson, "userID")
+	err := s.reader.HydrateLesson(ctx, "userID", lesson)
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -86,7 +86,7 @@ func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
 	createExercise(s.DB, &exercise{LessonId: l.Id})
 	createExercise(s.DB, &exercise{LessonId: l.Id})
 
-	err = s.reader.HydrateLesson(ctx, lesson, "userID")
+	err = s.reader.HydrateLesson(ctx, "userID", lesson)
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -114,7 +114,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises() {
 
 	oldestExerciseID := 1
 
-	res, err := s.reader.FetchExercises(ctx, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
+	res, err := s.reader.FetchExercises(ctx, "userID", backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)
@@ -161,7 +161,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises_oldestExerciseID() {
 
 	oldestExerciseID := 2
 
-	res, err := s.reader.FetchExercises(ctx, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID, "userID")
+	res, err := s.reader.FetchExercises(ctx, "userID", backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)

@@ -4,16 +4,16 @@ import "context"
 
 type Reader interface {
 	FetchLessons(ctx context.Context, userID string) (Lessons, error)
-	HydrateLesson(ctx context.Context, lesson *Lesson, userID string) error
-	FetchExercises(ctx context.Context, lesson Lesson, oldestExerciseID int, userID string) (Exercises, error)
+	HydrateLesson(ctx context.Context, userID string, lesson *Lesson) error
+	FetchExercises(ctx context.Context, userID string, lesson Lesson, oldestExerciseID int) (Exercises, error)
 }
 
 type Writer interface {
-	UpsertLesson(ctx context.Context, lesson *Lesson, userID string) error
-	DeleteLesson(ctx context.Context, lesson Lesson, userID string) error
-	UpsertExercise(ctx context.Context, exercise *Exercise, userID string) error
-	StoreExercises(ctx context.Context, exercise Exercises, userID string) error
-	DeleteExercise(ctx context.Context, exercise Exercise, userID string) error
+	UpsertLesson(ctx context.Context, userID string, lesson *Lesson) error
+	DeleteLesson(ctx context.Context, userID string, lesson Lesson) error
+	UpsertExercise(ctx context.Context, userID string, exercise *Exercise) error
+	StoreExercises(ctx context.Context, userID string, exercise Exercises) error
+	DeleteExercise(ctx context.Context, userID string, exercise Exercise) error
 }
 
 type Publisher interface {

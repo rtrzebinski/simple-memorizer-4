@@ -17,7 +17,7 @@ func NewWebWriter(db *sql.DB) *WebWriter {
 	return &WebWriter{db: db}
 }
 
-func (w *WebWriter) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
+func (w *WebWriter) UpsertLesson(ctx context.Context, userID string, lesson *backend.Lesson) error {
 	slog.Debug("WebWriter UpsertLesson", "userID", userID)
 
 	var query string
@@ -49,7 +49,7 @@ func (w *WebWriter) UpsertLesson(ctx context.Context, lesson *backend.Lesson, us
 	return nil
 }
 
-func (w *WebWriter) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
+func (w *WebWriter) DeleteLesson(ctx context.Context, userID string, lesson backend.Lesson) error {
 	slog.Debug("WebWriter DeleteLesson", "userID", userID)
 
 	query := `DELETE FROM lesson WHERE id = $1;`
@@ -62,7 +62,7 @@ func (w *WebWriter) DeleteLesson(ctx context.Context, lesson backend.Lesson, use
 	return nil
 }
 
-func (w *WebWriter) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
+func (w *WebWriter) UpsertExercise(ctx context.Context, userID string, exercise *backend.Exercise) error {
 	slog.Debug("WebWriter UpsertExercise", "userID", userID)
 
 	var query string
@@ -94,7 +94,7 @@ func (w *WebWriter) UpsertExercise(ctx context.Context, exercise *backend.Exerci
 	return nil
 }
 
-func (w *WebWriter) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
+func (w *WebWriter) StoreExercises(ctx context.Context, userID string, exercises backend.Exercises) error {
 	slog.Debug("WebWriter StoreExercises", "userID", userID)
 
 	const query = `
@@ -112,7 +112,7 @@ func (w *WebWriter) StoreExercises(ctx context.Context, exercises backend.Exerci
 	return nil
 }
 
-func (w *WebWriter) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
+func (w *WebWriter) DeleteExercise(ctx context.Context, userID string, exercise backend.Exercise) error {
 	slog.Debug("WebWriter DeleteExercise", "userID", userID)
 
 	query := `DELETE FROM exercise WHERE id = $1;`

@@ -18,31 +18,31 @@ func (s *Service) FetchLessons(ctx context.Context, userID string) (Lessons, err
 }
 
 func (s *Service) HydrateLesson(ctx context.Context, userID string, lesson *Lesson) error {
-	return s.r.HydrateLesson(ctx, lesson, userID)
+	return s.r.HydrateLesson(ctx, userID, lesson)
 }
 
 func (s *Service) FetchExercises(ctx context.Context, userID string, lesson Lesson, oldestExerciseID int) (Exercises, error) {
-	return s.r.FetchExercises(ctx, lesson, oldestExerciseID, userID)
+	return s.r.FetchExercises(ctx, userID, lesson, oldestExerciseID)
 }
 
 func (s *Service) UpsertLesson(ctx context.Context, userID string, lesson *Lesson) error {
-	return s.w.UpsertLesson(ctx, lesson, userID)
+	return s.w.UpsertLesson(ctx, userID, lesson)
 }
 
 func (s *Service) DeleteLesson(ctx context.Context, userID string, lesson Lesson) error {
-	return s.w.DeleteLesson(ctx, lesson, userID)
+	return s.w.DeleteLesson(ctx, userID, lesson)
 }
 
 func (s *Service) UpsertExercise(ctx context.Context, userID string, exercise *Exercise) error {
-	return s.w.UpsertExercise(ctx, exercise, userID)
+	return s.w.UpsertExercise(ctx, userID, exercise)
 }
 
 func (s *Service) StoreExercises(ctx context.Context, userID string, exercises Exercises) error {
-	return s.w.StoreExercises(ctx, exercises, userID)
+	return s.w.StoreExercises(ctx, userID, exercises)
 }
 
 func (s *Service) DeleteExercise(ctx context.Context, userID string, exercise Exercise) error {
-	return s.w.DeleteExercise(ctx, exercise, userID)
+	return s.w.DeleteExercise(ctx, userID, exercise)
 }
 
 func (s *Service) PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error {
