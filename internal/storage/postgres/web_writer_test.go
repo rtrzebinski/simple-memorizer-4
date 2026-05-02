@@ -31,29 +31,29 @@ func (s *WebWriterSuite) TestWebWriter_UpsertLesson_createNew() {
 
 	userID := randomString()
 
-	lesson := backend.Lesson{
+	l := backend.Lesson{
 		Name:        "name",
 		Description: "description",
 	}
 
-	err := s.writer.UpsertLesson(ctx, userID, &lesson)
+	err := s.writer.UpsertLesson(ctx, userID, &l)
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestLesson(s.DB)
 
-	assert.Equal(s.T(), lesson.Name, stored.Name)
-	assert.Equal(s.T(), lesson.Description, stored.Description)
-	assert.Equal(s.T(), lesson.Id, stored.Id)
+	assert.Equal(s.T(), l.Name, stored.Name)
+	assert.Equal(s.T(), l.Description, stored.Description)
+	assert.Equal(s.T(), l.Id, stored.Id)
 	assert.Equal(s.T(), userID, stored.UserID)
 }
 
 func (s *WebWriterSuite) TestWebWriter_UpsertLesson_updateExisting() {
 	ctx := s.T().Context()
 
-	lesson := &lesson{}
-	createLesson(s.DB, lesson)
+	l := &lesson{}
+	createLesson(s.DB, l)
 
-	err := s.writer.UpsertLesson(ctx, "userID", &backend.Lesson{
+	err := s.writer.UpsertLesson(ctx, l.UserID, &backend.Lesson{
 		Id:          1,
 		Name:        "newName",
 		Description: "newDescription",
@@ -69,56 +69,56 @@ func (s *WebWriterSuite) TestWebWriter_UpsertLesson_updateExisting() {
 func (s *WebWriterSuite) TestWebWriter_DeleteLesson() {
 	ctx := s.T().Context()
 
-	createLesson(s.DB, &lesson{})
-	stored := fetchLatestLesson(s.DB)
+	l := &lesson{}
+	createLesson(s.DB, l)
 
-	createLesson(s.DB, &lesson{
+	another := &lesson{
 		Name: "another",
-	})
-	another := fetchLatestLesson(s.DB)
+	}
+	createLesson(s.DB, another)
 
-	err := s.writer.DeleteLesson(ctx, "userID", backend.Lesson{Id: stored.Id})
+	err := s.writer.DeleteLesson(ctx, l.UserID, backend.Lesson{Id: l.Id})
 	assert.NoError(s.T(), err)
 
-	assert.Nil(s.T(), findLessonById(s.DB, stored.Id))
+	assert.Nil(s.T(), findLessonById(s.DB, l.Id))
 	assert.Equal(s.T(), "another", findLessonById(s.DB, another.Id).Name)
 }
 
 func (s *WebWriterSuite) TestWebWriter_UpsertExercise_createNew() {
 	ctx := s.T().Context()
 
-	lesson := &lesson{}
-	createLesson(s.DB, lesson)
+	l := &lesson{}
+	createLesson(s.DB, l)
 
-	exercise := backend.Exercise{
+	ex := backend.Exercise{
 		Lesson: &backend.Lesson{
-			Id: lesson.Id,
+			Id: l.Id,
 		},
 		Question: "question",
 		Answer:   "answer",
 	}
 
-	err := s.writer.UpsertExercise(ctx, "userID", &exercise)
+	err := s.writer.UpsertExercise(ctx, l.UserID, &ex)
 	assert.NoError(s.T(), err)
 
 	stored := fetchLatestExercise(s.DB)
 
-	assert.Equal(s.T(), exercise.Lesson.Id, stored.LessonId)
-	assert.Equal(s.T(), exercise.Question, stored.Question)
-	assert.Equal(s.T(), exercise.Answer, stored.Answer)
-	assert.Equal(s.T(), exercise.Id, stored.Id)
+	assert.Equal(s.T(), ex.Lesson.Id, stored.LessonId)
+	assert.Equal(s.T(), ex.Question, stored.Question)
+	assert.Equal(s.T(), ex.Answer, stored.Answer)
+	assert.Equal(s.T(), ex.Id, stored.Id)
 }
 
 func (s *WebWriterSuite) TestWebWriter_UpsertExercise_updateExisting() {
 	ctx := s.T().Context()
 
-	lesson := lesson{}
-	createLesson(s.DB, &lesson)
+	l := lesson{}
+	createLesson(s.DB, &l)
 
-	exercise := exercise{LessonId: lesson.Id}
-	createExercise(s.DB, &exercise)
+	ex := exercise{LessonId: l.Id}
+	createExercise(s.DB, &ex)
 
-	err := s.writer.UpsertExercise(ctx, "userID", &backend.Exercise{
+	err := s.writer.UpsertExercise(ctx, l.UserID, &backend.Exercise{
 		Id:       1,
 		Question: "newQuestion",
 		Answer:   "newAnswer",
@@ -127,7 +127,7 @@ func (s *WebWriterSuite) TestWebWriter_UpsertExercise_updateExisting() {
 
 	stored := fetchLatestExercise(s.DB)
 
-	assert.Equal(s.T(), lesson.Id, stored.LessonId)
+	assert.Equal(s.T(), l.Id, stored.LessonId)
 	assert.Equal(s.T(), "newQuestion", stored.Question)
 	assert.Equal(s.T(), "newAnswer", stored.Answer)
 }
@@ -135,13 +135,13 @@ func (s *WebWriterSuite) TestWebWriter_UpsertExercise_updateExisting() {
 func (s *WebWriterSuite) TestWebWriter_StoreExercises() {
 	ctx := s.T().Context()
 
-	lesson := &lesson{}
-	createLesson(s.DB, lesson)
+	l := &lesson{}
+	createLesson(s.DB, l)
 
 	// exercise1 existing
 	exercise1 := backend.Exercise{
 		Lesson: &backend.Lesson{
-			Id: lesson.Id,
+			Id: l.Id,
 		},
 		Question: "question1",
 		Answer:   "answer1",
@@ -157,7 +157,7 @@ func (s *WebWriterSuite) TestWebWriter_StoreExercises() {
 	// exercise2 not existing
 	exercise2 := backend.Exercise{
 		Lesson: &backend.Lesson{
-			Id: lesson.Id,
+			Id: l.Id,
 		},
 		Question: "question2",
 		Answer:   "answer2",
@@ -165,7 +165,7 @@ func (s *WebWriterSuite) TestWebWriter_StoreExercises() {
 
 	exercises := backend.Exercises{exercise1, exercise2}
 
-	err := s.writer.StoreExercises(ctx, "userID", exercises)
+	err := s.writer.StoreExercises(ctx, l.UserID, exercises)
 	assert.NoError(s.T(), err)
 
 	ex1 := findExerciseById(s.DB, 1)
@@ -186,11 +186,11 @@ func (s *WebWriterSuite) TestWebWriter_StoreExercises() {
 func (s *WebWriterSuite) TestWebWriter_DeleteExercise() {
 	ctx := s.T().Context()
 
-	lesson := &lesson{}
-	createLesson(s.DB, lesson)
+	l := &lesson{}
+	createLesson(s.DB, l)
 
 	createExercise(s.DB, &exercise{
-		LessonId: lesson.Id,
+		LessonId: l.Id,
 	})
 	stored := fetchLatestExercise(s.DB)
 
@@ -199,7 +199,7 @@ func (s *WebWriterSuite) TestWebWriter_DeleteExercise() {
 	})
 	another := fetchLatestExercise(s.DB)
 
-	err := s.writer.DeleteExercise(ctx, "userID", backend.Exercise{Id: stored.Id})
+	err := s.writer.DeleteExercise(ctx, l.UserID, backend.Exercise{Id: stored.Id})
 	assert.NoError(s.T(), err)
 
 	assert.Nil(s.T(), findExerciseById(s.DB, stored.Id))

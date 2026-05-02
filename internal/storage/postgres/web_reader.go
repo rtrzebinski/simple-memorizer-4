@@ -33,7 +33,7 @@ func (r *WebReader) FetchLessons(ctx context.Context, userID string) (backend.Le
 
 	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
-		return lessons, err
+		return lessons, fmt.Errorf("failed to fetch lessons: %w", err)
 	}
 	defer rows.Close()
 
@@ -58,12 +58,13 @@ func (r *WebReader) HydrateLesson(ctx context.Context, userID string, lesson *ba
 		SELECT name, description, count(e.id) AS exercise_count
 		FROM lesson l
 		LEFT JOIN exercise e ON e.lesson_id = l.id 
-		WHERE l.id = $1
+		WHERE l.id = $1 AND l.user_id = $2
 		GROUP BY name, description
 	`
 
-	if err := r.db.QueryRowContext(ctx, query, lesson.Id).Scan(&lesson.Name, &lesson.Description, &lesson.ExerciseCount); err != nil {
-		return fmt.Errorf("failed to execute 'SELECT FROM lesson' query: %w", err)
+	err := r.db.QueryRowContext(ctx, query, lesson.Id, userID).Scan(&lesson.Name, &lesson.Description, &lesson.ExerciseCount)
+	if err != nil {
+		return fmt.Errorf("failed to hydrate lesson: %w", err)
 	}
 
 	return nil
@@ -73,18 +74,20 @@ func (r *WebReader) FetchExercises(ctx context.Context, userID string, lesson ba
 	slog.Debug("WebReader FetchExercises", "userID", userID)
 
 	const query = `
-SELECT e.id, e.question, e.answer,
-       e.bad_answers, e.bad_answers_today, e.latest_bad_answer, e.latest_bad_answer_was_today,
-       e.good_answers, e.good_answers_today, e.latest_good_answer, e.latest_good_answer_was_today
-FROM exercise e
-WHERE lesson_id = $1
-AND id >= $2
-ORDER BY e.id DESC
-`
+		SELECT e.id, e.question, e.answer,
+       	e.bad_answers, e.bad_answers_today, e.latest_bad_answer, e.latest_bad_answer_was_today,
+       	e.good_answers, e.good_answers_today, e.latest_good_answer, e.latest_good_answer_was_today
+		FROM exercise e
+		JOIN lesson l ON e.lesson_id = l.id
+		WHERE e.lesson_id = $1
+  		AND e.id >= $2
+  		AND l.user_id = $3
+		ORDER BY e.id DESC
+	`
 
-	rows, err := r.db.QueryContext(ctx, query, lesson.Id, oldestExerciseID)
+	rows, err := r.db.QueryContext(ctx, query, lesson.Id, oldestExerciseID, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch exercises: %w", err)
 	}
 	defer rows.Close()
 

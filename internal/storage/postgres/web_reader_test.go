@@ -31,35 +31,29 @@ func (s *WebReaderSuite) SetupSuite() {
 func (s *WebReaderSuite) TestWebReader_FetchLessons() {
 	ctx := s.T().Context()
 
-	userID := randomString()
+	l := &lesson{}
+	createLesson(s.DB, l)
+	createExercise(s.DB, &exercise{LessonId: l.Id})
 
-	lesson := &lesson{
-		UserID: userID,
-	}
-	createLesson(s.DB, lesson)
-
-	createExercise(s.DB, &exercise{LessonId: lesson.Id})
-
-	res, err := s.reader.FetchLessons(ctx, userID)
+	res, err := s.reader.FetchLessons(ctx, l.UserID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
 	assert.Len(s.T(), res, 1)
-	assert.Equal(s.T(), lesson.Id, res[0].Id)
-	assert.Equal(s.T(), lesson.Name, res[0].Name)
-	assert.Equal(s.T(), lesson.Description, res[0].Description)
+	assert.Equal(s.T(), l.Id, res[0].Id)
+	assert.Equal(s.T(), l.Name, res[0].Name)
+	assert.Equal(s.T(), l.Description, res[0].Description)
 	assert.Equal(s.T(), 1, res[0].ExerciseCount)
 }
 
 func (s *WebReaderSuite) TestWebReader_FetchLessons_otherUser() {
 	ctx := s.T().Context()
 
-	lesson := &lesson{}
-	createLesson(s.DB, lesson)
+	l := &lesson{}
+	createLesson(s.DB, l)
+	createExercise(s.DB, &exercise{LessonId: l.Id})
 
-	createExercise(s.DB, &exercise{LessonId: lesson.Id})
-
-	res, err := s.reader.FetchLessons(ctx, "2")
+	res, err := s.reader.FetchLessons(ctx, "otherUserID")
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Lessons{}, res)
@@ -76,7 +70,7 @@ func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
 		Id: l.Id,
 	}
 
-	err := s.reader.HydrateLesson(ctx, "userID", lesson)
+	err := s.reader.HydrateLesson(ctx, l.UserID, lesson)
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -86,7 +80,7 @@ func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
 	createExercise(s.DB, &exercise{LessonId: l.Id})
 	createExercise(s.DB, &exercise{LessonId: l.Id})
 
-	err = s.reader.HydrateLesson(ctx, "userID", lesson)
+	err = s.reader.HydrateLesson(ctx, l.UserID, lesson)
 
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), l.Name, lesson.Name)
@@ -97,6 +91,9 @@ func (s *WebReaderSuite) TestWebReader_HydrateLesson() {
 func (s *WebReaderSuite) TestWebReader_FetchExercises() {
 	ctx := s.T().Context()
 
+	l := &lesson{}
+	createLesson(s.DB, l)
+
 	exercise1 := &exercise{
 		BadAnswers:               1,
 		BadAnswersToday:          2,
@@ -105,6 +102,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises() {
 		GoodAnswersToday:         4,
 		LatestGoodAnswer:         null.Time{},
 		LatestGoodAnswerWasToday: true,
+		LessonId:                 l.Id,
 	}
 	createExercise(s.DB, exercise1)
 
@@ -114,7 +112,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises() {
 
 	oldestExerciseID := 1
 
-	res, err := s.reader.FetchExercises(ctx, "userID", backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
+	res, err := s.reader.FetchExercises(ctx, l.UserID, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)
@@ -144,6 +142,9 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises() {
 func (s *WebReaderSuite) TestWebReader_FetchExercises_oldestExerciseID() {
 	ctx := s.T().Context()
 
+	l := &lesson{}
+	createLesson(s.DB, l)
+
 	exercise1 := &exercise{
 		BadAnswers:               1,
 		BadAnswersToday:          2,
@@ -152,6 +153,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises_oldestExerciseID() {
 		GoodAnswersToday:         4,
 		LatestGoodAnswer:         null.Time{},
 		LatestGoodAnswerWasToday: true,
+		LessonId:                 l.Id,
 	}
 	createExercise(s.DB, exercise1)
 
@@ -161,7 +163,7 @@ func (s *WebReaderSuite) TestWebReader_FetchExercises_oldestExerciseID() {
 
 	oldestExerciseID := 2
 
-	res, err := s.reader.FetchExercises(ctx, "userID", backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
+	res, err := s.reader.FetchExercises(ctx, l.UserID, backend.Lesson{Id: exercise1.LessonId}, oldestExerciseID)
 
 	assert.NoError(s.T(), err)
 	assert.IsType(s.T(), backend.Exercises{}, res)
