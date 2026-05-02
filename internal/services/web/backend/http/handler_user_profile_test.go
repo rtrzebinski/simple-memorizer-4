@@ -13,7 +13,7 @@ import (
 
 func TestHandlerUserProfile_success(t *testing.T) {
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100", Name: "Test Name", Email: "test@example.com"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID", Name: "Test Name", Email: "test@example.com"}, nil)
 	r := NewTokenRefresherMock()
 	r.On("Refresh", mock.Anything, mock.Anything).Return(backend.Tokens{}, nil).Maybe()
 

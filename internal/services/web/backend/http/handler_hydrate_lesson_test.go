@@ -20,10 +20,10 @@ func TestHandlerHydrateLesson(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("HydrateLesson", mock.Anything, lesson, "100").Return(nil)
+	service.On("HydrateLesson", mock.Anything, "userID", lesson).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
 
@@ -50,7 +50,7 @@ func TestHandlerHydrateLesson_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
 

@@ -67,7 +67,7 @@ func (h *HandlerHydrateLesson) ServeHTTP(res http.ResponseWriter, req *http.Requ
 
 	lesson := &backend.Lesson{Id: lessonId}
 
-	err = h.s.HydrateLesson(ctx, lesson, userID)
+	err = h.s.HydrateLesson(ctx, userID, lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to hydrate a lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

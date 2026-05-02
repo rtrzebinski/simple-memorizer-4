@@ -33,9 +33,9 @@ func TestHandlerExportLessonCsv(t *testing.T) {
 
 	oldestExerciseID := 1
 
-	service.On("FetchExercises", mock.Anything, lesson, oldestExerciseID, "").Return(exercises, nil)
-	service.On("HydrateLesson", mock.Anything, &lesson, "").Run(func(args mock.Arguments) {
-		args.Get(1).(*backend.Lesson).Name = "lesson name"
+	service.On("FetchExercises", mock.Anything, "", lesson, oldestExerciseID).Return(exercises, nil)
+	service.On("HydrateLesson", mock.Anything, "", &lesson).Run(func(args mock.Arguments) {
+		args.Get(2).(*backend.Lesson).Name = "lesson name"
 	}).Return(nil)
 
 	route := NewHandlerExportLessonCsv(service)

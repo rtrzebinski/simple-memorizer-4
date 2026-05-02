@@ -68,7 +68,7 @@ func (h *HandlerUpsertLesson) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.UpsertLesson(ctx, &lesson, userID)
+	err = h.s.UpsertLesson(ctx, userID, &lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

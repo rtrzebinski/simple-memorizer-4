@@ -20,38 +20,38 @@ func (m *ServiceMock) FetchLessons(ctx context.Context, userID string) (backend.
 	return args.Get(0).(backend.Lessons), args.Error(1)
 }
 
-func (m *ServiceMock) HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	args := m.Called(ctx, lesson, userID)
+func (m *ServiceMock) HydrateLesson(ctx context.Context, userID string, lesson *backend.Lesson) error {
+	args := m.Called(ctx, userID, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error) {
-	args := m.Called(ctx, lesson, oldestExerciseID, userID)
+func (m *ServiceMock) FetchExercises(ctx context.Context, userID string, lesson backend.Lesson, oldestExerciseID int) (backend.Exercises, error) {
+	args := m.Called(ctx, userID, lesson, oldestExerciseID)
 	return args.Get(0).(backend.Exercises), args.Error(1)
 }
 
-func (m *ServiceMock) UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error {
-	args := m.Called(ctx, lesson, userID)
+func (m *ServiceMock) UpsertLesson(ctx context.Context, userID string, lesson *backend.Lesson) error {
+	args := m.Called(ctx, userID, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error {
-	args := m.Called(ctx, lesson, userID)
+func (m *ServiceMock) DeleteLesson(ctx context.Context, userID string, lesson backend.Lesson) error {
+	args := m.Called(ctx, userID, lesson)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error {
-	args := m.Called(ctx, exercise, userID)
+func (m *ServiceMock) UpsertExercise(ctx context.Context, userID string, exercise *backend.Exercise) error {
+	args := m.Called(ctx, userID, exercise)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) StoreExercises(ctx context.Context, exercises backend.Exercises, userID string) error {
-	args := m.Called(ctx, exercises, userID)
+func (m *ServiceMock) StoreExercises(ctx context.Context, userID string, exercises backend.Exercises) error {
+	args := m.Called(ctx, userID, exercises)
 	return args.Error(0)
 }
 
-func (m *ServiceMock) DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error {
-	args := m.Called(ctx, exercise, userID)
+func (m *ServiceMock) DeleteExercise(ctx context.Context, userID string, exercise backend.Exercise) error {
+	args := m.Called(ctx, userID, exercise)
 	return args.Error(0)
 }
 

@@ -68,7 +68,7 @@ func (h *HandlerDeleteExercise) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.DeleteExercise(ctx, exercise, userID)
+	err = h.s.DeleteExercise(ctx, userID, exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

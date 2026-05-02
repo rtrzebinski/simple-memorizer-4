@@ -27,10 +27,10 @@ func TestStoreExercises(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("StoreExercises", mock.Anything, input, "100").Return(nil)
+	service.On("StoreExercises", mock.Anything, "userID", input).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerStoreExercises(service))
 
@@ -58,7 +58,7 @@ func TestHandlerStoreExercises_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerStoreExercises(service))
 

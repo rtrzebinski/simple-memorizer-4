@@ -68,7 +68,7 @@ func (h *HandlerUpsertExercise) ServeHTTP(res http.ResponseWriter, req *http.Req
 		return
 	}
 
-	err = h.s.UpsertExercise(ctx, &exercise, userID)
+	err = h.s.UpsertExercise(ctx, userID, &exercise)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to upsert exercise: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

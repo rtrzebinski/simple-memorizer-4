@@ -25,10 +25,10 @@ func TestHandlerDeleteExercise(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("DeleteExercise", mock.Anything, input, "100").Return(nil)
+	service.On("DeleteExercise", mock.Anything, "userID", input).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerDeleteExercise(service))
 
@@ -54,7 +54,7 @@ func TestHandlerDeleteExercise_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerDeleteExercise(service))
 

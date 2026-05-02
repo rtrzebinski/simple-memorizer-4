@@ -25,10 +25,10 @@ func TestHandlerUpsertLesson(t *testing.T) {
 	}
 
 	service := NewServiceMock()
-	service.On("UpsertLesson", mock.Anything, &input, "100").Return(nil)
+	service.On("UpsertLesson", mock.Anything, "userID", &input).Return(nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerUpsertLesson(service))
 
@@ -54,7 +54,7 @@ func TestHandlerUpsertLesson_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerUpsertLesson(service))
 

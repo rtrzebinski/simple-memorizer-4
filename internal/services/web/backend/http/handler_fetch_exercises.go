@@ -70,7 +70,7 @@ func (h *HandlerFetchExercises) ServeHTTP(res http.ResponseWriter, req *http.Req
 		log.Print(fmt.Errorf("failed to get a oldest_exercise_id: %w", err))
 	}
 
-	exercises, err := h.s.FetchExercises(ctx, backend.Lesson{Id: lessonId}, oldestExerciseID, userID)
+	exercises, err := h.s.FetchExercises(ctx, userID, backend.Lesson{Id: lessonId}, oldestExerciseID)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to fetch exercises: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)

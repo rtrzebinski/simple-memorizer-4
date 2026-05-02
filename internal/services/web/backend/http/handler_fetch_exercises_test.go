@@ -38,10 +38,10 @@ func TestHandlerFetchExercises(t *testing.T) {
 
 	oldestExerciseID := 1
 
-	service.On("FetchExercises", mock.Anything, backend.Lesson{Id: lessonId}, oldestExerciseID, "100").Return(exercises, nil)
+	service.On("FetchExercises", mock.Anything, "userID", backend.Lesson{Id: lessonId}, oldestExerciseID).Return(exercises, nil)
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerFetchExercises(service))
 
@@ -85,7 +85,7 @@ func TestHandlerFetchExercises_invalidInput(t *testing.T) {
 	service := NewServiceMock()
 
 	v := NewTokenVerifierMock()
-	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
+	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
 	route := Auth(v, r, false)(NewHandlerFetchExercises(service))
 

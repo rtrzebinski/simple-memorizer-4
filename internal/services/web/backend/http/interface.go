@@ -8,13 +8,13 @@ import (
 
 type Service interface {
 	FetchLessons(ctx context.Context, userID string) (lessons backend.Lessons, err error)
-	HydrateLesson(ctx context.Context, lesson *backend.Lesson, userID string) error
-	FetchExercises(ctx context.Context, lesson backend.Lesson, oldestExerciseID int, userID string) (backend.Exercises, error)
-	UpsertLesson(ctx context.Context, lesson *backend.Lesson, userID string) error
-	DeleteLesson(ctx context.Context, lesson backend.Lesson, userID string) error
-	UpsertExercise(ctx context.Context, exercise *backend.Exercise, userID string) error
-	StoreExercises(ctx context.Context, exercise backend.Exercises, userID string) error
-	DeleteExercise(ctx context.Context, exercise backend.Exercise, userID string) error
+	HydrateLesson(ctx context.Context, userID string, lesson *backend.Lesson) error
+	FetchExercises(ctx context.Context, userID string, lesson backend.Lesson, oldestExerciseID int) (backend.Exercises, error)
+	UpsertLesson(ctx context.Context, userID string, lesson *backend.Lesson) error
+	DeleteLesson(ctx context.Context, userID string, lesson backend.Lesson) error
+	UpsertExercise(ctx context.Context, userID string, exercise *backend.Exercise) error
+	StoreExercises(ctx context.Context, userID string, exercise backend.Exercises) error
+	DeleteExercise(ctx context.Context, userID string, exercise backend.Exercise) error
 	PublishGoodAnswer(ctx context.Context, userID string, exerciseID int) error
 	PublishBadAnswer(ctx context.Context, userID string, exerciseID int) error
 	Register(ctx context.Context, firstName, lastName, email, password string) (backend.Tokens, error)

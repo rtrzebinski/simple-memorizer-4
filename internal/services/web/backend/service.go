@@ -17,31 +17,31 @@ func (s *Service) FetchLessons(ctx context.Context, userID string) (Lessons, err
 	return s.r.FetchLessons(ctx, userID)
 }
 
-func (s *Service) HydrateLesson(ctx context.Context, lesson *Lesson, userID string) error {
+func (s *Service) HydrateLesson(ctx context.Context, userID string, lesson *Lesson) error {
 	return s.r.HydrateLesson(ctx, lesson, userID)
 }
 
-func (s *Service) FetchExercises(ctx context.Context, lesson Lesson, oldestExerciseID int, userID string) (Exercises, error) {
+func (s *Service) FetchExercises(ctx context.Context, userID string, lesson Lesson, oldestExerciseID int) (Exercises, error) {
 	return s.r.FetchExercises(ctx, lesson, oldestExerciseID, userID)
 }
 
-func (s *Service) UpsertLesson(ctx context.Context, lesson *Lesson, userID string) error {
+func (s *Service) UpsertLesson(ctx context.Context, userID string, lesson *Lesson) error {
 	return s.w.UpsertLesson(ctx, lesson, userID)
 }
 
-func (s *Service) DeleteLesson(ctx context.Context, lesson Lesson, userID string) error {
+func (s *Service) DeleteLesson(ctx context.Context, userID string, lesson Lesson) error {
 	return s.w.DeleteLesson(ctx, lesson, userID)
 }
 
-func (s *Service) UpsertExercise(ctx context.Context, exercise *Exercise, userID string) error {
+func (s *Service) UpsertExercise(ctx context.Context, userID string, exercise *Exercise) error {
 	return s.w.UpsertExercise(ctx, exercise, userID)
 }
 
-func (s *Service) StoreExercises(ctx context.Context, exercises Exercises, userID string) error {
+func (s *Service) StoreExercises(ctx context.Context, userID string, exercises Exercises) error {
 	return s.w.StoreExercises(ctx, exercises, userID)
 }
 
-func (s *Service) DeleteExercise(ctx context.Context, exercise Exercise, userID string) error {
+func (s *Service) DeleteExercise(ctx context.Context, userID string, exercise Exercise) error {
 	return s.w.DeleteExercise(ctx, exercise, userID)
 }
 

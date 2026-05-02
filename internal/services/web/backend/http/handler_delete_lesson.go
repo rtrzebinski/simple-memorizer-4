@@ -68,7 +68,7 @@ func (h *HandlerDeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	err = h.s.DeleteLesson(ctx, lesson, userID)
+	err = h.s.DeleteLesson(ctx, userID, lesson)
 	if err != nil {
 		log.Print(fmt.Errorf("failed to delete lesson: %w", err))
 		res.WriteHeader(http.StatusInternalServerError)
