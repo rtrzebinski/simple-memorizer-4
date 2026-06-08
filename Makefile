@@ -150,7 +150,7 @@ k8s-start: ## Kubernetes create all objects (Docker hub tag 'latest' image)
 	@envsubst < k8s/db-backup-cronjob.yaml  | kubectl -n sm4 apply -f -
 	@kubectl apply -f k8s/metrics-server.yaml
 	@echo "==> Keycloak UI http://localhost:30002 (admin:change_me)"
-	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running on http://localhost:9001 $(NO_COLOR)"
 
 k8s-status: ## Kubernetes show all objects
 	@kubectl -n sm4 get all
@@ -167,7 +167,7 @@ k8s-rollout: ## Kubernetes rollout (Docker hub tag 'latest' image)
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-auth
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-web
 	@kubectl -n sm4 rollout restart deployment.apps/sm4-worker
-	@echo "$(OK_COLOR)==> Running on http://localhost:9000 $(NO_COLOR)"
+	@echo "$(OK_COLOR)==> Running on http://localhost:9001 $(NO_COLOR)"
 
 k8s-logs-auth: ## Kubernetes auth logs
 	@kubectl -n sm4 logs -l app=sm4-auth -f
