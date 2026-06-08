@@ -61,7 +61,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 9001
+    - port: 9000
       targetPort: 8000
   selector:
     app: sm4-web

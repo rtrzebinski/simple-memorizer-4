@@ -71,7 +71,7 @@ spec:
             - --import-realm
           ports:
             - containerPort: 8180   # app HTTP
-            - containerPort: 9001   # management/health
+            - containerPort: 9000   # management/health
           env:
             - name: KC_BOOTSTRAP_ADMIN_USERNAME
               value: "admin"
@@ -104,22 +104,22 @@ spec:
               mountPath: /opt/keycloak/data/import
               readOnly: true
 
-          # Probes: health is on mgmt port 9001
+          # Probes: health is on mgmt port 9000
           startupProbe:
             tcpSocket:
-              port: 9001
+              port: 9000
             periodSeconds: 5
             failureThreshold: 60
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: 9001
+              port: 9000
             periodSeconds: 5
             failureThreshold: 12
           livenessProbe:
             httpGet:
               path: /health/live
-              port: 9001
+              port: 9000
             initialDelaySeconds: 60
             periodSeconds: 10
             failureThreshold: 6
