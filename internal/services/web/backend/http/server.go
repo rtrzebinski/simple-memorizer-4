@@ -2,6 +2,11 @@ package http
 
 import (
 	"net/http"
+	"time"
+
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/middleware/stdlib"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 const (
@@ -40,11 +45,34 @@ func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string,
 	http.Handle(ExportLessonCsv, Auth(v, rfr, secure)(NewHandlerExportLessonCsv(s)))
 
 	// auth
-	http.Handle(AuthRegister, NewHandlerAuthRegister(s, secure))
-	http.Handle(AuthSignIn, NewHandlerAuthSignIn(s, secure))
-	http.Handle(AuthLogout, NewHandlerAuthLogout(s))
+	http.Handle(AuthRegister, rateLimit(NewHandlerAuthRegister(s, secure)))
+	http.Handle(AuthSignIn, rateLimit(NewHandlerAuthSignIn(s, secure)))
+	http.Handle(AuthLogout, rateLimit(NewHandlerAuthLogout(s)))
 
 	handler := CSRFDynamicHost()(http.DefaultServeMux)
 
 	return http.ListenAndServe(port, handler)
+}
+
+// rateLimit takes an http.Handler and returns a new http.Handler wrapped with rate limiting
+func rateLimit(next http.Handler) http.Handler {
+	rate := limiter.Rate{
+		Period: 1 * time.Minute,
+		Limit:  20,
+	}
+
+	store := memory.NewStoreWithOptions(limiter.StoreOptions{
+		CleanUpInterval: 5 * time.Minute,
+	})
+
+	// K8s Ingress must be configured to set the X-Forwarded-For header
+	// https://github.com/ulule/limiter#limiter-behind-a-reverse-proxy
+	instance := limiter.New(store, rate, limiter.WithTrustForwardHeader(true))
+
+	m := stdlib.NewMiddleware(instance)
+	m.OnLimitReached = func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+	}
+
+	return m.Handler(next)
 }

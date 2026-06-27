@@ -18,6 +18,7 @@ require (
 	github.com/maxence-charriere/go-app/v10 v10.0.8
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.39.0
+	github.com/ulule/limiter/v3 v3.11.2
 	google.golang.org/grpc v1.67.0
 	google.golang.org/protobuf v1.34.2
 )
