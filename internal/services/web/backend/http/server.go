@@ -26,7 +26,7 @@ const (
 	AuthLogout      = "/auth-logout"
 )
 
-func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string, secure bool) error {
+func NewServer(s Service, v TokenVerifier, rfr TokenRefresher, port string, secure bool) *http.Server {
 	// read
 	http.Handle(FetchLessons, Auth(v, rfr, secure)(NewHandlerFetchLessons(s)))
 	http.Handle(HydrateLesson, Auth(v, rfr, secure)(NewHandlerHydrateLesson(s)))
@@ -51,7 +51,13 @@ func ListenAndServe(s Service, v TokenVerifier, rfr TokenRefresher, port string,
 
 	handler := CSRFDynamicHost()(http.DefaultServeMux)
 
-	return http.ListenAndServe(port, handler)
+	return &http.Server{
+		Addr:         port,
+		Handler:      handler,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 20 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
 }
 
 // rateLimit takes an http.Handler and returns a new http.Handler wrapped with rate limiting

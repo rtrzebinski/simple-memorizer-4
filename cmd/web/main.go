@@ -184,6 +184,9 @@ func run(ctx context.Context) error {
 		cfg.Auth.ServerAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
+	if err != nil {
+		return fmt.Errorf("failed to connect to gRPC server: %w", err)
+	}
 	defer func() {
 		err := conn.Close()
 		if err != nil {
@@ -192,10 +195,6 @@ func run(ctx context.Context) error {
 	}()
 
 	grpcClient := gengrpc.NewAuthServiceClient(conn)
-
-	if err != nil {
-		return fmt.Errorf("failed to connect to gRPC server: %w", err)
-	}
 
 	slog.Info("connected to auth gRPC server", "service", "web", "addr", cfg.Auth.ServerAddr)
 
@@ -210,9 +209,11 @@ func run(ctx context.Context) error {
 	service := backend.NewService(reader, writer, publisher, authClient)
 	verifier := auth.NewTokenVerifier(cfg.Keycloak.URL, cfg.Keycloak.Realm)
 
+	webServer := bhttp.NewServer(service, verifier, authClient, cfg.Web.Port, cfg.Keycloak.Secure)
+
 	go func() {
 		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
-		serverErrors <- bhttp.ListenAndServe(service, verifier, authClient, cfg.Web.Port, cfg.Keycloak.Secure)
+		serverErrors <- webServer.ListenAndServe()
 	}()
 
 	// =========================================
@@ -241,7 +242,10 @@ func run(ctx context.Context) error {
 
 	select {
 	case err := <-serverErrors:
-		return fmt.Errorf("server error: %w", err)
+		// http.ErrServerClosed is expected during a graceful shutdown
+		if err != nil && err != http.ErrServerClosed {
+			return fmt.Errorf("server error: %w", err)
+		}
 	case <-done.Done():
 		slog.Info("start shutdown", "service", "web")
 
@@ -249,10 +253,17 @@ func run(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
 		defer cancel()
 
-		// Shutdown gracefully on signal received
-		if err := probeServer.Shutdown(ctx); err != nil {
-			log.Print(fmt.Errorf("failed to gracefully shutdown the probe server %w", err))
+		// Shutdown the main web server
+		if err := webServer.Shutdown(ctx); err != nil {
+			slog.Error("failed to gracefully shutdown the web server", "error", err)
+			if err = webServer.Close(); err != nil {
+				return fmt.Errorf("could not stop web server gracefully: %w", err)
+			}
+		}
 
+		// Shutdown the probe server
+		if err := probeServer.Shutdown(ctx); err != nil {
+			slog.Error("failed to gracefully shutdown the probe server", "error", err)
 			if err = probeServer.Close(); err != nil {
 				return fmt.Errorf("could not stop probe server gracefully: %w", err)
 			}
