@@ -66,7 +66,7 @@ func main() {
 	defer cancel()
 
 	if err := run(ctx); err != nil {
-		slog.Error(err.Error(), "service", "web")
+		slog.Error(err.Error())
 	}
 }
 
@@ -74,7 +74,8 @@ func main() {
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
 func run(ctx context.Context) error {
-	slog.Info("application starting", "service", "web")
+	slog.SetDefault(slog.Default().With("service", "web"))
+	slog.Info("application starting")
 
 	u := app.Window().URL()
 
@@ -115,7 +116,7 @@ func run(ctx context.Context) error {
 		defer func() {
 			err := file.Close()
 			if err != nil {
-				slog.Warn("failed to close file", "error", err, "service", "web")
+				slog.Warn("failed to close file", "error", err)
 			}
 		}()
 
@@ -123,9 +124,9 @@ func run(ctx context.Context) error {
 
 		if scanner.Scan() {
 			version = scanner.Text()
-			slog.Info("version", "version", version, "service", "web")
+			slog.Info("version", "version", version)
 		} else {
-			slog.Info("version unknown", "service", "web")
+			slog.Info("version unknown")
 		}
 	}
 
@@ -194,13 +195,13 @@ func run(ctx context.Context) error {
 	defer func() {
 		err := conn.Close()
 		if err != nil {
-			slog.Warn("failed to close gRPC connection", "error", err, "service", "web")
+			slog.Warn("failed to close gRPC connection", "error", err)
 		}
 	}()
 
 	grpcClient := gengrpc.NewAuthServiceClient(conn)
 
-	slog.Info("connected to auth gRPC server", "service", "web", "addr", cfg.Auth.ServerAddr)
+	slog.Info("connected to auth gRPC server", "addr", cfg.Auth.ServerAddr)
 
 	// =========================================
 	// Start a Web server
@@ -216,7 +217,7 @@ func run(ctx context.Context) error {
 	webServer := bhttp.NewServer(service, verifier, authClient, cfg.Web.Port, cfg.Keycloak.Secure)
 
 	go func() {
-		slog.Info("initializing server", "port", cfg.Web.Port, "service", "web")
+		slog.Info("initializing server", "port", cfg.Web.Port)
 		serverErrors <- webServer.ListenAndServe()
 	}()
 
@@ -232,11 +233,11 @@ func run(ctx context.Context) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		slog.Info("initializing probe server", "addr", cfg.ProbeAddr, "service", "web")
+		slog.Info("initializing probe server", "addr", cfg.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	slog.Info("application running", "service", "web")
+	slog.Info("application running")
 
 	// =========================================
 	// Blocking main and waiting for shutdown.
@@ -251,7 +252,7 @@ func run(ctx context.Context) error {
 			return fmt.Errorf("server error: %w", err)
 		}
 	case <-done.Done():
-		slog.Info("start shutdown", "service", "web")
+		slog.Info("start shutdown")
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
@@ -274,7 +275,7 @@ func run(ctx context.Context) error {
 		}
 	}
 
-	slog.Info("application completed", "service", "web")
+	slog.Info("application completed")
 
 	return nil
 }

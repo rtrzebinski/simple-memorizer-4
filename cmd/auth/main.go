@@ -39,12 +39,13 @@ func main() {
 	defer cancel()
 
 	if err := run(ctx); err != nil {
-		slog.Error(err.Error(), "service", "auth")
+		slog.Error(err.Error())
 	}
 }
 
 func run(ctx context.Context) error {
-	slog.Info("application starting", "service", "auth")
+	slog.SetDefault(slog.Default().With("service", "auth"))
+	slog.Info("application starting")
 
 	// Version
 	var version string
@@ -53,7 +54,7 @@ func run(ctx context.Context) error {
 		defer func() {
 			err := file.Close()
 			if err != nil {
-				slog.Warn("failed to close file", "error", err, "service", "web")
+				slog.Warn("failed to close file", "error", err)
 			}
 		}()
 
@@ -61,9 +62,9 @@ func run(ctx context.Context) error {
 
 		if scanner.Scan() {
 			version = scanner.Text()
-			slog.Info("version", "version", version, "service", "auth")
+			slog.Info("version", "version", version)
 		} else {
-			slog.Info("version unknown", "service", "auth")
+			slog.Info("version unknown")
 		}
 	}
 
@@ -113,7 +114,7 @@ func run(ctx context.Context) error {
 	healthServer.SetServingStatus("sm4-auth", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	go func() {
-		slog.Info("initializing gRPC server", "addr", cfg.ServerAddr, "service", "auth")
+		slog.Info("initializing gRPC server", "addr", cfg.ServerAddr)
 		serverErrors <- grpcServer.Serve(listener)
 	}()
 
@@ -128,11 +129,11 @@ func run(ctx context.Context) error {
 
 	// Start probe server and send errors to the channel
 	go func() {
-		slog.Info("initializing probe server", "addr", cfg.ProbeAddr, "service", "auth")
+		slog.Info("initializing probe server", "addr", cfg.ProbeAddr)
 		serverErrors <- probeServer.ListenAndServe()
 	}()
 
-	slog.Info("application running", "service", "auth")
+	slog.Info("application running")
 
 	// =========================================
 	// Blocking main and waiting for shutdown.
@@ -144,7 +145,7 @@ func run(ctx context.Context) error {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
 	case <-done.Done():
-		slog.Info("start shutdown", "service", "auth")
+		slog.Info("start shutdown")
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(ctx, cfg.ShutdownTimeout)
@@ -160,7 +161,7 @@ func run(ctx context.Context) error {
 		}
 	}
 
-	slog.Info("application completed", "service", "auth")
+	slog.Info("application completed")
 
 	return nil
 }
