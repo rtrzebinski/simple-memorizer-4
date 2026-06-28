@@ -43,7 +43,7 @@ func TestHandlerFetchExercises(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerFetchExercises(service))
+	route := auth(v, r, false)(NewHandlerFetchExercises(service))
 
 	u, _ := url.Parse(FetchExercises)
 	params := u.Query()
@@ -87,7 +87,7 @@ func TestHandlerFetchExercises_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerFetchExercises(service))
+	route := auth(v, r, false)(NewHandlerFetchExercises(service))
 
 	req, _ := http.NewRequest(http.MethodGet, FetchExercises, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
@@ -110,7 +110,7 @@ func TestHandlerFetchExercises_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerFetchExercises(service))
+	route := auth(v, r, false)(NewHandlerFetchExercises(service))
 
 	req, _ := http.NewRequest(http.MethodGet, FetchExercises, nil)
 

@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// CSRFDynamicHost returns a middleware that protects against CSRF attacks
+// csrf returns a middleware that protects against CSRF attacks
 // by rejecting unsafe HTTP requests (POST, PUT, PATCH, DELETE) coming from
 // other domains. It compares the Origin or Referer header to the request’s
 // Host value and only allows requests where they match.
-func CSRFDynamicHost() func(http.Handler) http.Handler {
+func csrf() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {

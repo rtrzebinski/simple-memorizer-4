@@ -25,7 +25,7 @@ func TestHandlerHydrateLesson(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
+	route := auth(v, r, false)(NewHandlerHydrateLesson(service))
 
 	u, _ := url.Parse(HydrateLesson)
 	params := u.Query()
@@ -52,7 +52,7 @@ func TestHandlerHydrateLesson_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
+	route := auth(v, r, false)(NewHandlerHydrateLesson(service))
 
 	req, _ := http.NewRequest(http.MethodGet, HydrateLesson, nil)
 	req.AddCookie(&http.Cookie{Name: "access_token", Value: "accessToken"})
@@ -79,7 +79,7 @@ func TestHandlerHydrateLesson_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerHydrateLesson(service))
+	route := auth(v, r, false)(NewHandlerHydrateLesson(service))
 
 	req, _ := http.NewRequest(http.MethodGet, HydrateLesson, nil)
 

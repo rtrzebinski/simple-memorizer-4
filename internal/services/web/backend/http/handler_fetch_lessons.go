@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
+	bauth "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 )
 
 type HandlerFetchLessons struct {
@@ -25,7 +25,7 @@ func (h *HandlerFetchLessons) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	userID, ok := auth.UserIDFromContext(ctx)
+	userID, ok := bauth.UserIDFromContext(ctx)
 	if !ok || userID == "" {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return

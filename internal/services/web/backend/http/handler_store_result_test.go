@@ -32,7 +32,7 @@ func TestHandlerStoreResult_goodAnswer(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerStoreResult(service))
+	route := auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
@@ -64,7 +64,7 @@ func TestHandlerStoreResult_badAnswer(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerStoreResult(service))
+	route := auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
@@ -90,7 +90,7 @@ func TestHandlerStoreResult_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerStoreResult(service))
+	route := auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(string(body)))
@@ -116,7 +116,7 @@ func TestHandlerStoreResult_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerStoreResult(service))
+	route := auth(v, r, false)(NewHandlerStoreResult(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, StoreResult, strings.NewReader(`{}`))

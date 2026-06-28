@@ -30,7 +30,7 @@ func TestHandlerDeleteLesson(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerDeleteLesson(service))
+	route := auth(v, r, false)(NewHandlerDeleteLesson(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, DeleteLesson, io.NopCloser(strings.NewReader(string(body))))
@@ -56,7 +56,7 @@ func TestHandlerDeleteLesson_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerDeleteLesson(service))
+	route := auth(v, r, false)(NewHandlerDeleteLesson(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, DeleteLesson, io.NopCloser(strings.NewReader(string(body))))
@@ -82,7 +82,7 @@ func TestHandlerDeleteLesson_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerDeleteLesson(service))
+	route := auth(v, r, false)(NewHandlerDeleteLesson(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, DeleteLesson, io.NopCloser(strings.NewReader(`{}`)))

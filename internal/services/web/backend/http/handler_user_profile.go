@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
+	bauth "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 )
 
 type HandlerUserProfile struct {
@@ -25,7 +25,7 @@ func (h *HandlerUserProfile) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	profile, ok := auth.UserProfileFromContext(req.Context())
+	profile, ok := bauth.UserProfileFromContext(req.Context())
 	if !ok || profile == nil {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return

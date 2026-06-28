@@ -21,7 +21,7 @@ func TestHandlerFetchLessons(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "100"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerFetchLessons(service))
+	route := auth(v, r, false)(NewHandlerFetchLessons(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, FetchLessons, nil)
@@ -46,7 +46,7 @@ func TestHandlerFetchLessons_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerFetchLessons(service))
+	route := auth(v, r, false)(NewHandlerFetchLessons(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, FetchLessons, nil)

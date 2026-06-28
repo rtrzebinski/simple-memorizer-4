@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend"
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
+	bauth "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/http/validation"
 )
 
@@ -27,7 +27,7 @@ func (h *HandlerDeleteLesson) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	userID, ok := auth.UserIDFromContext(ctx)
+	userID, ok := bauth.UserIDFromContext(ctx)
 	if !ok || userID == "" {
 		http.Error(res, "unauthorized", http.StatusUnauthorized)
 		return

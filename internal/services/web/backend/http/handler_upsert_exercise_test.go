@@ -31,7 +31,7 @@ func TestHandlerUpsertExercise(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerUpsertExercise(service))
+	route := auth(v, r, false)(NewHandlerUpsertExercise(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
@@ -57,7 +57,7 @@ func TestHandlerUpsertExercise_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerUpsertExercise(service))
+	route := auth(v, r, false)(NewHandlerUpsertExercise(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(string(body)))
@@ -83,7 +83,7 @@ func TestHandlerUpsertExercise_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerUpsertExercise(service))
+	route := auth(v, r, false)(NewHandlerUpsertExercise(service))
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, UpsertExercise, strings.NewReader(`{}`))

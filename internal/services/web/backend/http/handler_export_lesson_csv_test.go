@@ -41,7 +41,7 @@ func TestHandlerExportLessonCsv(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
+	route := auth(v, r, false)(NewHandlerExportLessonCsv(service))
 
 	u, _ := url.Parse(ExportLessonCsv)
 	params := u.Query()
@@ -69,7 +69,7 @@ func TestHandlerExportLessonCsv_invalidInput(t *testing.T) {
 	v := NewTokenVerifierMock()
 	v.On("VerifyAndUser", mock.Anything, "accessToken").Return(&backend.User{ID: "userID"}, nil)
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
+	route := auth(v, r, false)(NewHandlerExportLessonCsv(service))
 
 	req, err := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
 	assert.NoError(t, err)
@@ -93,7 +93,7 @@ func TestHandlerExportLessonCsv_unauthorized(t *testing.T) {
 
 	v := NewTokenVerifierMock()
 	r := NewTokenRefresherMock()
-	route := Auth(v, r, false)(NewHandlerExportLessonCsv(service))
+	route := auth(v, r, false)(NewHandlerExportLessonCsv(service))
 
 	req, _ := http.NewRequest(http.MethodGet, ExportLessonCsv, nil)
 

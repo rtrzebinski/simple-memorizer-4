@@ -4,12 +4,12 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
+	bauth "github.com/rtrzebinski/simple-memorizer-4/internal/services/web/backend/auth"
 )
 
-// Auth returns a middleware that authenticates incoming HTTP requests using
+// auth returns a middleware that authenticates incoming HTTP requests using
 // access and refresh tokens stored in HttpOnly cookies.
-func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) http.Handler {
+func auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			ca, err := req.Cookie("access_token")
@@ -78,7 +78,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 				}
 
 				// add user to ctx to be accessed by handlers
-				ctx := auth.ContextWithUser(req.Context(), user)
+				ctx := bauth.ContextWithUser(req.Context(), user)
 				next.ServeHTTP(res, req.WithContext(ctx))
 
 				return
@@ -134,7 +134,7 @@ func Auth(v TokenVerifier, r TokenRefresher, secure bool) func(http.Handler) htt
 			}
 
 			// add user to ctx to be accessed by handlers
-			ctx := auth.ContextWithUser(req.Context(), user)
+			ctx := bauth.ContextWithUser(req.Context(), user)
 			next.ServeHTTP(res, req.WithContext(ctx))
 		})
 	}
