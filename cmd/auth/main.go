@@ -39,7 +39,7 @@ func main() {
 	defer cancel()
 
 	if err := run(ctx); err != nil {
-		slog.Error(err.Error())
+		slog.Error(err.Error(), "service", "auth")
 	}
 }
 
@@ -95,6 +95,14 @@ func run(ctx context.Context) error {
 
 	// register auth service
 	kc := gocloak.NewClient(cfg.Keycloak.URL)
+
+	// ping kc
+	_, err = kc.LoginClient(ctx, cfg.Keycloak.ClientID, cfg.Keycloak.ClientSecret, cfg.Keycloak.Realm)
+	if err != nil {
+		return fmt.Errorf("could not connect to kc: %w", err)
+	}
+	slog.Info("successfully connected to Keycloak")
+
 	server := intgrpc.NewServer(keycloak.NewService(kc, keycloak.Config{
 		Realm:        cfg.Keycloak.Realm,
 		ClientID:     cfg.Keycloak.ClientID,

@@ -66,7 +66,7 @@ func main() {
 	defer cancel()
 
 	if err := run(ctx); err != nil {
-		slog.Error(err.Error())
+		slog.Error(err.Error(), "service", "web")
 	}
 }
 
@@ -160,6 +160,10 @@ func run(ctx context.Context) error {
 	db, err := sql.Open(cfg.Db.Driver, cfg.Db.DSN)
 	if err != nil {
 		return err
+	}
+
+	if err := db.PingContext(ctx); err != nil {
+		return fmt.Errorf("could not connect to db: %w", err)
 	}
 
 	// CloudEvents client
